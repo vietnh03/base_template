@@ -41,6 +41,37 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/logout-all', [AuthController::class, 'logoutAll']); // POST /api/auth/logout-all
     });
 
+    // Admin API Routes
+    Route::prefix('admin')->group(function () {
+        // Product Management
+        Route::prefix('products')->group(function () {
+            Route::get('/', [\App\AppMain\Application\Admin\Product\Controllers\ProductController::class, 'index']);
+            Route::post('/', [\App\AppMain\Application\Admin\Product\Controllers\ProductController::class, 'store']);
+            Route::get('/{id}', [\App\AppMain\Application\Admin\Product\Controllers\ProductController::class, 'show']);
+            Route::put('/{id}', [\App\AppMain\Application\Admin\Product\Controllers\ProductController::class, 'update']);
+            Route::delete('/{id}', [\App\AppMain\Application\Admin\Product\Controllers\ProductController::class, 'destroy']);
+            Route::post('/{id}/images', [\App\AppMain\Application\Admin\Product\Controllers\ProductController::class, 'uploadImage']);
+            Route::put('/{id}/inventory', [\App\AppMain\Application\Admin\Product\Controllers\ProductController::class, 'updateInventory']);
+        });
+
+        // Category Management
+        Route::prefix('categories')->group(function () {
+            Route::get('/', [\App\AppMain\Application\Admin\Category\Controllers\CategoryController::class, 'index']);
+            Route::post('/', [\App\AppMain\Application\Admin\Category\Controllers\CategoryController::class, 'store']);
+            Route::get('/{id}', [\App\AppMain\Application\Admin\Category\Controllers\CategoryController::class, 'show']);
+            Route::put('/{id}', [\App\AppMain\Application\Admin\Category\Controllers\CategoryController::class, 'update']);
+            Route::delete('/{id}', [\App\AppMain\Application\Admin\Category\Controllers\CategoryController::class, 'destroy']);
+        });
+    });
+
+    // Web API Routes
+    Route::prefix('web')->group(function () {
+        Route::prefix('products')->group(function () {
+            Route::get('/', [\App\AppMain\Application\Web\Product\Controllers\ProductController::class, 'index']);
+            Route::get('/{url_key}', [\App\AppMain\Application\Web\Product\Controllers\ProductController::class, 'show']);
+        });
+    });
+
     // Customer Management (for Business/Tenant users)
     Route::prefix('customers')->group(function () {
         Route::get('/', [CustomerController::class, 'index']);           // GET /api/customers

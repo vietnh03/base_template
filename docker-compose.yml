@@ -1,0 +1,48 @@
+services:
+  laravel:
+    image: webdevops/php-nginx:8.4
+    volumes:
+      - .:/app
+    ports:
+      - "8003:80"
+    environment:
+      WEB_DOCUMENT_ROOT: /app/public
+    depends_on:
+      - mysql
+      - redis
+
+  mysql:
+    image: mysql:8.3
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+    ports:
+      - "3308:3306"
+    command: --default-authentication-plugin=mysql_native_password
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    ports:
+      - "8084:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: 123456
+
+  redis:
+    image: redis:6.2-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - /fujimart_redis:/data
+    restart: unless-stopped
+    command: redis-server --requirepass 123456
+
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: 12345678
+    command: server /data --console-address ":9001"
