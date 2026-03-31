@@ -50,4 +50,13 @@ Route::middleware('auth:api')->group(function () {
         Route::patch('/{id}', [CustomerController::class, 'update']);    // PATCH /api/customers/{id}
         Route::delete('/{id}', [CustomerController::class, 'destroy']);  // DELETE /api/customers/{id}
     });
+
+    // Cart and Checkout endpoints
+    Route::prefix('cart')->group(function () {
+        Route::get('/', [\App\AppMain\Application\User\Checkout\Controllers\CartController::class, 'get']);
+        Route::post('/add', [\App\AppMain\Application\User\Checkout\Controllers\CartController::class, 'add']);
+        Route::put('/update/{itemId}', [\App\AppMain\Application\User\Checkout\Controllers\CartController::class, 'update']);
+        Route::delete('/remove/{itemId}', [\App\AppMain\Application\User\Checkout\Controllers\CartController::class, 'remove']);
+        Route::post('/checkout', [\App\AppMain\Application\User\Checkout\Controllers\CartController::class, 'checkout']);
+    });
 });

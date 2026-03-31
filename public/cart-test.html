@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart API Tester</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        :root {
+            --bg: #0f1117;
+            --surface: #1a1d27;
+            --surface2: #22263a;
+            --border: #2e3348;
+            --accent: #10b981;
+            --ah: #34d399;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warn: #f59e0b;
+            --text: #e2e8f0;
+            --muted: #64748b;
+            --code: #111827;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            height: 100vh;
+            overflow: hidden
+        }
+
+        /* sidebar */
+        #sidebar {
+            width: 230px;
+            min-width: 230px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto
+        }
+
+        .logo {
+            padding: 18px 16px 14px;
+            font-size: 14.5px;
+            font-weight: 700;
+            color: var(--accent);
+            border-bottom: 1px solid var(--border)
+        }
+
+        .nav-group {
+            padding: 10px 0 4px 14px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 14px;
+            cursor: pointer;
+            font-size: 13px;
+            border-left: 3px solid transparent;
+            transition: all .15s;
+            color: #94a3b8
+        }
+
+        .nav-item:hover {
+            background: var(--surface2);
+            color: var(--text)
+        }
+
+        .nav-item.active {
+            background: rgba(16, 185, 129, .13);
+            border-left-color: var(--accent);
+            color: var(--accent);
+            font-weight: 500
+        }
+
+        /* main */
+        #main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden
+        }
+
+        .topbar {
+            padding: 12px 22px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--surface)
+        }
+
+        .topbar h1 {
+            font-size: 16px;
+            font-weight: 600
+        }
+
+        .env {
+            margin-left: auto;
+            font-size: 11px;
+            background: rgba(16, 185, 129, .18);
+            color: var(--accent);
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-weight: 500
+        }
+
+        /* split */
+        .split {
+            flex: 1;
+            display: flex;
+            overflow: hidden
+        }
+
+        .left {
+            flex: 1;
+            overflow-y: auto;
+            padding: 18px 20px
+        }
+
+        .right {
+            width: 42%;
+            min-width: 360px;
+            background: var(--surface);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden
+        }
+
+        .right-head {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12.5px;
+            font-weight: 500
+        }
+
+        #response-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            color: #a5b4fc;
+            background: var(--code);
+            line-height: 1.6
+        }
+
+        /* card */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 14px;
+            overflow: hidden
+        }
+
+        .card-head {
+            padding: 10px 14px;
+            background: var(--surface2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+            user-select: none
+        }
+
+        .card-head:hover {
+            background: #272b3f
+        }
+
+        .card-body {
+            padding: 14px;
+            display: none
+        }
+
+        .card-body.open {
+            display: block
+        }
+
+        .chevron {
+            margin-left: auto;
+            transition: transform .2s;
+            font-size: 11px;
+            color: var(--muted)
+        }
+
+        .card-head.open .chevron {
+            transform: rotate(180deg)
+        }
+
+        /* method badge */
+        .mb {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace
+        }
+
+        .get {
+            background: rgba(16, 185, 129, .15);
+            color: #34d399
+        }
+
+        .post {
+            background: rgba(99, 102, 241, .15);
+            color: #818cf8
+        }
+
+        .put {
+            background: rgba(245, 158, 11, .15);
+            color: #fbbf24
+        }
+
+        .del {
+            background: rgba(239, 68, 68, .15);
+            color: #f87171
+        }
+
+        /* status */
+        .sbadge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 9px;
+            border-radius: 100px
+        }
+
+        .s2 {
+            background: rgba(16, 185, 129, .15);
+            color: var(--success)
+        }
+
+        .s4,
+        .s5 {
+            background: rgba(239, 68, 68, .15);
+            color: var(--danger)
+        }
+
+        .sp {
+            background: rgba(100, 116, 139, .15);
+            color: var(--muted)
+        }
+
+        /* form */
+        label {
+            display: block;
+            font-size: 11.5px;
+            color: var(--muted);
+            margin-bottom: 4px;
+            font-weight: 500
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 7px 11px;
+            background: var(--code);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            outline: none;
+            transition: border-color .15s;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            border-color: var(--accent)
+        }
+
+        .fr {
+            margin-bottom: 10px
+        }
+
+        .row {
+            display: flex;
+            gap: 10px
+        }
+
+        .row>.fr {
+            flex: 1
+        }
+
+        /* buttons */
+        .btn {
+            padding: 7px 16px;
+            border: none;
+            border-radius: 7px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px
+        }
+
+        .btn-p {
+            background: var(--accent);
+            color: #fff
+        }
+
+        .btn-p:hover {
+            background: var(--ah)
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px
+        }
+    </style>
+</head>
+
+<body>
+    <nav id="sidebar">
+        <div class="logo">🛒 Cart API Tester</div>
+        <div class="nav-group">Cart Flow</div>
+        <div class="nav-item active" data-t="flow" onclick="switchTab(this,'flow')"><span>📦</span> Cart Actions</div>
+        <div class="nav-item" data-t="auth" onclick="switchTab(this,'auth')"><span>🔑</span> Authentication</div>
+    </nav>
+
+    <div id="main">
+        <div class="topbar">
+            <span style="font-size:17px">🛍️</span>
+            <h1 id="top-title">Cart Actions</h1>
+            <span class="env">localhost · /api/cart</span>
+        </div>
+
+        <div class="split">
+            <div class="left" id="left"></div>
+            <div class="right">
+                <div class="right-head">
+                    <span>Response</span>
+                    <span id="sbadge" class="sbadge sp">—</span>
+                </div>
+                <div id="rb">// Kết quả sẽ hiển thị ở đây...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const B = '/api/cart';
+
+        let token = localStorage.getItem('api_token') || '';
+
+        async function api(method, url, body = null, returnRaw = false) {
+            setStatus('sp', '...');
+            document.getElementById('rb').textContent = '⏳ Đang gọi...';
+
+            const headers = {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            };
+
+            if (token) {
+                headers['Authorization'] = 'Bearer ' + token;
+            }
+
+            const opts = { method, headers };
+            if (body) opts.body = JSON.stringify(body);
+
+            try {
+                const r = await fetch(url, opts);
+                const txt = await r.text();
+                let parsed; try { parsed = JSON.parse(txt); } catch { parsed = txt; }
+                const code = r.status;
+                const cls = code >= 500 ? 's5' : code >= 400 ? 's4' : 's2';
+                setStatus(cls, code + ' ' + r.statusText);
+                document.getElementById('rb').textContent = typeof parsed === 'string' ? parsed : JSON.stringify(parsed, null, 2);
+
+                if (returnRaw) return { ok: code >= 200 && code < 300, data: parsed };
+            } catch (e) {
+                setStatus('s5', 'Network Error');
+                document.getElementById('rb').textContent = '❌ ' + e.message;
+                if (returnRaw) return { ok: false, data: null };
+            }
+        }
+
+        function setStatus(cls, txt) { const el = document.getElementById('sbadge'); el.className = 'sbadge ' + cls; el.textContent = txt; }
+        function v(id) { return document.getElementById(id)?.value?.trim() || ''; }
+
+        function toggle(el) { const b = el.nextElementSibling; el.classList.toggle('open'); b.classList.toggle('open'); }
+
+        function switchTab(el, t) {
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
+            const titles = { flow: 'Cart Actions', auth: 'Authentication' };
+            document.getElementById('top-title').textContent = titles[t];
+            ({ flow: renderFlow, auth: renderAuth })[t]();
+        }
+
+        function card(method, title, body, open = false) {
+            const cls = { GET: 'get', POST: 'post', PUT: 'put', DEL: 'del' }[method];
+            const m = method === 'DEL' ? 'DELETE' : method;
+            const openCls = open ? 'open' : '';
+            return `<div class="card"><div class="card-head ${openCls}" onclick="toggle(this)"><span class="mb ${cls}">` + m + `</span>` + title + `<span class="chevron">▼</span></div><div class="card-body ${openCls}">` + body + `</div></div>`;
+        }
+
+        // ════════════════ AUTH ════════════════
+        function renderAuth() {
+            const left = document.getElementById('left');
+            left.innerHTML = `
+                <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Vì Cart được cấu hình trong Route::middleware('auth:api'), bạn cần khai báo Token để gọi API. Hoặc bạn có thể gọi API Login bên dưới để lấy Token tự động.</div>
+                
+                <div class="card" style="margin-bottom:20px;">
+                    <div class="card-body open" style="display:block;">
+                        <div class="fr"><label>Bearer Token (cho phép bạn copy paste token vào đây)</label>
+                        <input id="f-auth-token" value="` + token + `" onchange="saveToken(this.value)"></div>
+                    </div>
+                </div>
+
+                ` + card('POST', '/api/auth/login', `
+                    <div class="row">
+                        <div class="fr"><label>Email</label><input id="f-login-email" value="admin@example.com"></div>
+                        <div class="fr"><label>Password</label><input id="f-login-pass" value="password" type="password"></div>
+                    </div>
+                    <button class="btn btn-p" onclick="doLogin()">🔑 Login & Lưu Token</button>
+                `, true) + `
+                
+                ` + card('POST', '/api/auth/register', `
+                    <div class="row">
+                        <div class="fr"><label>Name</label><input id="f-reg-name" value="Test Customer"></div>
+                        <div class="fr"><label>Email</label><input id="f-reg-email" value="customer@example.com"></div>
+                    </div>
+                    <div class="row">
+                        <div class="fr"><label>Password</label><input id="f-reg-pass" value="password" type="password"></div>
+                        <div class="fr"><label>Confirm</label><input id="f-reg-pass2" value="password" type="password"></div>
+                    </div>
+                    <button class="btn btn-p" onclick="doRegister()">📝 Register</button>
+                `) + `
+            `;
+        }
+
+        function saveToken(val) {
+            token = val;
+            localStorage.setItem('api_token', token);
+            const el = document.getElementById('f-auth-token');
+            if (el) el.value = token;
+        }
+
+        async function doLogin() {
+            const body = { email: v('f-login-email'), password: v('f-login-pass') };
+            const r = await api('POST', '/api/auth/login', body, true);
+            if (r && r.ok && r.data && r.data.token) {
+                saveToken(r.data.token);
+                alert('Login thành công và Token đã được lưu tự động!');
+            } else if (r && r.ok && r.data && r.data.data && r.data.data.token) {
+                saveToken(r.data.data.token);
+                alert('Login thành công và Token đã được lưu tự động!');
+            }
+        }
+
+        async function doRegister() {
+            const body = { name: v('f-reg-name'), email: v('f-reg-email'), password: v('f-reg-pass'), password_confirmation: v('f-reg-pass2') };
+            const r = await api('POST', '/api/auth/register', body, true);
+            if (r && r.ok && r.data && r.data.token) {
+                saveToken(r.data.token);
+                alert('Đăng ký thành công và Token đã được lưu tự động!');
+            } else if (r && r.ok && r.data && r.data.data && r.data.data.token) {
+                saveToken(r.data.data.token);
+                alert('Đăng ký thành công và Token đã được lưu tự động!');
+            }
+        }
+
+        // ════════════════ CART FLOW ════════════════
+        function renderFlow() {
+            const left = document.getElementById('left');
+            left.innerHTML = `
+  <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Luồng thao tác với Giỏ hàng (Add -> Update -> Remove -> Checkout).</div>
+
+  ` + card('GET', '/', `
+    <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Lấy thông tin giỏ hàng hiện tại đang active của User.</div>
+    <button class="btn btn-p" onclick="api('GET', B)">🛒 Lấy rổ hàng hiện tại</button>
+  `, true) + `
+
+  ` + card('POST', '/add', `
+    <div class="row">
+      <div class="fr"><label>product_id (Cần ID hợp lệ trong DB)</label><input id="f-add-pid" value="1"></div>
+      <div class="fr"><label>quantity</label><input id="f-add-qty" type="number" value="1"></div>
+    </div>
+    <button class="btn btn-p" onclick="addCart()">➕ Thêm vào rổ hàng</button>
+  `) + `
+
+  ` + card('PUT', '/update/{id}', `
+    <div class="row">
+      <div class="fr"><label>Cart Item ID (Trường id của cart_items)</label><input id="f-upd-id" value=""></div>
+      <div class="fr"><label>quantity mới (0 = xoá)</label><input id="f-upd-qty" type="number" value="2"></div>
+    </div>
+    <button class="btn btn-p" onclick="updateCart()">🔄 Cập nhật số lượng</button>
+  `) + `
+
+  ` + card('DEL', '/remove/{id}', `
+    <div class="fr"><label>Cart Item ID (Trường id của cart_items)</label><input id="f-del-id" value=""></div>
+    <button class="btn btn-p" style="background:var(--danger)" onclick="removeCart()">🗑 Xoá item</button>
+  `) + `
+
+  ` + card('POST', '/checkout', `
+    <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Khoá giỏ hàng hiện tại và chuyển toàn bộ dữ liệu Cart -> Order. Hành động này sẽ trả về Order.</div>
+    <button class="btn btn-p" onclick="api('POST', B + '/checkout')">🚀 Chốt đơn (Place Order)</button>
+  `) + `
+  `;
+        }
+
+        async function addCart() {
+            await api('POST', B + '/add', { product_id: parseInt(v('f-add-pid')), quantity: parseInt(v('f-add-qty')) });
+        }
+
+        async function updateCart() {
+            const id = v('f-upd-id');
+            if (!id) return alert("Vui lòng điền Cart Item ID");
+            await api('PUT', B + '/update/' + id, { quantity: parseInt(v('f-upd-qty')) });
+        }
+
+        async function removeCart() {
+            const id = v('f-del-id');
+            if (!id) return alert("Vui lòng điền Cart Item ID");
+            await api('DELETE', B + '/remove/' + id);
+        }
+
+        // Init
+        renderFlow();
+    </script>
+</body>
+
+</html>
