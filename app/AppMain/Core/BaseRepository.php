@@ -57,7 +57,7 @@ abstract class BaseRepository
     /**
      * Update record by ID
      */
-    public function update($id, array $data): bool
+    public function update($id, array $data): mixed
     {
         $record = $this->findOrFail($id);
         return $record->update($data);
@@ -165,6 +165,36 @@ abstract class BaseRepository
     {
         if (isset($filters['per_page']) && is_numeric($filters['per_page'])) {
             return $query->cursorPaginate($filters['per_page']);
+        }
+    }
+
+    /**
+     * Sync a HasMany relation: delete removed items, update existing, create new.
+     * Common utility shared by ProductRepository and AttributeRepository.
+     *
+     * @param \Illuminate\Database\Eloquent\Relations\HasMany $relation
+     * @param array $items     Array of item data; items with 'id' are updated, others are created
+     * @param array $fillable  Columns that may be written
+     */
+    protected function syncHasMany($relation, array $items, array $fillable): void
+    {
+        $existingItems = $relation->get();
+        $itemIds = collect($items)->pluck('id')->filter()->toArray();
+
+        // Delete removed items
+        $existingItems->each(function ($item) use ($itemIds) {
+            if (!empty($item->id) && !in_array($item->id, $itemIds)) {
+                $item->delete();
+            }
+        });
+
+        // Update or Create
+        foreach ($items as $itemData) {
+            if (isset($itemData['id']) && $item = $existingItems->find($itemData['id'])) {
+                $item->update(collect($itemData)->only($fillable)->toArray());
+            } else {
+                $relation->create(collect($itemData)->only($fillable)->toArray());
+            }
         }
     }
 }

@@ -56,7 +56,7 @@ class ProductService
         return $product->load(array_merge(self::RELATION_KEYS, ['flat']));
     }
 
-    public function updateProduct(string $id, ProductDTO $dto)
+    public function updateProduct(string $id, ProductDTO $dto): \App\Models\Product
     {
         $data = $dto->onlyFilled();
         $relations = [];
@@ -68,7 +68,9 @@ class ProductService
             }
         }
 
-        return $this->productRepository->update($id, $data, $relations);
+        $product = $this->productRepository->update($id, $data, $relations);
+
+        return $product->load(array_merge(self::RELATION_KEYS, ['flat']));
     }
 
     public function deleteProduct(string $id): bool

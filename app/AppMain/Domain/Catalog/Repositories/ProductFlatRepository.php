@@ -14,8 +14,11 @@ class ProductFlatRepository extends BaseRepository
 
     public function getWebProductsWithFilters(array $filters)
     {
+        $locale = $filters['locale'] ?? config('app.locale', 'vi');
+
         $query = $this->model->newQuery();
-        $query->where('status', true);
+        $query->where('status', true)
+            ->where('locale', $locale);
 
         if (!empty($filters['category_id'])) {
             $categoryId = $filters['category_id'];

@@ -34,27 +34,39 @@ class ProductRepository extends BaseRepository
     public function create(array $data, array $relations = [])
     {
         return DB::transaction(function () use ($data, $relations) {
-            $product = $this->model->create($data);
+            // Disable observer during create to prevent partial flat-write before EAV is saved.
+            // syncToFlat() is called explicitly after syncRelations().
+            $product = Product::withoutObservers(function () use ($data) {
+                return $this->model->create($data);
+            });
 
             $this->syncRelations($product, $relations);
+
+            // If no attribute_values were provided, still ensure a flat row exists
+            if (!isset($relations['attribute_values'])) {
+                $this->syncToFlat($product);
+            }
 
             return $product;
         });
     }
 
-    public function update($id, array $data, array $relations = []): bool
+    public function update($id, array $data, array $relations = []): Product
     {
         return DB::transaction(function () use ($id, $data, $relations) {
             $product = $this->findById($id);
-            if (!$product) {
-                throw new \Illuminate\Database\Eloquent\ModelNotFoundException();
-            }
 
             $product->update($data);
 
             $this->syncRelations($product, $relations);
 
-            return true;
+            // Nếu không có attribute_values trong relations, vẫn phải sync flat
+            // để đảm bảo các scalar field (sku, status, parent_id, v.v.) được cập nhật
+            if (!isset($relations['attribute_values'])) {
+                $this->syncToFlat($product->fresh());
+            }
+
+            return $product->fresh();
         });
     }
 
@@ -108,27 +120,6 @@ class ProductRepository extends BaseRepository
         }
     }
 
-    protected function syncHasMany($relation, array $items, array $fillable)
-    {
-        $existingItems = $relation->get();
-        $itemIds = collect($items)->pluck('id')->filter()->toArray();
-
-        // Delete removed items
-        $existingItems->each(function ($item) use ($itemIds) {
-            if (!in_array($item->id, $itemIds)) {
-                $item->delete();
-            }
-        });
-
-        // Update or Create
-        foreach ($items as $itemData) {
-            if (isset($itemData['id']) && $item = $existingItems->find($itemData['id'])) {
-                $item->update(collect($itemData)->only($fillable)->toArray());
-            } else {
-                $relation->create(collect($itemData)->only($fillable)->toArray());
-            }
-        }
-    }
 
     protected function saveAttributeValues($product, array $values, ?string $locale = null, $attributes = null)
     {
@@ -169,11 +160,11 @@ class ProductRepository extends BaseRepository
     {
         $defaultLocale = config('app.locale', 'vi');
 
-        $locales = \App\Models\ProductAttributeValue::where('product_id', $product->id)
-            ->pluck('locale')
-            ->unique()
-            ->filter();
+        // Load ALL attribute values for this product in ONE query
+        $allAttributeValues = \App\Models\ProductAttributeValue::where('product_id', $product->id)->get();
 
+        // Determine locales from current rows; default to app locale if none exist
+        $locales = $allAttributeValues->pluck('locale')->unique()->filter();
         if ($locales->isEmpty()) {
             $locales = collect([$defaultLocale]);
         }
@@ -182,13 +173,14 @@ class ProductRepository extends BaseRepository
         $attributeMap = ProductFlat::ATTRIBUTE_MAP;
         $attributes = \App\Models\Attribute::whereIn('code', array_keys($attributeMap))->get()->keyBy('id');
 
+        // Group by locale in memory (null = common / locale-agnostic values)
+        $valuesByLocale = $allAttributeValues->groupBy('locale');
+
         foreach ($locales as $locale) {
-            $attributeValues = \App\Models\ProductAttributeValue::where('product_id', $product->id)
-                ->where(function ($q) use ($locale) {
-                    $q->where('locale', $locale)
-                        ->orWhereNull('locale');
-                })
-                ->get();
+            // Merge locale-specific values on top of common (null locale) values
+            $commonValues = $valuesByLocale->get(null, collect());
+            $localeValues = $valuesByLocale->get($locale, collect());
+            $attributeValues = $commonValues->merge($localeValues);
 
             $flatData = [
                 'sku' => $product->sku,
@@ -208,28 +200,37 @@ class ProductRepository extends BaseRepository
 
             $resolvedLocale = $locale ?? $defaultLocale;
 
-            $flatModel = ProductFlat::updateOrCreate(
+            // Ensure url_key is unique and merge into flatData atomically
+            if (isset($flatData['url_key'])) {
+                $urlKeyService = app(\App\AppMain\Domain\Catalog\Services\ProductUrlKeyService::class);
+                $flatData['url_key'] = $urlKeyService->generateUniqueUrlKey(
+                    $flatData['url_key'],
+                    $resolvedLocale,
+                    $product->id
+                );
+            } else {
+                // Generate url_key from name or sku if the flat row doesn't have one yet
+                $existingFlat = ProductFlat::where('product_id', $product->id)
+                    ->where('locale', $resolvedLocale)
+                    ->first();
+
+                if (!$existingFlat || empty($existingFlat->url_key)) {
+                    $urlKeyService = app(\App\AppMain\Domain\Catalog\Services\ProductUrlKeyService::class);
+                    $name = $flatData['name'] ?? $product->sku;
+                    $flatData['url_key'] = $urlKeyService->generateUniqueUrlKey($name, $resolvedLocale, $product->id);
+                }
+            }
+
+            ProductFlat::updateOrCreate(
                 ['product_id' => $product->id, 'locale' => $resolvedLocale],
                 $flatData
             );
-
-            // Ensure URL Key uniqueness
-            if (empty($flatModel->url_key) || (isset($flatData['url_key']) && $flatData['url_key'] !== $flatModel->url_key)) {
-                $urlKeyService = app(\App\AppMain\Domain\Catalog\Services\ProductUrlKeyService::class);
-                $name = $flatData['name'] ?? $product->sku;
-                $uniqueUrlKey = $urlKeyService->generateUniqueUrlKey($flatData['url_key'] ?? $name, $resolvedLocale, $product->id);
-                $flatModel->update(['url_key' => $uniqueUrlKey]);
-            }
         }
     }
 
     public function delete($id): bool
     {
-        $product = $this->findById($id);
-        if (!$product) {
-            throw new \Illuminate\Database\Eloquent\ModelNotFoundException();
-        }
-        return $product->delete();
+        return $this->findById($id)->delete();
     }
 
     public function getProductsWithFilters($filters = [])

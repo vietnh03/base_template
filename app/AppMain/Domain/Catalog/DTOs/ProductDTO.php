@@ -9,13 +9,14 @@ class ProductDTO extends BaseDTO
     public string $sku;
     public bool $status = true;
     public ?int $parent_id = null;
-    public int $attribute_family_id = 1;
+    public ?int $attribute_family_id = null;
     public ?array $additional = null;
 
     public ?float $weight = null;
     public ?string $thumbnail = null;
     public bool $new = false;
     public bool $featured = false;
+    public bool $visible_individually = true;
 
     // Relationships
     public array $categories = [];

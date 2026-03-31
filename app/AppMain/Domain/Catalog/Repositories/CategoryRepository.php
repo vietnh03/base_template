@@ -3,10 +3,9 @@
 namespace App\AppMain\Domain\Catalog\Repositories;
 
 use App\AppMain\Core\BaseRepository;
+use App\AppMain\Domain\Catalog\Services\CategoryUrlKeyService;
 use App\Models\Category;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class CategoryRepository extends BaseRepository
 {
@@ -35,9 +34,6 @@ class CategoryRepository extends BaseRepository
     {
         return DB::transaction(function () use ($id, $data, $translations) {
             $category = $this->findById($id);
-            if (!$category) {
-                throw new \Illuminate\Database\Eloquent\ModelNotFoundException();
-            }
 
             $category->update($data);
 
@@ -51,45 +47,19 @@ class CategoryRepository extends BaseRepository
 
     protected function saveTranslations($category, array $translations)
     {
+        $urlKeyService = app(CategoryUrlKeyService::class);
+
         foreach ($translations as $locale => $translationData) {
             $category->translations()->updateOrCreate(
                 ['locale' => $locale],
                 array_merge($translationData, [
-                    'url_key' => $this->generateUniqueUrlKey($translationData['url_key'] ?? $translationData['name'], $locale, $category->id),
+                    'url_key' => $urlKeyService->generateUniqueUrlKey(
+                        $translationData['url_key'] ?? $translationData['name'],
+                        $locale,
+                        $category->id
+                    ),
                 ])
             );
-        }
-    }
-
-    protected function generateUniqueUrlKey($name, $locale, $categoryId = null): string
-    {
-        $urlKey = Str::slug($name);
-        $originalUrlKey = $urlKey;
-
-        $lock = Cache::lock("category_url_key_{$locale}_{$originalUrlKey}", 5);
-        $lock->block(5);
-
-        try {
-            $i = 1;
-            while (true) {
-                $query = DB::table('category_translations')
-                    ->where('url_key', $urlKey)
-                    ->where('locale', $locale);
-
-                if ($categoryId) {
-                    $query->where('category_id', '!=', $categoryId);
-                }
-
-                if (!$query->exists()) {
-                    break;
-                }
-
-                $urlKey = $originalUrlKey . '-' . $i++;
-            }
-
-            return $urlKey;
-        } finally {
-            $lock->release();
         }
     }
 

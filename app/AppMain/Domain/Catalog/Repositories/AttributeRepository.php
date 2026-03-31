@@ -32,13 +32,10 @@ class AttributeRepository extends BaseRepository
         });
     }
 
-    public function update($id, array $data, array $options = []): bool
+    public function update($id, array $data, array $options = []): Attribute
     {
         return \DB::transaction(function () use ($id, $data, $options) {
             $attribute = $this->findById($id);
-            if (!$attribute) {
-                throw new \Illuminate\Database\Eloquent\ModelNotFoundException();
-            }
 
             $attribute->update($data);
 
@@ -46,31 +43,10 @@ class AttributeRepository extends BaseRepository
                 $this->syncHasMany($attribute->options(), $options, ['admin_name', 'swatch_value', 'sort_order']);
             }
 
-            return true;
+            return $attribute->load('options');
         });
     }
 
-    protected function syncHasMany($relation, array $items, array $fillable)
-    {
-        $existingItems = $relation->get();
-        $itemIds = collect($items)->pluck('id')->filter()->toArray();
-
-        // Delete removed items
-        $existingItems->each(function ($item) use ($itemIds) {
-            if (!empty($item->id) && !in_array($item->id, $itemIds)) {
-                $item->delete();
-            }
-        });
-
-        // Update or Create
-        foreach ($items as $itemData) {
-            if (isset($itemData['id']) && $item = $existingItems->find($itemData['id'])) {
-                $item->update(collect($itemData)->only($fillable)->toArray());
-            } else {
-                $relation->create(collect($itemData)->only($fillable)->toArray());
-            }
-        }
-    }
 
     public function getAttributesWithFilters($filters = [])
     {

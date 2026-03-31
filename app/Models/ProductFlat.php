@@ -14,11 +14,18 @@ class ProductFlat extends BaseModel
      */
     public const ATTRIBUTE_MAP = [
         'name' => 'name',
+        'short_description' => 'short_description',
         'description' => 'description',
         'url_key' => 'url_key',
         'new' => 'new',
         'featured' => 'featured',
+        'visible_individually' => 'visible_individually',
+        'thumbnail' => 'thumbnail',
         'price' => 'price',
+        'cost_price' => 'cost_price',
+        'special_price' => 'special_price',
+        'special_price_from' => 'special_price_from',
+        'special_price_to' => 'special_price_to',
         'weight' => 'weight',
         'meta_title' => 'meta_title',
         'meta_keywords' => 'meta_keywords',

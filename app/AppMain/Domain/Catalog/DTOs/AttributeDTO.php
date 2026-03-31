@@ -17,13 +17,15 @@ class AttributeDTO extends BaseDTO
 
     public function __construct(array $data)
     {
-        $this->code = $data['code'];
-        $this->admin_name = $data['admin_name'];
-        $this->type = $data['type'];
-        $this->is_required = (bool) ($data['is_required'] ?? false);
-        $this->is_unique = (bool) ($data['is_unique'] ?? false);
-        $this->is_filterable = (bool) ($data['is_filterable'] ?? false);
-        $this->is_configurable = (bool) ($data['is_configurable'] ?? false);
+        // Cast boolean fields before delegating to parent
+        foreach (['is_required', 'is_unique', 'is_filterable', 'is_configurable'] as $boolField) {
+            if (array_key_exists($boolField, $data)) {
+                $data[$boolField] = (bool) $data[$boolField];
+            }
+        }
+
+        parent::__construct($data);
+
         $this->options = $data['options'] ?? [];
     }
 }

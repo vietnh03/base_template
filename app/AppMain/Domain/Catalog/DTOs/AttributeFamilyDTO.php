@@ -13,9 +13,8 @@ class AttributeFamilyDTO extends BaseDTO
 
     public function __construct(array $data)
     {
-        $this->code = $data['code'];
-        $this->name = $data['name'];
-        $this->status = (bool) ($data['status'] ?? true);
+        $data['status'] = (bool) ($data['status'] ?? true);
+        parent::__construct($data);
         $this->groups = $data['groups'] ?? [];
     }
 }
