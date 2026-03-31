@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalog API Tester – Production</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        :root {
+            --bg: #0f1117;
+            --surface: #1a1d27;
+            --surface2: #22263a;
+            --border: #2e3348;
+            --accent: #6366f1;
+            --ah: #818cf8;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warn: #f59e0b;
+            --text: #e2e8f0;
+            --muted: #64748b;
+            --code: #111827;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            height: 100vh;
+            overflow: hidden
+        }
+
+        /* sidebar */
+        #sidebar {
+            width: 230px;
+            min-width: 230px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto
+        }
+
+        .logo {
+            padding: 18px 16px 14px;
+            font-size: 14.5px;
+            font-weight: 700;
+            color: var(--accent);
+            border-bottom: 1px solid var(--border)
+        }
+
+        .nav-group {
+            padding: 10px 0 4px 14px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 14px;
+            cursor: pointer;
+            font-size: 13px;
+            border-left: 3px solid transparent;
+            transition: all .15s;
+            color: #94a3b8
+        }
+
+        .nav-item:hover {
+            background: var(--surface2);
+            color: var(--text)
+        }
+
+        .nav-item.active {
+            background: rgba(99, 102, 241, .13);
+            border-left-color: var(--accent);
+            color: var(--accent);
+            font-weight: 500
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            font-size: 10px;
+            background: rgba(16, 185, 129, .2);
+            color: var(--success);
+            padding: 1px 7px;
+            border-radius: 100px;
+            font-weight: 600
+        }
+
+        /* main */
+        #main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden
+        }
+
+        .topbar {
+            padding: 12px 22px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--surface)
+        }
+
+        .topbar h1 {
+            font-size: 16px;
+            font-weight: 600
+        }
+
+        .env {
+            margin-left: auto;
+            font-size: 11px;
+            background: rgba(99, 102, 241, .18);
+            color: var(--accent);
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-weight: 500
+        }
+
+        /* split */
+        .split {
+            flex: 1;
+            display: flex;
+            overflow: hidden
+        }
+
+        .left {
+            flex: 1;
+            overflow-y: auto;
+            padding: 18px 20px
+        }
+
+        .right {
+            width: 42%;
+            min-width: 360px;
+            background: var(--surface);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden
+        }
+
+        .right-head {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12.5px;
+            font-weight: 500
+        }
+
+        /* state bar */
+        #state-bar {
+            background: var(--surface2);
+            border-bottom: 1px solid var(--border);
+            padding: 8px 14px;
+            font-size: 11.5px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center
+        }
+
+        .state-chip {
+            background: rgba(99, 102, 241, .15);
+            color: var(--ah);
+            padding: 2px 10px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer
+        }
+
+        .state-chip:hover {
+            background: rgba(99, 102, 241, .25)
+        }
+
+        #response-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            color: #a5b4fc;
+            background: var(--code);
+            line-height: 1.6
+        }
+
+        /* card */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 14px;
+            overflow: hidden
+        }
+
+        .card-head {
+            padding: 10px 14px;
+            background: var(--surface2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+            user-select: none
+        }
+
+        .card-head:hover {
+            background: #272b3f
+        }
+
+        .card-body {
+            padding: 14px;
+            display: none
+        }
+
+        .card-body.open {
+            display: block
+        }
+
+        .chevron {
+            margin-left: auto;
+            transition: transform .2s;
+            font-size: 11px;
+            color: var(--muted)
+        }
+
+        .card-head.open .chevron {
+            transform: rotate(180deg)
+        }
+
+        /* method badge */
+        .mb {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace
+        }
+
+        .get {
+            background: rgba(16, 185, 129, .15);
+            color: #34d399
+        }
+
+        .post {
+            background: rgba(99, 102, 241, .15);
+            color: #818cf8
+        }
+
+        .put {
+            background: rgba(245, 158, 11, .15);
+            color: #fbbf24
+        }
+
+        .del {
+            background: rgba(239, 68, 68, .15);
+            color: #f87171
+        }
+
+        /* status */
+        .sbadge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 9px;
+            border-radius: 100px
+        }
+
+        .s2 {
+            background: rgba(16, 185, 129, .15);
+            color: var(--success)
+        }
+
+        .s4 {
+            background: rgba(239, 68, 68, .15);
+            color: var(--danger)
+        }
+
+        .s5 {
+            background: rgba(239, 68, 68, .15);
+            color: var(--danger)
+        }
+
+        .sp {
+            background: rgba(100, 116, 139, .15);
+            color: var(--muted)
+        }
+
+        /* form */
+        label {
+            display: block;
+            font-size: 11.5px;
+            color: var(--muted);
+            margin-bottom: 4px;
+            font-weight: 500
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 7px 11px;
+            background: var(--code);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            outline: none;
+            transition: border-color .15s;
+            resize: vertical
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            border-color: var(--accent)
+        }
+
+        textarea {
+            min-height: 90px
+        }
+
+        .fr {
+            margin-bottom: 10px
+        }
+
+        .row {
+            display: flex;
+            gap: 10px
+        }
+
+        .row>.fr {
+            flex: 1
+        }
+
+        /* buttons */
+        .btn {
+            padding: 7px 16px;
+            border: none;
+            border-radius: 7px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px
+        }
+
+        .btn-p {
+            background: var(--accent);
+            color: #fff
+        }
+
+        .btn-p:hover {
+            background: var(--ah)
+        }
+
+        .btn-d {
+            background: rgba(239, 68, 68, .12);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, .3)
+        }
+
+        .btn-d:hover {
+            background: rgba(239, 68, 68, .22)
+        }
+
+        .btn-s {
+            background: rgba(16, 185, 129, .12);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, .3)
+        }
+
+        .btn-s:hover {
+            background: rgba(16, 185, 129, .22)
+        }
+
+        .btn-sm {
+            padding: 5px 12px;
+            font-size: 12px
+        }
+
+        /* flow */
+        .flow-step {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 12px
+        }
+
+        .flow-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            background: var(--accent);
+            border-radius: 50%;
+            font-size: 11px;
+            font-weight: 700;
+            color: #fff;
+            margin-right: 8px;
+            flex-shrink: 0
+        }
+
+        .flow-title {
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 10px
+        }
+
+        .done {
+            border-color: rgba(16, 185, 129, .4);
+            background: rgba(16, 185, 129, .06)
+        }
+
+        .done .flow-num {
+            background: var(--success)
+        }
+
+        .step-result {
+            font-size: 11.5px;
+            color: var(--success);
+            margin-top: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(16, 185, 129, .08);
+            padding: 5px 9px;
+            border-radius: 5px;
+            display: none
+        }
+
+        .hint {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 3px
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav id="sidebar">
+        <div class="logo">🛍 Catalog API Tester</div>
+        <div class="nav-group">Full Flow</div>
+        <div class="nav-item active" data-t="flow" onclick="switchTab(this,'flow')"><span>🚀</span> Guided Flow</div>
+        <div class="nav-group">Individual</div>
+        <div class="nav-item" data-t="attrs" onclick="switchTab(this,'attrs')"><span>⚙</span> Attributes</div>
+        <div class="nav-item" data-t="fams" onclick="switchTab(this,'fams')"><span>📦</span> Attr Families</div>
+        <div class="nav-item" data-t="tags" onclick="switchTab(this,'tags')"><span>🏷</span> Tags</div>
+        <div class="nav-item" data-t="cats" onclick="switchTab(this,'cats')"><span>📁</span> Categories</div>
+        <div class="nav-item" data-t="prods" onclick="switchTab(this,'prods')"><span>🛒</span> Products</div>
+    </nav>
+
+    <div id="main">
+        <div class="topbar">
+            <span style="font-size:17px">🔬</span>
+            <h1 id="top-title">Guided Flow</h1>
+            <span class="env">localhost · /api/admin/catalog</span>
+        </div>
+
+        <div id="state-bar" style="display:none">
+            <span style="color:var(--muted);font-size:11px">Đã tạo:</span>
+        </div>
+
+        <div class="split">
+            <div class="left" id="left"></div>
+            <div class="right">
+                <div class="right-head">
+                    <span>Response</span>
+                    <span id="sbadge" class="sbadge sp">—</span>
+                </div>
+                <div id="rb">// Kết quả sẽ hiển thị ở đây...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const B = '/api/admin/catalog';
+
+        // ── State (track created IDs) ─────────────────────────────
+        const S = { attrs: {}, famId: null, tagIds: [], catIds: [], prodId: null };
+
+        function saveAttr(id, code) { S.attrs[id] = code; renderStateBar(); }
+        function saveFam(id, name) { S.famId = id; S.famName = name; renderStateBar(); }
+        function saveTag(id, name) { if (!S.tagIds.find(t => t.id === id)) S.tagIds.push({ id, name }); renderStateBar(); }
+        function saveCat(id, name) { if (!S.catIds.find(c => c.id === id)) S.catIds.push({ id, name }); renderStateBar(); }
+        function saveProd(id, sku) { S.prodId = id; S.prodSku = sku; renderStateBar(); }
+
+        function renderStateBar() {
+            const bar = document.getElementById('state-bar');
+            const chips = [];
+            Object.entries(S.attrs).forEach(([id, code]) => chips.push(`attr:${code}=#${id}`));
+            if (S.famId) chips.push(`family=#${S.famId}`);
+            S.tagIds.forEach(t => chips.push(`tag:${t.name}=#${t.id}`));
+            S.catIds.forEach(c => chips.push(`cat:${c.name}=#${c.id}`));
+            if (S.prodId) chips.push(`product:${S.prodSku}=#${S.prodId}`);
+            if (chips.length === 0) { bar.style.display = 'none'; return; }
+            bar.style.display = 'flex';
+            bar.innerHTML = `<span style="color:var(--muted);font-size:11px">Đã tạo:</span>`
+                + chips.map(c => `<span class="state-chip" title="click để copy ID" onclick="copyId(this)">${c}</span>`).join('');
+        }
+
+        function copyId(el) {
+            const m = el.textContent.match(/#(\d+)$/);
+            if (m) { navigator.clipboard.writeText(m[1]); el.style.background = 'rgba(16,185,129,.3)'; setTimeout(() => el.style.background = '', 1000); }
+        }
+
+        // ── HTTP ─────────────────────────────────────────────────
+        async function api(method, url, body = null) {
+            setStatus('sp', '...');
+            document.getElementById('rb').textContent = '⏳ Đang gọi...';
+            const opts = { method, headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' } };
+            if (body) opts.body = JSON.stringify(body);
+            try {
+                const r = await fetch(url, opts);
+                const txt = await r.text();
+                let parsed; try { parsed = JSON.parse(txt); } catch { parsed = txt; }
+                const code = r.status;
+                const cls = code >= 500 ? 's5' : code >= 400 ? 's4' : 's2';
+                setStatus(cls, code + ' ' + r.statusText);
+                document.getElementById('rb').textContent = typeof parsed === 'string' ? parsed : JSON.stringify(parsed, null, 2);
+                return { ok: code >= 200 && code < 300, data: parsed };
+            } catch (e) {
+                setStatus('s5', 'Network Error');
+                document.getElementById('rb').textContent = '❌ ' + e.message;
+                return { ok: false, data: null };
+            }
+        }
+
+        function setStatus(cls, txt) { const el = document.getElementById('sbadge'); el.className = 'sbadge ' + cls; el.textContent = txt; }
+        function v(id) { return document.getElementById(id)?.value?.trim() || ''; }
+        function j(id) { const x = v(id); if (!x) return null; try { return JSON.parse(x); } catch { alert('JSON lỗi: ' + id); throw new Error(); } }
+
+        function toggle(el) { const b = el.nextElementSibling; el.classList.toggle('open'); b.classList.toggle('open'); }
+
+        function switchTab(el, t) {
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
+            const titles = { flow: 'Guided Flow', attrs: 'Attributes', fams: 'Attribute Families', tags: 'Tags', cats: 'Categories', prods: 'Products' };
+            document.getElementById('top-title').textContent = titles[t];
+            ({ flow: renderFlow, attrs: renderAttrs, fams: renderFams, tags: renderTags, cats: renderCats, prods: renderProds })[t]();
+        }
+
+        // ── Card helper ──────────────────────────────────────────
+        function card(method, title, body) {
+            const cls = { GET: 'get', POST: 'post', PUT: 'put', DEL: 'del' }[method];
+            const m = method === 'DEL' ? 'DELETE' : method;
+            return `<div class="card"><div class="card-head" onclick="toggle(this)"><span class="mb ${cls}">${m}</span>${title}<span class="chevron">▼</span></div><div class="card-body">${body}</div></div>`;
+        }
+
+        // ════════════════ FLOW ════════════════
+        function renderFlow() {
+            const left = document.getElementById('left');
+            left.innerHTML = `
+  <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Tạo hoàn chỉnh 1 sản phẩm từ đầu — theo đúng thứ tự phụ thuộc.</div>
+
+  <!-- Step 1: Attributes -->
+  <div class="flow-step" id="fs1">
+    <div class="flow-title"><span class="flow-num">1</span> Tạo Attributes</div>
+    <div class="fr"><label>code</label><input id="f-at-code" value="color"></div>
+    <div class="fr"><label>admin_name</label><input id="f-at-aname" value="Màu sắc"></div>
+    <div class="fr"><label>type</label>
+      <select id="f-at-type">
+        <option>text</option><option>textarea</option><option value="select" selected>select</option>
+        <option>multiselect</option><option>boolean</option><option>integer</option>
+        <option>float</option><option>datetime</option><option>date</option><option>checkbox</option>
+      </select>
+    </div>
+    <div class="row">
+      <div class="fr"><label>is_required</label><select id="f-at-req"><option value="0">0 – Không</option><option value="1">1 – Có</option></select></div>
+      <div class="fr"><label>is_filterable</label><select id="f-at-filt"><option value="0">0 – Không</option><option value="1">1 – Có</option></select></div>
+      <div class="fr"><label>is_configurable</label><select id="f-at-conf"><option value="0">0 – Không</option><option value="1">1 – Có</option></select></div>
+    </div>
+    <div class="fr"><label>options (cho select/multiselect, JSON array)</label>
+      <textarea id="f-at-opts" style="min-height:60px">[{"admin_name":"Đỏ"},{"admin_name":"Xanh"},{"admin_name":"Trắng"}]</textarea>
+    </div>
+    <button class="btn btn-p btn-sm" onclick="flowCreateAttr()">▶ Tạo Attribute</button>
+    <div class="step-result" id="fr1"></div>
+  </div>
+
+  <!-- Step 2: Attribute Family -->
+  <div class="flow-step" id="fs2">
+    <div class="flow-title"><span class="flow-num">2</span> Tạo Attribute Family</div>
+    <div class="row">
+      <div class="fr"><label>code</label><input id="f-fm-code" value="default"></div>
+      <div class="fr"><label>name</label><input id="f-fm-name" value="Mặc định"></div>
+    </div>
+    <div class="fr"><label>groups (JSON – gán attr IDs đã tạo ở bước 1 vào đây)</label>
+      <textarea id="f-fm-grps" style="min-height:110px">[{"name":"Thông tin chung","position":1,"attributes":[]},{"name":"SEO","position":2,"attributes":[]}]</textarea>
+      <div class="hint">💡 Sau khi tạo attribute bước 1, copy ID vào mảng "attributes"</div>
+    </div>
+    <button class="btn btn-p btn-sm" onclick="flowCreateFam()">▶ Tạo Family</button>
+    <div class="step-result" id="fr2"></div>
+  </div>
+
+  <!-- Step 3: Tag -->
+  <div class="flow-step" id="fs3">
+    <div class="flow-title"><span class="flow-num">3</span> Tạo Tag (tuỳ chọn)</div>
+    <div class="fr"><label>translations (JSON)</label>
+      <textarea id="f-tg-tr" style="min-height:60px">[{"name":"Mới về","slug":"moi-ve"},{"name":"Nổi bật","slug":"noi-bat"}]</textarea>
+    </div>
+    <button class="btn btn-p btn-sm" onclick="flowCreateTag()">▶ Tạo Tag</button>
+    <div class="step-result" id="fr3"></div>
+  </div>
+
+  <!-- Step 4: Category -->
+  <div class="flow-step" id="fs4">
+    <div class="flow-title"><span class="flow-num">4</span> Tạo Category</div>
+    <div class="row">
+      <div class="fr"><label>parent_id (null = root)</label><input id="f-ct-pid" placeholder="null"></div>
+      <div class="fr"><label>status</label><select id="f-ct-st"><option value="1">1 – Active</option><option value="0">0 – Inactive</option></select></div>
+      <div class="fr"><label>position</label><input id="f-ct-pos" value="0"></div>
+    </div>
+    <div class="fr"><label>translations (JSON)</label>
+      <textarea id="f-ct-tr">[{"name":"Thời trang nam","slug":"thoi-trang-nam","url_key":"thoi-trang-nam","description":"Danh mục thời trang nam","meta_title":"Thời trang nam","meta_keywords":"thoi trang nam","meta_description":"Quần áo thời trang nam cao cấp"}]</textarea>
+    </div>
+    <button class="btn btn-p btn-sm" onclick="flowCreateCat()">▶ Tạo Category</button>
+    <div class="step-result" id="fr4"></div>
+  </div>
+
+  <!-- Step 5: Product -->
+  <div class="flow-step" id="fs5">
+    <div class="flow-title"><span class="flow-num">5</span> Tạo Product</div>
+    <div class="row">
+      <div class="fr"><label>sku *</label><input id="f-pr-sku" value="PROD-001"></div>
+      <div class="fr"><label>attribute_family_id</label><input id="f-pr-fam" placeholder="← từ bước 2"></div>
+    </div>
+    <div class="row">
+      <div class="fr"><label>weight (kg)</label><input id="f-pr-wt" value="0.5"></div>
+      <div class="fr"><label>cost_price</label><input id="f-pr-cp" value="150000"></div>
+      <div class="fr"><label>status</label><select id="f-pr-st"><option value="1">1 – Active</option><option value="0">0 – Inactive</option></select></div>
+    </div>
+    <div class="row">
+      <div class="fr"><label>new</label><select id="f-pr-new"><option value="0">0 – Không</option><option value="1">1 – Có</option></select></div>
+      <div class="fr"><label>featured</label><select id="f-pr-feat"><option value="0">0 – Không</option><option value="1">1 – Có</option></select></div>
+      <div class="fr"><label>thumbnail</label><input id="f-pr-thumb" placeholder="/img/thumb.jpg"></div>
+    </div>
+    <div class="fr"><label>flat * – keyed by locale code</label>
+      <textarea id="f-pr-flat" style="min-height:130px">{
+  "vi": {
+    "name": "Áo thun nam",
+    "description": "Áo thun nam chất liệu cotton cao cấp",
+    "price": 250000,
+    "url_key": "ao-thun-nam",
+    "meta_title": "Áo thun nam",
+    "meta_keywords": "ao thun nam",
+    "meta_description": "Áo thun nam cotton cao cấp"
+  },
+  "en": {
+    "name": "Men T-Shirt",
+    "description": "Premium cotton men t-shirt",
+    "price": 250000,
+    "url_key": "men-t-shirt",
+    "meta_title": "Men T-Shirt"
+  }
+}</textarea>
+    </div>
+    <div class="row">
+      <div class="fr"><label>categories (IDs từ bước 4)</label><input id="f-pr-cats" placeholder="[1]"></div>
+      <div class="fr"><label>tags (IDs từ bước 3)</label><input id="f-pr-tags" placeholder="[1]"></div>
+    </div>
+    <div class="fr"><label>inventories</label>
+      <textarea id="f-pr-invs" style="min-height:55px">[{"qty":100}]</textarea>
+    </div>
+    <div class="fr"><label>images (tuỳ chọn)</label>
+      <textarea id="f-pr-imgs" style="min-height:55px">[{"path":"/storage/images/ao-thun.jpg","type":"image","position":1}]</textarea>
+    </div>
+    <div class="fr"><label>attribute_values ({"&lt;attr_id&gt;":"value"}) – từ bước 1</label>
+      <textarea id="f-pr-avs" style="min-height:55px">{}</textarea>
+    </div>
+    <button class="btn btn-p btn-sm" onclick="flowCreateProd()">▶ Tạo Product</button>
+    <div class="step-result" id="fr5"></div>
+  </div>
+
+  <!-- Step 6: Verify -->
+  <div class="flow-step" id="fs6">
+    <div class="flow-title"><span class="flow-num">6</span> Verify Product</div>
+    <div class="fr"><label>Product ID (tự điền sau bước 5)</label><input id="f-pr-vid" placeholder="← từ bước 5"></div>
+    <button class="btn btn-s btn-sm" onclick="flowVerifyProd()">🔍 GET Product</button>
+  </div>`;
+        }
+
+        /* Flow actions */
+        async function flowCreateAttr() {
+            const body = {
+                code: v('f-at-code'), admin_name: v('f-at-aname'), type: v('f-at-type'),
+                is_required: parseInt(v('f-at-req')), is_filterable: parseInt(v('f-at-filt')), is_configurable: parseInt(v('f-at-conf'))
+            };
+            const opts = j('f-at-opts'); if (opts) body.options = opts;
+            const r = await api('POST', B + '/attributes', body);
+            if (r.ok && r.data?.data?.id) {
+                const id = r.data.data.id; const code = r.data.data.code;
+                saveAttr(id, code);
+                stepDone('fs1', 'fr1', `✅ Attribute "${code}" tạo thành công – ID: ${id}`);
+                // hint: update family groups textarea
+                tryAutoFillAttrToFamily(id);
+            }
+        }
+
+        function tryAutoFillAttrToFamily(attrId) {
+            const ta = document.getElementById('f-fm-grps');
+            try {
+                const g = JSON.parse(ta.value);
+                if (g[0] && Array.isArray(g[0].attributes) && !g[0].attributes.includes(attrId)) {
+                    g[0].attributes.push(attrId);
+                    ta.value = JSON.stringify(g, null, 2);
+                }
+            } catch { }
+        }
+
+        async function flowCreateFam() {
+            const body = { code: v('f-fm-code'), name: v('f-fm-name'), status: 1 };
+            const grps = j('f-fm-grps'); if (grps) body.groups = grps;
+            const r = await api('POST', B + '/attribute-families', body);
+            if (r.ok && r.data?.data?.id) {
+                const id = r.data.data.id; const name = r.data.data.name;
+                saveFam(id, name);
+                document.getElementById('f-pr-fam').value = id;
+                stepDone('fs2', 'fr2', `✅ Family "${name}" tạo thành công – ID: ${id}`);
+            }
+        }
+
+        async function flowCreateTag() {
+            const body = { translations: j('f-tg-tr') };
+            const r = await api('POST', B + '/tags', body);
+            if (r.ok && r.data?.data?.id) {
+                const id = r.data.data.id;
+                const name = r.data.data.translations?.[0]?.name || 'tag';
+                saveTag(id, name);
+                const tEl = document.getElementById('f-pr-tags');
+                try { const a = JSON.parse(tEl.value || '[]'); if (!a.includes(id)) { a.push(id); tEl.value = JSON.stringify(a); } } catch { tEl.value = '[' + id + ']'; }
+                stepDone('fs3', 'fr3', `✅ Tag "${name}" tạo thành công – ID: ${id}`);
+            }
+        }
+
+        async function flowCreateCat() {
+            const body = { status: parseInt(v('f-ct-st')), position: parseInt(v('f-ct-pos') || 0), translations: j('f-ct-tr') };
+            const pid = v('f-ct-pid'); if (pid) body.parent_id = parseInt(pid);
+            const r = await api('POST', B + '/categories', body);
+            if (r.ok && r.data?.data?.id) {
+                const id = r.data.data.id;
+                const name = r.data.data.translations?.[0]?.name || 'category';
+                saveCat(id, name);
+                const cEl = document.getElementById('f-pr-cats');
+                try { const a = JSON.parse(cEl.value || '[]'); if (!a.includes(id)) { a.push(id); cEl.value = JSON.stringify(a); } } catch { cEl.value = '[' + id + ']'; }
+                stepDone('fs4', 'fr4', `✅ Category "${name}" tạo thành công – ID: ${id}`);
+            }
+        }
+
+        async function flowCreateProd() {
+            const body = {
+                sku: v('f-pr-sku'), status: parseInt(v('f-pr-st')),
+                weight: parseFloat(v('f-pr-wt') || 0), cost_price: parseFloat(v('f-pr-cp') || 0),
+                new: parseInt(v('f-pr-new')), featured: parseInt(v('f-pr-feat')),
+                flat: j('f-pr-flat'),
+                categories: j('f-pr-cats') || [], tags: j('f-pr-tags') || [],
+                inventories: j('f-pr-invs') || [], images: j('f-pr-imgs') || [],
+                attribute_values: j('f-pr-avs') || {}
+            };
+            const fam = v('f-pr-fam'); if (fam) body.attribute_family_id = parseInt(fam);
+            const thumb = v('f-pr-thumb'); if (thumb) body.thumbnail = thumb;
+            const r = await api('POST', B + '/products', body);
+            if (r.ok && r.data?.data?.id) {
+                const id = r.data.data.id; const sku = r.data.data.sku;
+                saveProd(id, sku);
+                document.getElementById('f-pr-vid').value = id;
+                stepDone('fs5', 'fr5', `✅ Product "${sku}" tạo thành công – ID: ${id}`);
+            }
+        }
+
+        async function flowVerifyProd() {
+            await api('GET', B + '/products/' + v('f-pr-vid'));
+        }
+
+        function stepDone(stepId, resultId, msg) {
+            document.getElementById(stepId).classList.add('done');
+            const r = document.getElementById(resultId);
+            r.textContent = msg; r.style.display = 'block';
+        }
+
+        // ════════════════ ATTRS ════════════════
+        function renderAttrs() {
+            const types = ['text', 'textarea', 'boolean', 'integer', 'float', 'select', 'multiselect', 'datetime', 'date', 'checkbox'];
+            const tOpts = types.map(t => `<option>${t}</option>`).join('');
+            document.getElementById('left').innerHTML =
+                card('GET', 'GET All Attributes', `<button class="btn btn-p btn-sm" onclick="api('GET','${B}/attributes')">▶ Gửi</button>`)
+                + card('GET', 'GET Attribute By ID', `<div class="fr"><label>ID</label><input id="at-sid"></div><button class="btn btn-p btn-sm" onclick="api('GET','${B}/attributes/'+v('at-sid'))">▶ Gửi</button>`)
+                + card('POST', 'POST Create Attribute', `
+    <div class="row"><div class="fr"><label>code</label><input id="at-code" placeholder="color"></div><div class="fr"><label>admin_name</label><input id="at-an" placeholder="Màu sắc"></div></div>
+    <div class="row"><div class="fr"><label>type</label><select id="at-type">${tOpts}</select></div><div class="fr"><label>is_required</label><select id="at-req"><option value="0">0</option><option value="1">1</option></select></div><div class="fr"><label>is_filterable</label><select id="at-filt"><option value="0">0</option><option value="1">1</option></select></div><div class="fr"><label>is_configurable</label><select id="at-conf"><option value="0">0</option><option value="1">1</option></select></div></div>
+    <div class="fr"><label>options (select/multiselect)</label><textarea id="at-opts" placeholder='[{"admin_name":"Đỏ"},{"admin_name":"Xanh"}]'></textarea></div>
+    <button class="btn btn-p btn-sm" onclick="doCreateAttr()">▶ Tạo</button>`)
+                + card('PUT', 'PUT Update Attribute', `
+    <div class="row"><div class="fr"><label>ID</label><input id="at-uid"></div><div class="fr"><label>admin_name</label><input id="at-uan"></div><div class="fr"><label>type</label><select id="at-utype">${tOpts}</select></div></div>
+    <button class="btn btn-p btn-sm" onclick="api('PUT','${B}/attributes/'+v('at-uid'),{admin_name:v('at-uan'),type:v('at-utype')})">▶ Cập nhật</button>`)
+                + card('DEL', 'DELETE Attribute', `<div class="fr"><label>ID</label><input id="at-did"></div><button class="btn btn-d btn-sm" onclick="api('DELETE','${B}/attributes/'+v('at-did'))">🗑 Xoá</button>`);
+        }
+        function doCreateAttr() {
+            const body = { code: v('at-code'), admin_name: v('at-an'), type: v('at-type'), is_required: parseInt(v('at-req')), is_filterable: parseInt(v('at-filt')), is_configurable: parseInt(v('at-conf')) };
+            const o = j('at-opts'); if (o) body.options = o;
+            api('POST', B + '/attributes', body);
+        }
+
+        // ════════════════ FAMILIES ════════════════
+        function renderFams() {
+            document.getElementById('left').innerHTML =
+                card('GET', 'GET All Attribute Families', `<button class="btn btn-p btn-sm" onclick="api('GET','${B}/attribute-families')">▶ Gửi</button>`)
+                + card('GET', 'GET Attribute Family By ID', `<div class="fr"><label>ID</label><input id="fm-sid"></div><button class="btn btn-p btn-sm" onclick="api('GET','${B}/attribute-families/'+v('fm-sid'))">▶ Gửi</button>`)
+                + card('POST', 'POST Create Attribute Family', `
+    <div class="row"><div class="fr"><label>code</label><input id="fm-code" value="default"></div><div class="fr"><label>name</label><input id="fm-name" value="Mặc định"></div><div class="fr"><label>status</label><select id="fm-st"><option value="1">1 – Active</option><option value="0">0</option></select></div></div>
+    <div class="fr"><label>groups (JSON – kèm attributes array là IDs, tuỳ chọn)</label>
+      <textarea id="fm-grps">[{"name":"Thông tin chung","position":1,"attributes":[1,2,3]},{"name":"SEO","position":2,"attributes":[4,5]}]</textarea>
+      <div class="hint">attributes là mảng attribute_id đã có trong DB</div>
+    </div>
+    <button class="btn btn-p btn-sm" onclick="doCreateFam()">▶ Tạo</button>`)
+                + card('PUT', 'PUT Update Attribute Family', `
+    <div class="row"><div class="fr"><label>ID</label><input id="fm-uid"></div><div class="fr"><label>name mới</label><input id="fm-uname"></div></div>
+    <div class="fr"><label>groups mới (tuỳ chọn)</label><textarea id="fm-ugrps" placeholder="[...]"></textarea></div>
+    <button class="btn btn-p btn-sm" onclick="doUpdateFam()">▶ Cập nhật</button>`)
+                + card('DEL', 'DELETE Attribute Family', `<div class="fr"><label>ID</label><input id="fm-did"></div><button class="btn btn-d btn-sm" onclick="api('DELETE','${B}/attribute-families/'+v('fm-did'))">🗑 Xoá</button>`);
+        }
+        function doCreateFam() {
+            const body = { code: v('fm-code'), name: v('fm-name'), status: parseInt(v('fm-st')) };
+            const g = j('fm-grps'); if (g) body.groups = g;
+            api('POST', B + '/attribute-families', body);
+        }
+        function doUpdateFam() {
+            const body = { name: v('fm-uname') };
+            const g = j('fm-ugrps'); if (g) body.groups = g;
+            api('PUT', B + '/attribute-families/' + v('fm-uid'), body);
+        }
+
+        // ════════════════ TAGS ════════════════
+        function renderTags() {
+            document.getElementById('left').innerHTML =
+                card('GET', 'GET All Tags', `<button class="btn btn-p btn-sm" onclick="api('GET','${B}/tags')">▶ Gửi</button>`)
+                + card('GET', 'GET Tag By ID', `<div class="fr"><label>ID</label><input id="tg-sid"></div><button class="btn btn-p btn-sm" onclick="api('GET','${B}/tags/'+v('tg-sid'))">▶ Gửi</button>`)
+                + card('POST', 'POST Create Tag', `
+    <div class="fr"><label>translations</label><textarea id="tg-tr">[{"name":"Mới về","slug":"moi-ve"}]</textarea></div>
+    <button class="btn btn-p btn-sm" onclick="api('POST','${B}/tags',{translations:j('tg-tr')})">▶ Tạo</button>`)
+                + card('PUT', 'PUT Update Tag', `
+    <div class="row"><div class="fr"><label>ID</label><input id="tg-uid"></div></div>
+    <div class="fr"><label>translations mới</label><textarea id="tg-utr">[{"name":"Tag mới","slug":"tag-moi"}]</textarea></div>
+    <button class="btn btn-p btn-sm" onclick="api('PUT','${B}/tags/'+v('tg-uid'),{translations:j('tg-utr')})">▶ Cập nhật</button>`)
+                + card('DEL', 'DELETE Tag', `<div class="fr"><label>ID</label><input id="tg-did"></div><button class="btn btn-d btn-sm" onclick="api('DELETE','${B}/tags/'+v('tg-did'))">🗑 Xoá</button>`);
+        }
+
+        // ════════════════ CATEGORIES ════════════════
+        function renderCats() {
+            const sampleTr = `[{"name":"Thời trang nam","slug":"thoi-trang-nam","url_key":"thoi-trang-nam","description":"Mô tả danh mục","meta_title":"Thời trang nam","meta_keywords":"thoi trang nam","meta_description":"Danh mục quần áo nam"}]`;
+            document.getElementById('left').innerHTML =
+                card('GET', 'GET All Categories', `<button class="btn btn-p btn-sm" onclick="api('GET','${B}/categories')">▶ Gửi</button>`)
+                + card('GET', 'GET Category By ID', `<div class="fr"><label>ID</label><input id="ct-sid"></div><button class="btn btn-p btn-sm" onclick="api('GET','${B}/categories/'+v('ct-sid'))">▶ Gửi</button>`)
+                + card('POST', 'POST Create Category', `
+    <div class="row"><div class="fr"><label>parent_id</label><input id="ct-pid" placeholder="null"></div><div class="fr"><label>status</label><select id="ct-st"><option value="1">1</option><option value="0">0</option></select></div><div class="fr"><label>position</label><input id="ct-pos" value="0"></div></div>
+    <div class="fr"><label>translations</label><textarea id="ct-tr">${sampleTr}</textarea></div>
+    <button class="btn btn-p btn-sm" onclick="doCreateCat()">▶ Tạo</button>`)
+                + card('PUT', 'PUT Update Category', `
+    <div class="fr"><label>ID</label><input id="ct-uid"></div>
+    <div class="fr"><label>translations mới</label><textarea id="ct-utr">${sampleTr}</textarea></div>
+    <button class="btn btn-p btn-sm" onclick="api('PUT','${B}/categories/'+v('ct-uid'),{translations:j('ct-utr')})">▶ Cập nhật</button>`)
+                + card('DEL', 'DELETE Category', `<div class="fr"><label>ID</label><input id="ct-did"></div><button class="btn btn-d btn-sm" onclick="api('DELETE','${B}/categories/'+v('ct-did'))">🗑 Xoá</button>`);
+        }
+        function doCreateCat() {
+            const body = { status: parseInt(v('ct-st')), position: parseInt(v('ct-pos') || 0), translations: j('ct-tr') };
+            const pid = v('ct-pid'); if (pid) body.parent_id = parseInt(pid);
+            api('POST', B + '/categories', body);
+        }
+
+        // ════════════════ PRODUCTS ════════════════
+        function renderProds() {
+            const flatSample = `{
+  "vi": {"name":"Áo thun nam","description":"Mô tả","price":250000,"url_key":"ao-thun-nam","meta_title":"Áo thun nam"},
+  "en": {"name":"Men T-Shirt","description":"Description","price":250000,"url_key":"men-t-shirt"}
+}`;
+            document.getElementById('left').innerHTML =
+                card('GET', 'GET All Products', `
+    <div class="row"><div class="fr"><label>page</label><input id="pr-pg" value="1"></div><div class="fr"><label>per_page</label><input id="pr-pp" value="15"></div><div class="fr"><label>search</label><input id="pr-q" placeholder="sku/tên"></div></div>
+    <button class="btn btn-p btn-sm" onclick="listProds()">▶ Gửi</button>`)
+                + card('GET', 'GET Product By ID', `<div class="fr"><label>ID</label><input id="pr-sid"></div><button class="btn btn-p btn-sm" onclick="api('GET','${B}/products/'+v('pr-sid'))">▶ Gửi</button>`)
+                + card('POST', 'POST Create Product', `
+    <div class="row"><div class="fr"><label>sku *</label><input id="pr-sku" value="PROD-001"></div><div class="fr"><label>attribute_family_id</label><input id="pr-fam" placeholder="1"></div></div>
+    <div class="row"><div class="fr"><label>weight</label><input id="pr-wt" value="0.5"></div><div class="fr"><label>cost_price</label><input id="pr-cp" value="150000"></div><div class="fr"><label>status</label><select id="pr-st"><option value="1">1</option><option value="0">0</option></select></div></div>
+    <div class="row"><div class="fr"><label>new</label><select id="pr-new"><option value="0">0</option><option value="1">1</option></select></div><div class="fr"><label>featured</label><select id="pr-feat"><option value="0">0</option><option value="1">1</option></select></div><div class="fr"><label>thumbnail</label><input id="pr-thumb" placeholder="/img/t.jpg"></div></div>
+    <div class="fr"><label>flat * (keyed by locale)</label><textarea id="pr-flat" style="min-height:120px">${flatSample}</textarea></div>
+    <div class="row"><div class="fr"><label>categories (IDs)</label><input id="pr-cats" value="[]"></div><div class="fr"><label>tags (IDs)</label><input id="pr-tags" value="[]"></div></div>
+    <div class="fr"><label>inventories</label><textarea id="pr-invs" style="min-height:50px">[{"qty":100}]</textarea></div>
+    <div class="fr"><label>images (tuỳ chọn)</label><textarea id="pr-imgs" style="min-height:50px">[]</textarea></div>
+    <div class="fr"><label>attribute_values ({"&lt;attr_id&gt;":"value"})</label><textarea id="pr-avs" style="min-height:50px">{}</textarea></div>
+    <button class="btn btn-p btn-sm" onclick="doCreateProd()">▶ Tạo</button>`)
+                + card('PUT', 'PUT Update Product', `
+    <div class="fr"><label>ID</label><input id="pr-uid"></div>
+    <div class="row"><div class="fr"><label>status</label><select id="pr-ust"><option value="1">1</option><option value="0">0</option></select></div><div class="fr"><label>weight</label><input id="pr-uwt" placeholder="0.5"></div><div class="fr"><label>cost_price</label><input id="pr-ucp" placeholder=""></div></div>
+    <div class="fr"><label>flat (tuỳ chọn)</label><textarea id="pr-uflat" style="min-height:100px">${flatSample}</textarea></div>
+    <div class="row"><div class="fr"><label>categories</label><input id="pr-ucats" placeholder="[1,2]"></div><div class="fr"><label>tags</label><input id="pr-utags" placeholder="[1]"></div></div>
+    <div class="fr"><label>attribute_values</label><textarea id="pr-uavs" style="min-height:50px">{}</textarea></div>
+    <button class="btn btn-p btn-sm" onclick="doUpdateProd()">▶ Cập nhật</button>`)
+                + card('DEL', 'DELETE Product', `<div class="fr"><label>ID</label><input id="pr-did"></div><button class="btn btn-d btn-sm" onclick="api('DELETE','${B}/products/'+v('pr-did'))">🗑 Xoá</button>`);
+        }
+
+        function listProds() {
+            const p = new URLSearchParams();
+            if (v('pr-pg')) p.set('page', v('pr-pg'));
+            if (v('pr-pp')) p.set('per_page', v('pr-pp'));
+            if (v('pr-q')) p.set('search', v('pr-q'));
+            api('GET', B + '/products?' + p);
+        }
+
+        function doCreateProd() {
+            const body = {
+                sku: v('pr-sku'), status: parseInt(v('pr-st')), weight: parseFloat(v('pr-wt') || 0),
+                cost_price: parseFloat(v('pr-cp') || 0), new: parseInt(v('pr-new')), featured: parseInt(v('pr-feat')),
+                flat: j('pr-flat'), categories: j('pr-cats') || [], tags: j('pr-tags') || [],
+                inventories: j('pr-invs') || [], images: j('pr-imgs') || [], attribute_values: j('pr-avs') || {}
+            };
+            const fam = v('pr-fam'); if (fam) body.attribute_family_id = parseInt(fam);
+            const th = v('pr-thumb'); if (th) body.thumbnail = th;
+            api('POST', B + '/products', body);
+        }
+
+        function doUpdateProd() {
+            const body = { status: parseInt(v('pr-ust')) };
+            const wt = v('pr-uwt'); if (wt) body.weight = parseFloat(wt);
+            const cp = v('pr-ucp'); if (cp) body.cost_price = parseFloat(cp);
+            const fl = j('pr-uflat'); if (fl) body.flat = fl;
+            const ct = j('pr-ucats'); if (ct) body.categories = ct;
+            const tg = j('pr-utags'); if (tg) body.tags = tg;
+            const av = j('pr-uavs'); if (av && Object.keys(av).length) body.attribute_values = av;
+            api('PUT', B + '/products/' + v('pr-uid'), body);
+        }
+
+        // ── init ─────────────────────────────────────────────────
+        renderFlow();
+    </script>
+</body>
+
+</html>

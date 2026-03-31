@@ -35,6 +35,7 @@ class CatalogAttributeSeeder extends Seeder
 
         $now = now()->toDateTimeString();
 
+        // ── 1. Upsert attributes ──────────────────────────────────────────────
         foreach ($attributes as $attr) {
             DB::table('attributes')->updateOrInsert(
                 ['code' => $attr['code']],
@@ -42,12 +43,70 @@ class CatalogAttributeSeeder extends Seeder
             );
         }
 
-        // Create default attribute family if not present
+        // Reload attribute codes → IDs
+        $attrMap = DB::table('attributes')
+            ->whereIn('code', array_column($attributes, 'code'))
+            ->pluck('id', 'code');
+
+        // ── 2. Attribute Family: default ──────────────────────────────────────
         DB::table('attribute_families')->updateOrInsert(
             ['code' => 'default'],
             ['code' => 'default', 'name' => 'Default', 'status' => true, 'created_at' => $now, 'updated_at' => $now]
         );
+        $familyId = DB::table('attribute_families')->where('code', 'default')->value('id');
 
-        echo "✅ Catalog system attributes seeded.\n";
+        // ── 3. Attribute Groups ───────────────────────────────────────────────
+        $groups = [
+            [
+                'name' => 'General',
+                'position' => 1,
+                'attributes' => ['name', 'short_description', 'description', 'url_key', 'new', 'featured', 'visible_individually', 'thumbnail'],
+            ],
+            [
+                'name' => 'Pricing',
+                'position' => 2,
+                'attributes' => ['price', 'cost_price', 'special_price', 'special_price_from', 'special_price_to', 'weight'],
+            ],
+            [
+                'name' => 'SEO',
+                'position' => 3,
+                'attributes' => ['meta_title', 'meta_keywords', 'meta_description'],
+            ],
+        ];
+
+        foreach ($groups as $groupData) {
+            // Upsert group (by family + name)
+            $existingGroupId = DB::table('attribute_groups')
+                ->where('attribute_family_id', $familyId)
+                ->where('name', $groupData['name'])
+                ->value('id');
+
+            if ($existingGroupId) {
+                DB::table('attribute_groups')
+                    ->where('id', $existingGroupId)
+                    ->update(['position' => $groupData['position'], 'updated_at' => $now]);
+                $groupId = $existingGroupId;
+            } else {
+                $groupId = DB::table('attribute_groups')->insertGetId([
+                    'attribute_family_id' => $familyId,
+                    'name' => $groupData['name'],
+                    'position' => $groupData['position'],
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ]);
+            }
+
+            // ── 4. Attribute Group Mappings ───────────────────────────────────
+            foreach ($groupData['attributes'] as $code) {
+                $attrId = $attrMap[$code] ?? null;
+                if (!$attrId)
+                    continue;
+
+                DB::table('attribute_group_mappings')->updateOrInsert(
+                    ['attribute_group_id' => $groupId, 'attribute_id' => $attrId],
+                    ['attribute_group_id' => $groupId, 'attribute_id' => $attrId]
+                );
+            }
+        }
     }
 }

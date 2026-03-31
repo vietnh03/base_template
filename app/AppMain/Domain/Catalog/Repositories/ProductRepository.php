@@ -49,11 +49,9 @@ class ProductRepository extends BaseRepository
 
             // Disable observer during create to prevent partial flat-write before EAV is saved.
             // syncToFlat() is called explicitly after syncRelations().
-            \Illuminate\Support\Facades\Log::debug("Calling Product::create");
             $product = Product::withoutEvents(function () use ($coreData) {
                 return $this->model->create($coreData);
             });
-            \Illuminate\Support\Facades\Log::debug("Product created with ID: " . ($product->id ?? 'null'));
 
             // If root attributes exist, merge them into relations['attribute_values']['common']
             if (!empty($rootAttributes)) {
@@ -61,7 +59,6 @@ class ProductRepository extends BaseRepository
                     $relations['attribute_values'] = [];
                 }
 
-                \Illuminate\Support\Facades\Log::debug("Resolving root attributes");
                 // We need to resolve attribute IDs from codes for root attributes
                 $attributes = \App\Models\Attribute::whereIn('code', array_keys($rootAttributes))->get()->keyBy('code');
                 foreach ($rootAttributes as $code => $value) {
@@ -72,7 +69,6 @@ class ProductRepository extends BaseRepository
                 }
             }
 
-            \Illuminate\Support\Facades\Log::debug("Calling syncRelations");
             $this->syncRelations($product, $relations);
 
             // If no attribute_values were provided, still ensure a flat row exists
