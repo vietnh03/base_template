@@ -2,6 +2,11 @@
 
 use App\AppMain\Application\Admin\Auth\Controllers\AuthController;
 use App\AppMain\Application\Admin\User\Controllers\UserController;
+use App\AppMain\Application\Admin\Catalog\Controllers\TagController;
+use App\AppMain\Application\Admin\Catalog\Controllers\CategoryController;
+use App\AppMain\Application\Admin\Catalog\Controllers\ProductController;
+use App\AppMain\Application\Admin\Catalog\Controllers\AttributeController;
+use App\AppMain\Application\Admin\Catalog\Controllers\AttributeFamilyController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -44,5 +49,53 @@ Route::middleware('auth:admin')->group(function () {
         Route::put('/{id}', [UserController::class, 'update']);     // PUT /api/admin/users/{id}
         Route::patch('/{id}', [UserController::class, 'update']);   // PATCH /api/admin/users/{id}
         Route::delete('/{id}', [UserController::class, 'destroy']); // DELETE /api/admin/users/{id}
+    });
+});
+
+// Catalog Management (Temporarily PUBLIC for testing)
+Route::prefix('catalog')->group(function () {
+    // Tag Management
+    Route::prefix('tags')->group(function () {
+        Route::get('/', [TagController::class, 'index']);          // GET /api/admin/catalog/tags
+        Route::post('/', [TagController::class, 'store']);         // POST /api/admin/catalog/tags
+        Route::get('/{id}', [TagController::class, 'show']);       // GET /api/admin/catalog/tags/{id}
+        Route::put('/{id}', [TagController::class, 'update']);     // PUT /api/admin/catalog/tags/{id}
+        Route::delete('/{id}', [TagController::class, 'destroy']); // DELETE /api/admin/catalog/tags/{id}
+    });
+
+    // Category Management
+    Route::prefix('categories')->group(function () {
+        Route::get('/', [CategoryController::class, 'index']);          // GET /api/admin/catalog/categories
+        Route::post('/', [CategoryController::class, 'store']);         // POST /api/admin/catalog/categories
+        Route::get('/{id}', [CategoryController::class, 'show']);       // GET /api/admin/catalog/categories/{id}
+        Route::put('/{id}', [CategoryController::class, 'update']);     // PUT /api/admin/catalog/categories/{id}
+        Route::delete('/{id}', [CategoryController::class, 'destroy']); // DELETE /api/admin/catalog/categories/{id}
+    });
+
+    // Product Management
+    Route::prefix('products')->group(function () {
+        Route::get('/', [ProductController::class, 'index']);          // GET /api/admin/catalog/products
+        Route::post('/', [ProductController::class, 'store']);         // POST /api/admin/catalog/products
+        Route::get('/{id}', [ProductController::class, 'show']);       // GET /api/admin/catalog/products/{id}
+        Route::put('/{id}', [ProductController::class, 'update']);     // PUT /api/admin/catalog/products/{id}
+        Route::delete('/{id}', [ProductController::class, 'destroy']); // DELETE /api/admin/catalog/products/{id}
+    });
+
+    // Attribute Management
+    Route::prefix('attributes')->group(function () {
+        Route::get('/', [AttributeController::class, 'index']);          // GET /api/admin/catalog/attributes
+        Route::post('/', [AttributeController::class, 'store']);         // POST /api/admin/catalog/attributes
+        Route::get('/{id}', [AttributeController::class, 'show']);       // GET /api/admin/catalog/attributes/{id}
+        Route::put('/{id}', [AttributeController::class, 'update']);     // PUT /api/admin/catalog/attributes/{id}
+        Route::delete('/{id}', [AttributeController::class, 'destroy']); // DELETE /api/admin/catalog/attributes/{id}
+    });
+
+    // Attribute Family Management
+    Route::prefix('attribute-families')->group(function () {
+        Route::get('/', [AttributeFamilyController::class, 'index']);          // GET /api/admin/catalog/attribute-families
+        Route::post('/', [AttributeFamilyController::class, 'store']);         // POST /api/admin/catalog/attribute-families
+        Route::get('/{id}', [AttributeFamilyController::class, 'show']);       // GET /api/admin/catalog/attribute-families/{id}
+        Route::put('/{id}', [AttributeFamilyController::class, 'update']);     // PUT /api/admin/catalog/attribute-families/{id}
+        Route::delete('/{id}', [AttributeFamilyController::class, 'destroy']); // DELETE /api/admin/catalog/attribute-families/{id}
     });
 });

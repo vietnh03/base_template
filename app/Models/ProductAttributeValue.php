@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\AppMain\Core\BaseModel;
 
-class ProductAttributeValue extends Model
+class ProductAttributeValue extends BaseModel
 {
     public $timestamps = false;
 

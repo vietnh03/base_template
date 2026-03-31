@@ -2,47 +2,36 @@
 
 namespace App\AppMain\Application\Web\Product\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\ProductFlat;
-use Illuminate\Http\JsonResponse;
+use App\AppMain\Core\Controller;
+use App\AppMain\Domain\Catalog\Services\ProductService;
+use App\AppMain\Application\Web\Product\Requests\ProductFilter;
+use App\AppMain\Application\Web\Product\Responses\ProductResponse;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index(Request $request): JsonResponse
+    protected ProductService $productService;
+
+    public function __construct(ProductService $productService)
     {
-        $query = ProductFlat::where('status', true);
-
-        if ($request->has('category_id')) {
-            // In a real app, you'd join with product_categories
-            // but for simplicity with flat table, we might need category_ids in flat
-            // or just query the Product model.
-            // Let's stick to simple status for now.
-        }
-
-        if ($request->has('featured')) {
-            $query->where('featured', true);
-        }
-
-        if ($request->has('new')) {
-            $query->where('new', true);
-        }
-
-        $products = $query->paginate($request->get('items_per_page', 12));
-
-        return response()->json($products);
+        $this->productService = $productService;
     }
 
-    public function show(string $urlKey): JsonResponse
+    public function index(Request $request)
     {
-        $product = ProductFlat::where('url_key', $urlKey)
-            ->where('status', true)
-            ->first();
+        return $this->baseAction(function () use ($request) {
+            $filter = ProductFilter::fromRequest($request);
+            $request->validate($filter->validate());
+            $products = $this->productService->getWebProductsWithFilters($filter->toArray());
+            return ProductResponse::paginated($products);
+        }, 'Products retrieved successfully');
+    }
 
-        if (!$product) {
-            return response()->json(['message' => 'Product not found'], 404);
-        }
-
-        return response()->json($product);
+    public function show(string $urlKey)
+    {
+        return $this->baseAction(function () use ($urlKey) {
+            $product = $this->productService->findWebProductByUrlKey($urlKey);
+            return ProductResponse::single($product);
+        }, 'Product retrieved successfully');
     }
 }

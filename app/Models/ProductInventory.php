@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\AppMain\Core\BaseModel;
 
-class ProductInventory extends Model
+class ProductInventory extends BaseModel
 {
     public $timestamps = false;
 

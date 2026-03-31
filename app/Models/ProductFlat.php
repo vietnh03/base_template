@@ -2,15 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\AppMain\Core\BaseModel;
 
-class ProductFlat extends Model
+class ProductFlat extends BaseModel
 {
     protected $table = 'product_flat';
 
     protected $fillable = [
         'sku',
+        'type',
+        'product_number',
         'name',
+        'short_description',
         'description',
         'url_key',
         'new',
@@ -19,10 +22,15 @@ class ProductFlat extends Model
         'thumbnail',
         'price',
         'cost_price',
+        'special_price',
+        'special_price_from',
+        'special_price_to',
         'weight',
         'product_id',
         'parent_id',
+        'attribute_family_id',
         'locale',
+        'visible_individually',
         'meta_title',
         'meta_keywords',
         'meta_description',
@@ -32,8 +40,12 @@ class ProductFlat extends Model
         'new' => 'boolean',
         'featured' => 'boolean',
         'status' => 'boolean',
+        'visible_individually' => 'boolean',
         'price' => 'decimal:2',
         'cost_price' => 'decimal:2',
+        'special_price' => 'decimal:2',
+        'special_price_from' => 'date',
+        'special_price_to' => 'date',
         'weight' => 'decimal:2',
     ];
 }

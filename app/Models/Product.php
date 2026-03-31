@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\AppMain\Core\BaseModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class Product extends Model
+class Product extends BaseModel
 {
     protected $fillable = [
         'sku',
@@ -17,7 +17,6 @@ class Product extends Model
         'parent_id',
         'attribute_family_id',
         'additional',
-        'cost_price',
     ];
 
     protected $casts = [
@@ -68,5 +67,20 @@ class Product extends Model
     public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class, 'product_tags');
+    }
+
+    public function up_sells(): BelongsToMany
+    {
+        return $this->belongsToMany(self::class, 'product_up_sells', 'parent_id', 'child_id');
+    }
+
+    public function cross_sells(): BelongsToMany
+    {
+        return $this->belongsToMany(self::class, 'product_cross_sells', 'parent_id', 'child_id');
+    }
+
+    public function super_attributes(): BelongsToMany
+    {
+        return $this->belongsToMany(Attribute::class, 'product_super_attributes');
     }
 }

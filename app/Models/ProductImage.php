@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\AppMain\Core\BaseModel;
 
-class ProductImage extends Model
+class ProductImage extends BaseModel
 {
     public $timestamps = false;
 
@@ -14,4 +14,11 @@ class ProductImage extends Model
         'type',
         'position',
     ];
+
+    protected static function booted()
+    {
+        static::deleting(function ($image) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($image->path);
+        });
+    }
 }

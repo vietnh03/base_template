@@ -1,18 +1,18 @@
-<?php
+use App\AppMain\Core\BaseModel;
 
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Model;
-
-class CategoryTranslation extends Model
+class CategoryTranslation extends BaseModel
 {
-    public $timestamps = false;
+public $timestamps = false;
 
-    protected $fillable = [
-        'category_id',
-        'locale',
-        'name',
-        'slug',
-        'description',
-    ];
+protected $fillable = [
+'category_id',
+'locale',
+'name',
+'slug',
+'description',
+'url_key',
+'meta_title',
+'meta_keywords',
+'meta_description',
+];
 }

@@ -24,7 +24,8 @@ abstract class BaseRepository
 
     abstract public function getModel();
 
-    public function newQuery() {
+    public function newQuery()
+    {
         $newQuery = $this->model->getQuery();
         return $newQuery;
     }
@@ -34,7 +35,15 @@ abstract class BaseRepository
      */
     public function findById($id)
     {
-        return $this->model->find($id);
+        return $this->model->findOrFail($id);
+    }
+
+    /**
+     * Find record by ID or throw exception
+     */
+    public function findOrFail($id)
+    {
+        return $this->model->findOrFail($id);
     }
 
     /**
@@ -50,10 +59,7 @@ abstract class BaseRepository
      */
     public function update($id, array $data): bool
     {
-        $record = $this->findById($id);
-        if (!$record) {
-            return false;
-        }
+        $record = $this->findOrFail($id);
         return $record->update($data);
     }
 
@@ -62,10 +68,7 @@ abstract class BaseRepository
      */
     public function delete($id): bool
     {
-        $record = $this->findById($id);
-        if (!$record) {
-            return false;
-        }
+        $record = $this->findOrFail($id);
         return $record->delete();
     }
 
@@ -81,7 +84,7 @@ abstract class BaseRepository
         }
     }
 
-     /**
+    /**
      * Apply LIKE search filters to query
      */
     protected function applyLikeFilters(Builder $query, array $filters): void
@@ -138,7 +141,7 @@ abstract class BaseRepository
         }
     }
 
-    protected function applySortingFilter(Builder $query, $filters=[]): void
+    protected function applySortingFilter(Builder $query, $filters = []): void
     {
         $sortBy = $filters['sort_by'] ?? null;
         $sortDirection = $filters['sort_direction'] ?? 'asc';
@@ -148,19 +151,19 @@ abstract class BaseRepository
     /**
      * Apply pagination ?per_page&page= to query
      */
-    protected function applyPagination(Builder $query, $filters=[])
+    protected function applyPagination(Builder $query, $filters = [])
     {
-         if (isset($filters['per_page']) && is_numeric($filters['per_page'])) {
-            return $query->paginate((int)$filters['per_page']);
+        if (isset($filters['per_page']) && is_numeric($filters['per_page'])) {
+            return $query->paginate((int) $filters['per_page']);
         }
     }
 
     /**
      * Apply pagination by cursor ?per_page&cursor= to query
      */
-    protected function applyCursorPagination(Builder $query, $filters=[])
+    protected function applyCursorPagination(Builder $query, $filters = [])
     {
-         if (isset($filters['per_page']) && is_numeric($filters['per_page'])) {
+        if (isset($filters['per_page']) && is_numeric($filters['per_page'])) {
             return $query->cursorPaginate($filters['per_page']);
         }
     }

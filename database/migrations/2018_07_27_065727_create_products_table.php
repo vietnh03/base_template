@@ -17,7 +17,6 @@ return new class extends Migration {
             $table->string('sku')->unique();
             $table->string('type');
             $table->boolean('status')->default(0);
-            $table->decimal('cost_price', 12, 4)->nullable();
             $table->integer('parent_id')->unsigned()->nullable();
             $table->integer('attribute_family_id')->unsigned()->nullable();
             $table->json('additional')->nullable();

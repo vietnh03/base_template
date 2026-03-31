@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\AppMain\Core\BaseModel;
 
-class AttributeOption extends Model
+class AttributeOption extends BaseModel
 {
     public $timestamps = false;
 
     protected $fillable = [
         'attribute_id',
         'admin_name',
+        'swatch_value',
         'sort_order',
     ];
 }

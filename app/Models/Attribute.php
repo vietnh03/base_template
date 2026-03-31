@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\AppMain\Core\BaseModel;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Attribute extends Model
+class Attribute extends BaseModel
 {
     protected $fillable = [
         'code',
