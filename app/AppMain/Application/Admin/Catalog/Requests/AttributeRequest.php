@@ -20,7 +20,7 @@ class AttributeRequest extends BaseFormRequest
                 Rule::unique('attributes', 'code')->ignore($id)
             ],
             'admin_name' => 'required|string|max:255',
-            'type' => 'required|string|in:text,textarea,boolean,integer,select,multiselect,datetime,date,checkbox',
+            'type' => 'required|string|in:text,textarea,boolean,integer,float,select,multiselect,datetime,date,checkbox',
             'is_required' => 'boolean',
             'is_unique' => 'boolean',
             'is_filterable' => 'boolean',

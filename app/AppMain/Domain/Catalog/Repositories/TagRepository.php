@@ -74,4 +74,21 @@ class TagRepository extends BaseRepository
 
         return $this->applyPagination($query, $filters) ?? $query->paginate($filters['per_page'] ?? 15);
     }
+
+    public function delete($id): bool
+    {
+        $tag = $this->findById($id);
+
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($tag) {
+            // Delete translations
+            $tag->translations()->delete();
+
+            // Detach from products in pivot table
+            if (method_exists($tag, 'products')) {
+                $tag->products()->detach();
+            }
+
+            return $tag->delete();
+        });
+    }
 }

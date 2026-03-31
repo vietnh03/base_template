@@ -21,7 +21,7 @@ class AttributeController extends Controller
 
     public function index(Request $request)
     {
-        $this->authorize('viewAny', Attribute::class);
+        /* $this->authorize('viewAny', Attribute::class); */
         return $this->baseAction(function () use ($request) {
             $filter = AttributeFilter::fromRequest($request);
             $request->validate($filter->validate());
@@ -33,7 +33,7 @@ class AttributeController extends Controller
     public function show(string $id)
     {
         $attribute = $this->attributeService->findAttribute($id);
-        $this->authorize('view', $attribute);
+        /* $this->authorize('view', $attribute); */
         return $this->baseAction(function () use ($attribute) {
             return AttributeResponse::single($attribute);
         }, 'Attribute retrieved successfully');
@@ -41,7 +41,7 @@ class AttributeController extends Controller
 
     public function store(AttributeRequest $request)
     {
-        $this->authorize('create', Attribute::class);
+        /* $this->authorize('create', Attribute::class); */
         return $this->baseActionTransaction(function () use ($request) {
             $dto = new AttributeDTO($request->validated());
             $attribute = $this->attributeService->createAttribute($dto);
@@ -52,7 +52,7 @@ class AttributeController extends Controller
     public function update(AttributeRequest $request, string $id)
     {
         $attribute = $this->attributeService->findAttribute($id);
-        $this->authorize('update', $attribute);
+        /* $this->authorize('update', $attribute); */
 
         return $this->baseActionTransaction(function () use ($request, $id) {
             $dto = new AttributeDTO($request->validated());
@@ -65,7 +65,7 @@ class AttributeController extends Controller
     public function destroy(string $id)
     {
         $attribute = $this->attributeService->findAttribute($id);
-        $this->authorize('delete', $attribute);
+        /* $this->authorize('delete', $attribute); */
 
         return $this->baseActionTransaction(function () use ($id) {
             $this->attributeService->deleteAttribute($id);

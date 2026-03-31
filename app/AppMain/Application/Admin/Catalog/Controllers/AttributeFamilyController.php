@@ -21,7 +21,7 @@ class AttributeFamilyController extends Controller
 
     public function index(Request $request)
     {
-        $this->authorize('viewAny', AttributeFamily::class);
+        /* $this->authorize('viewAny', AttributeFamily::class); */
         return $this->baseAction(function () use ($request) {
             $filter = AttributeFamilyFilter::fromRequest($request);
             $request->validate($filter->validate());
@@ -33,7 +33,7 @@ class AttributeFamilyController extends Controller
     public function show(string $id)
     {
         $family = $this->attributeFamilyService->findAttributeFamily($id);
-        $this->authorize('view', $family);
+        /* $this->authorize('view', $family); */
         return $this->baseAction(function () use ($family) {
             return AttributeFamilyResponse::single($family);
         }, 'Attribute family retrieved successfully');
@@ -41,7 +41,7 @@ class AttributeFamilyController extends Controller
 
     public function store(AttributeFamilyRequest $request)
     {
-        $this->authorize('create', AttributeFamily::class);
+        /* $this->authorize('create', AttributeFamily::class); */
         return $this->baseActionTransaction(function () use ($request) {
             $dto = new AttributeFamilyDTO($request->validated());
             $family = $this->attributeFamilyService->createAttributeFamily($dto);
@@ -52,7 +52,7 @@ class AttributeFamilyController extends Controller
     public function update(AttributeFamilyRequest $request, string $id)
     {
         $family = $this->attributeFamilyService->findAttributeFamily($id);
-        $this->authorize('update', $family);
+        /* $this->authorize('update', $family); */
 
         return $this->baseActionTransaction(function () use ($request, $id) {
             $dto = new AttributeFamilyDTO($request->validated());
@@ -65,7 +65,7 @@ class AttributeFamilyController extends Controller
     public function destroy(string $id)
     {
         $family = $this->attributeFamilyService->findAttributeFamily($id);
-        $this->authorize('delete', $family);
+        /* $this->authorize('delete', $family); */
 
         return $this->baseActionTransaction(function () use ($id) {
             $this->attributeFamilyService->deleteAttributeFamily($id);

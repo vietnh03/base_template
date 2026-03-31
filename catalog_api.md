@@ -62,6 +62,7 @@ Dưới đây là danh sách các API cho module **Catalog** cùng với dữ li
     "thumbnail": "products/macbook-pro.jpg",
     "new": true,
     "featured": true,
+    "visible_individually": true,
     "flat": {
         "en": {
             "name": "MacBook Pro M3",
@@ -90,13 +91,17 @@ Dưới đây là danh sách các API cho module **Catalog** cùng với dữ li
     "images": [
         {
             "path": "products/gallery/img1.jpg",
+            "type": "image",
             "position": 1
         }
     ],
     "attribute_values": {
         "color": "Silver",
         "storage": "512GB"
-    }
+    },
+    "up_sells": [],
+    "cross_sells": [],
+    "super_attributes": []
 }
 ```
 
@@ -146,7 +151,7 @@ Dưới đây là danh sách các API cho module **Catalog** cùng với dữ li
     "code": "default_family",
     "name": "Default",
     "status": true,
-    "attributes": [1, 2, 3] 
+    "groups": [1, 2, 3]
 }
 ```
 

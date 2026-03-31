@@ -62,4 +62,19 @@ class AttributeRepository extends BaseRepository
 
         return $this->applyPagination($query, $filters) ?? $query->paginate($filters['per_page'] ?? 15);
     }
+
+    public function delete($id): bool
+    {
+        $attribute = $this->findById($id);
+
+        return \DB::transaction(function () use ($attribute) {
+            // Delete attribute options
+            $attribute->options()->delete();
+
+            // Delete product attribute values associated with this attribute
+            \App\Models\ProductAttributeValue::where('attribute_id', $attribute->id)->delete();
+
+            return $attribute->delete();
+        });
+    }
 }

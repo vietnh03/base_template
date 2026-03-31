@@ -27,20 +27,11 @@ class Product extends BaseModel
         'parent_id',
         'attribute_family_id',
         'additional',
-        'weight',
-        'thumbnail',
-        'new',
-        'featured',
-        'visible_individually',
     ];
 
     protected $casts = [
         'status' => 'boolean',
         'additional' => 'json',
-        'weight' => 'float',
-        'new' => 'boolean',
-        'featured' => 'boolean',
-        'visible_individually' => 'boolean',
     ];
 
     public function categories(): BelongsToMany

@@ -34,12 +34,45 @@ class ProductRepository extends BaseRepository
     public function create(array $data, array $relations = [])
     {
         return DB::transaction(function () use ($data, $relations) {
+            // Extract root-level attributes that should be handled as EAV
+            $attributeMap = ProductFlat::ATTRIBUTE_MAP;
+            $rootAttributes = [];
+            foreach ($attributeMap as $code => $column) {
+                if (isset($data[$code])) {
+                    $rootAttributes[$code] = $data[$code];
+                }
+            }
+
+            // Filter out non-Product columns from $data
+            $productColumns = ['sku', 'status', 'parent_id', 'attribute_family_id', 'additional', 'cost_price', 'weight', 'thumbnail', 'new', 'featured', 'visible_individually', 'created_at', 'updated_at'];
+            $coreData = array_intersect_key($data, array_flip($productColumns));
+
             // Disable observer during create to prevent partial flat-write before EAV is saved.
             // syncToFlat() is called explicitly after syncRelations().
-            $product = Product::withoutObservers(function () use ($data) {
-                return $this->model->create($data);
+            \Illuminate\Support\Facades\Log::debug("Calling Product::create");
+            $product = Product::withoutEvents(function () use ($coreData) {
+                return $this->model->create($coreData);
             });
+            \Illuminate\Support\Facades\Log::debug("Product created with ID: " . ($product->id ?? 'null'));
 
+            // If root attributes exist, merge them into relations['attribute_values']['common']
+            if (!empty($rootAttributes)) {
+                if (!isset($relations['attribute_values'])) {
+                    $relations['attribute_values'] = [];
+                }
+
+                \Illuminate\Support\Facades\Log::debug("Resolving root attributes");
+                // We need to resolve attribute IDs from codes for root attributes
+                $attributes = \App\Models\Attribute::whereIn('code', array_keys($rootAttributes))->get()->keyBy('code');
+                foreach ($rootAttributes as $code => $value) {
+                    $attribute = $attributes->get($code);
+                    if ($attribute) {
+                        $relations['attribute_values']['common'][$attribute->id] = $value;
+                    }
+                }
+            }
+
+            \Illuminate\Support\Facades\Log::debug("Calling syncRelations");
             $this->syncRelations($product, $relations);
 
             // If no attribute_values were provided, still ensure a flat row exists
@@ -56,9 +89,37 @@ class ProductRepository extends BaseRepository
         return DB::transaction(function () use ($id, $data, $relations) {
             $product = $this->findById($id);
 
-            $product->update($data);
+            // Extract root-level attributes
+            $attributeMap = ProductFlat::ATTRIBUTE_MAP;
+            $rootAttributes = [];
+            foreach ($attributeMap as $code => $column) {
+                if (isset($data[$code])) {
+                    $rootAttributes[$code] = $data[$code];
+                }
+            }
 
-            $this->syncRelations($product, $relations);
+            // Filter out non-Product columns from $data
+            $productColumns = ['sku', 'status', 'parent_id', 'attribute_family_id', 'additional', 'cost_price', 'weight', 'thumbnail', 'new', 'featured', 'visible_individually', 'updated_at'];
+            $coreData = array_intersect_key($data, array_flip($productColumns));
+
+            $product->update($coreData);
+
+            // If root attributes exist, merge them into relations['attribute_values']['common']
+            if (!empty($rootAttributes)) {
+                if (!isset($relations['attribute_values'])) {
+                    $relations['attribute_values'] = [];
+                }
+
+                $attributes = \App\Models\Attribute::whereIn('code', array_keys($rootAttributes))->get()->keyBy('code');
+                foreach ($rootAttributes as $code => $value) {
+                    $attribute = $attributes->get($code);
+                    if ($attribute) {
+                        $relations['attribute_values']['common'][$attribute->id] = $value;
+                    }
+                }
+            }
+
+            $this->syncRelations($product->fresh(), $relations);
 
             // Nếu không có attribute_values trong relations, vẫn phải sync flat
             // để đảm bảo các scalar field (sku, status, parent_id, v.v.) được cập nhật
@@ -89,17 +150,66 @@ class ProductRepository extends BaseRepository
         }
 
         if (isset($relations['attribute_values'])) {
-            $allAttributeIds = [];
-            foreach ($relations['attribute_values'] as $values) {
-                $allAttributeIds = array_merge($allAttributeIds, array_keys($values));
-            }
-            $attributes = \App\Models\Attribute::whereIn('id', array_unique($allAttributeIds))->get()->keyBy('id');
+            $attributeValues = $relations['attribute_values'];
 
-            foreach ($relations['attribute_values'] as $locale => $values) {
-                if ($locale === 'common') {
-                    $this->saveAttributeValues($product, $values, null, $attributes);
-                } else {
-                    $this->saveAttributeValues($product, $values, $locale, $attributes);
+            // Check if it's a flat format (codes/labels) or nested (locales -> IDs)
+            // If the first item of the array IS NOT an array, it's likely flat format ['code' => 'value']
+            $isFlat = false;
+            foreach ($attributeValues as $key => $val) {
+                if (!is_array($val)) {
+                    $isFlat = true;
+                    break;
+                }
+            }
+
+            if ($isFlat) {
+                // Normalize flat format to ['common' => [code => value]]
+                $attributeValues = ['common' => $attributeValues];
+            }
+
+            $allCodesOrIds = [];
+            foreach ($attributeValues as $locale => $values) {
+                $allCodesOrIds = array_merge($allCodesOrIds, array_keys($values));
+            }
+
+            // Resolve attributes by ID or Code
+            $resolvedAttributes = \App\Models\Attribute::whereIn('id', $allCodesOrIds)
+                ->orWhereIn('code', $allCodesOrIds)
+                ->get();
+
+            $attributeMap = [];
+            foreach ($resolvedAttributes as $attr) {
+                $attributeMap[$attr->id] = $attr;
+                $attributeMap[$attr->code] = $attr;
+            }
+            $attributes = collect($attributeMap);
+
+            $normalizedAttributeValues = [];
+
+            foreach ($attributeValues as $locale => $values) {
+                $localeKey = ($locale === 'common' || empty($locale)) ? null : $locale;
+                $normalizedValues = [];
+
+                foreach ($values as $codeOrId => $value) {
+                    $attribute = $attributes->get($codeOrId);
+                    if (!$attribute)
+                        continue;
+
+                    // Resolve option label to ID for select/multiselect if value is string and not numeric
+                    if (in_array($attribute->type, ['select', 'multiselect']) && is_string($value) && !is_numeric($value)) {
+                        $option = \App\Models\AttributeOption::where('attribute_id', $attribute->id)
+                            ->where('admin_name', $value)
+                            ->first();
+                        if ($option) {
+                            $value = $option->id;
+                        }
+                    }
+
+                    $normalizedValues[$attribute->id] = $value;
+                }
+
+                if (!empty($normalizedValues)) {
+                    $this->saveAttributeValues($product, $normalizedValues, $localeKey, $attributes);
                 }
             }
 
@@ -137,8 +247,15 @@ class ProductRepository extends BaseRepository
 
             $upsertData[] = [
                 'product_id' => $product->id,
-                'attribute_id' => $attrId,
+                'attribute_id' => $attribute->id, // Use resolved ID
                 'locale' => $locale,
+                'text_value' => null,
+                'boolean_value' => null,
+                'integer_value' => null,
+                'float_value' => null,
+                'datetime_value' => null,
+                'date_value' => null,
+                'json_value' => null,
                 $column => $value
             ];
         }
@@ -230,7 +347,33 @@ class ProductRepository extends BaseRepository
 
     public function delete($id): bool
     {
-        return $this->findById($id)->delete();
+        $product = $this->findById($id);
+
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($product) {
+            // Delete EAV attribute values
+            $product->attribute_values()->delete();
+
+            // Delete flat table entries
+            $product->flat()->delete();
+
+            // Detach from pivot tables
+            $product->categories()->detach();
+            $product->tags()->detach();
+            $product->up_sells()->detach();
+            $product->cross_sells()->detach();
+            $product->super_attributes()->detach();
+
+            // Delete associated images and inventories
+            $product->images()->delete();
+            $product->inventories()->delete();
+
+            // Delete product's children if any (for configurable products)
+            foreach ($product->children as $child) {
+                $this->delete($child->id);
+            }
+
+            return $product->delete();
+        });
     }
 
     public function getProductsWithFilters($filters = [])

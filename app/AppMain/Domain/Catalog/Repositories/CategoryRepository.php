@@ -81,4 +81,21 @@ class CategoryRepository extends BaseRepository
 
         return $this->applyPagination($query, $filters) ?? $query->paginate($filters['per_page'] ?? 15);
     }
+
+    public function delete($id): bool
+    {
+        $category = $this->findById($id);
+
+        return DB::transaction(function () use ($category) {
+            // Delete translations
+            $category->translations()->delete();
+
+            // Detach from products in pivot table
+            if (method_exists($category, 'products')) {
+                $category->products()->detach();
+            }
+
+            return $category->delete();
+        });
+    }
 }

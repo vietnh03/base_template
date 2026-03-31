@@ -27,6 +27,7 @@ class ProductDTO extends BaseDTO
     public array $up_sells = [];
     public array $cross_sells = [];
     public array $super_attributes = [];
+    public ?array $flat = null;
 
     public function __construct(array $data)
     {
@@ -36,6 +37,7 @@ class ProductDTO extends BaseDTO
         $this->inventories = $data['inventories'] ?? [];
         $this->images = $data['images'] ?? [];
         $this->attribute_values = $data['attribute_values'] ?? [];
+        $this->flat = $data['flat'] ?? null;
         $this->up_sells = $data['up_sells'] ?? [];
         $this->cross_sells = $data['cross_sells'] ?? [];
         $this->super_attributes = $data['super_attributes'] ?? [];

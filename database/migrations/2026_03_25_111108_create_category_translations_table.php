@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->increments('id');
             $table->string('name');
             $table->string('slug');
+            $table->string('url_key')->nullable();
             $table->text('description')->nullable();
             $table->string('meta_title')->nullable();
             $table->string('meta_keywords')->nullable();

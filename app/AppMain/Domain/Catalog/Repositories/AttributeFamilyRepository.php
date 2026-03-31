@@ -102,4 +102,20 @@ class AttributeFamilyRepository extends BaseRepository
 
         return $this->applyPagination($query, $filters) ?? $query->paginate($filters['per_page'] ?? 15);
     }
+
+    public function delete($id): bool
+    {
+        $family = $this->findById($id);
+
+        return DB::transaction(function () use ($family) {
+            foreach ($family->groups as $group) {
+                // Delete mappings first
+                $group->attribute_group_mappings()->delete();
+                // Then delete the group
+                $group->delete();
+            }
+
+            return $family->delete();
+        });
+    }
 }

@@ -50,6 +50,19 @@ class ProductService
                 unset($data[$rel]);
             }
         }
+        // Merge flat data into attribute_values if available
+        if (!empty($data['flat'])) {
+            if (!isset($relations['attribute_values'])) {
+                $relations['attribute_values'] = [];
+            }
+            foreach ($data['flat'] as $locale => $values) {
+                if (!isset($relations['attribute_values'][$locale])) {
+                    $relations['attribute_values'][$locale] = [];
+                }
+                $relations['attribute_values'][$locale] = array_merge($relations['attribute_values'][$locale], $values);
+            }
+            unset($data['flat']);
+        }
 
         $product = $this->productRepository->create($data, $relations);
 
@@ -66,6 +79,19 @@ class ProductService
                 $relations[$rel] = $data[$rel];
                 unset($data[$rel]);
             }
+        }
+        // Merge flat data into attribute_values if available
+        if (!empty($data['flat'])) {
+            if (!isset($relations['attribute_values'])) {
+                $relations['attribute_values'] = [];
+            }
+            foreach ($data['flat'] as $locale => $values) {
+                if (!isset($relations['attribute_values'][$locale])) {
+                    $relations['attribute_values'][$locale] = [];
+                }
+                $relations['attribute_values'][$locale] = array_merge($relations['attribute_values'][$locale], $values);
+            }
+            unset($data['flat']);
         }
 
         $product = $this->productRepository->update($id, $data, $relations);
