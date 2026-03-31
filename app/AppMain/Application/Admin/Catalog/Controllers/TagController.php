@@ -24,7 +24,7 @@ class TagController extends Controller
 
     public function index(Request $request)
     {
-        $this->authorize('viewAny', Tag::class);
+        /* $this->authorize('viewAny', Tag::class); */
         return $this->baseAction(function () use ($request) {
             $filter = TagFilter::fromRequest($request);
             $request->validate($filter->validate());
@@ -39,7 +39,7 @@ class TagController extends Controller
         if (!$tag) {
             throw new NotFoundHttpException('Tag not found');
         }
-        $this->authorize('view', $tag);
+        /* $this->authorize('view', $tag); */
         return $this->baseAction(function () use ($tag) {
             return TagResponse::single($tag);
         }, 'Tag retrieved successfully');
@@ -47,7 +47,7 @@ class TagController extends Controller
 
     public function store(TagRequest $request)
     {
-        $this->authorize('create', Tag::class);
+        /* $this->authorize('create', Tag::class); */
         return $this->baseActionTransaction(function () use ($request) {
             $dto = TagDTO::fromRequest($request);
             $tag = $this->tagService->createTag($dto);
@@ -61,7 +61,7 @@ class TagController extends Controller
         if (!$tag) {
             throw new NotFoundHttpException('Tag not found');
         }
-        $this->authorize('update', $tag);
+        /* $this->authorize('update', $tag); */
 
         return $this->baseActionTransaction(function () use ($request, $id) {
             $dto = TagDTO::fromRequest($request);
@@ -77,7 +77,7 @@ class TagController extends Controller
         if (!$tag) {
             throw new NotFoundHttpException('Tag not found');
         }
-        $this->authorize('delete', $tag);
+        /* $this->authorize('delete', $tag); */
 
         return $this->baseActionTransaction(function () use ($id) {
             $this->tagService->deleteTag($id);

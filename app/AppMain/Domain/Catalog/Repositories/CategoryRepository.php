@@ -1,5 +1,7 @@
 <?php
 
+namespace App\AppMain\Domain\Catalog\Repositories;
+
 use App\AppMain\Core\BaseRepository;
 use App\Models\Category;
 use Illuminate\Support\Facades\Cache;

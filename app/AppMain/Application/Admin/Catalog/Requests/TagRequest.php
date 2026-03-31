@@ -13,13 +13,9 @@ class TagRequest extends BaseFormRequest
         $isUpdate = $id !== null;
 
         return [
-            'name' => ($isUpdate ? 'sometimes|' : 'required|') . 'string|max:255',
-            'slug' => [
-                'sometimes',
-                'string',
-                'max:255',
-                Rule::unique('tags', 'slug')->ignore($id, 'id')
-            ],
+            'translations' => ($isUpdate ? 'sometimes|' : 'required|') . 'array',
+            'translations.*.name' => 'required|string|max:255',
+            'translations.*.slug' => 'sometimes|string|max:255',
         ];
     }
 }

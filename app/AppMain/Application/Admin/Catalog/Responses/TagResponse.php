@@ -7,8 +7,7 @@ use App\AppMain\Core\BaseResponseDTO;
 class TagResponse extends BaseResponseDTO
 {
     public $id;
-    public $name;
-    public $slug;
+    public $translations = [];
     public $createdAt;
     public $updatedAt;
 
@@ -16,10 +15,17 @@ class TagResponse extends BaseResponseDTO
     {
         $dto = new self();
         $dto->id = $model->id;
-        $dto->name = $model->name;
-        $dto->slug = $model->slug;
         $dto->createdAt = $model->created_at;
         $dto->updatedAt = $model->updated_at;
+
+        if ($model->relationLoaded('translations')) {
+            foreach ($model->translations as $translation) {
+                $dto->translations[$translation->locale] = [
+                    'name' => $translation->name,
+                    'slug' => $translation->slug,
+                ];
+            }
+        }
         return $dto;
     }
 }

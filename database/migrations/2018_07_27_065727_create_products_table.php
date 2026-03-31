@@ -50,9 +50,20 @@ return new class extends Migration {
 
         Schema::create('tags', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
-            $table->string('slug')->unique();
             $table->timestamps();
+        });
+
+        Schema::create('tag_translations', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->string('slug');
+            $table->string('locale');
+            $table->integer('tag_id')->unsigned();
+            $table->unique(['tag_id', 'locale'], 'tag_translation_index_unique');
+            $table->unique(['slug', 'locale'], 'tag_translation_slug_index_unique');
+            $table->timestamps();
+
+            $table->foreign('tag_id')->references('id')->on('tags')->onDelete('cascade');
         });
 
         Schema::create('product_tags', function (Blueprint $table) {
@@ -81,6 +92,8 @@ return new class extends Migration {
         Schema::dropIfExists('product_categories');
 
         Schema::dropIfExists('product_tags');
+
+        Schema::dropIfExists('tag_translations');
 
         Schema::dropIfExists('tags');
 

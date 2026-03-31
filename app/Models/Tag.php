@@ -2,25 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\AppMain\Core\BaseModel;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class Tag extends Model
+class Tag extends BaseModel
 {
     protected $fillable = [
-        'name',
-        'slug',
+        'status',
     ];
 
-    protected static function boot()
+    public function translations()
     {
-        parent::boot();
-
-        static::creating(function ($tag) {
-            if (empty($tag->slug)) {
-                $tag->slug = \Illuminate\Support\Str::slug($tag->name);
-            }
-        });
+        return $this->hasMany(TagTranslation::class);
     }
 
     public function products(): BelongsToMany

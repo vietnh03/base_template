@@ -26,12 +26,16 @@ class TagService
 
     public function createTag(TagDTO $dto)
     {
-        return $this->tagRepository->create($dto->onlyFilled());
+        $data = $dto->toArray();
+        unset($data['translations']);
+        return $this->tagRepository->create($data, $dto->translations);
     }
 
     public function updateTag(string $id, TagDTO $dto)
     {
-        return $this->tagRepository->update($id, $dto->onlyFilled());
+        $data = $dto->onlyFilled();
+        unset($data['translations']);
+        return $this->tagRepository->update($id, $data, $dto->translations);
     }
 
     public function deleteTag(string $id): bool

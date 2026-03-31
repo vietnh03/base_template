@@ -21,7 +21,7 @@ class ProductController extends Controller
 
     public function index(Request $request)
     {
-        $this->authorize('viewAny', \App\Models\Product::class);
+        /* $this->authorize('viewAny', \App\Models\Product::class); */
         return $this->baseAction(function () use ($request) {
             $filter = ProductFilter::fromRequest($request);
             $request->validate($filter->validate());
@@ -33,7 +33,7 @@ class ProductController extends Controller
     public function show(string $id)
     {
         $product = $this->productService->findProduct($id);
-        $this->authorize('view', $product);
+        /* $this->authorize('view', $product); */
 
         return $this->baseAction(function () use ($product) {
             return ProductResponse::single($product);
@@ -42,7 +42,7 @@ class ProductController extends Controller
 
     public function store(ProductRequest $request)
     {
-        $this->authorize('create', \App\Models\Product::class);
+        /* $this->authorize('create', \App\Models\Product::class); */
         return $this->baseActionTransaction(function () use ($request) {
             $dto = ProductDTO::fromRequest($request);
             $product = $this->productService->createProduct($dto);
@@ -53,7 +53,7 @@ class ProductController extends Controller
     public function update(ProductRequest $request, string $id)
     {
         $product = $this->productService->findProduct($id);
-        $this->authorize('update', $product);
+        /* $this->authorize('update', $product); */
 
         return $this->baseActionTransaction(function () use ($request, $id) {
             $dto = ProductDTO::fromRequest($request);
@@ -66,7 +66,7 @@ class ProductController extends Controller
     public function destroy(string $id)
     {
         $product = $this->productService->findProduct($id);
-        $this->authorize('delete', $product);
+        /* $this->authorize('delete', $product); */
 
         return $this->baseActionTransaction(function () use ($id) {
             $this->productService->deleteProduct($id);

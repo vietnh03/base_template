@@ -6,6 +6,11 @@ use App\AppMain\Core\BaseDTO;
 
 class TagDTO extends BaseDTO
 {
-    public $name;
-    public $slug;
+    public $translations = [];
+
+    public function __construct(array $data)
+    {
+        parent::__construct($data);
+        $this->translations = $data['translations'] ?? [];
+    }
 }

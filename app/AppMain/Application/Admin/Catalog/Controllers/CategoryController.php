@@ -22,7 +22,7 @@ class CategoryController extends Controller
 
     public function index(Request $request)
     {
-        $this->authorize('viewAny', Category::class);
+        /* $this->authorize('viewAny', Category::class); */
         return $this->baseAction(function () use ($request) {
             $filter = CategoryFilter::fromRequest($request);
             $request->validate($filter->validate());
@@ -34,7 +34,7 @@ class CategoryController extends Controller
     public function show(string $id)
     {
         $category = $this->categoryService->findCategory($id);
-        $this->authorize('view', $category);
+        /* $this->authorize('view', $category); */
         return $this->baseAction(function () use ($category) {
             return CategoryResponse::single($category);
         }, 'Category retrieved successfully');
@@ -42,7 +42,7 @@ class CategoryController extends Controller
 
     public function store(CategoryRequest $request)
     {
-        $this->authorize('create', Category::class);
+        /* $this->authorize('create', Category::class); */
         return $this->baseActionTransaction(function () use ($request) {
             $dto = CategoryDTO::fromRequest($request);
             $category = $this->categoryService->createCategory($dto);
@@ -53,7 +53,7 @@ class CategoryController extends Controller
     public function update(CategoryRequest $request, string $id)
     {
         $category = $this->categoryService->findCategory($id);
-        $this->authorize('update', $category);
+        /* $this->authorize('update', $category); */
 
         return $this->baseActionTransaction(function () use ($request, $id) {
             $dto = CategoryDTO::fromRequest($request);
@@ -66,7 +66,7 @@ class CategoryController extends Controller
     public function destroy(string $id)
     {
         $category = $this->categoryService->findCategory($id);
-        $this->authorize('delete', $category);
+        /* $this->authorize('delete', $category); */
 
         return $this->baseActionTransaction(function () use ($id) {
             $this->categoryService->deleteCategory($id);
