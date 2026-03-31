@@ -10,17 +10,7 @@ use Illuminate\Support\Str;
 
 class ProductRepository extends BaseRepository
 {
-    protected array $defaultRelations = [
-        'categories.translations',
-        'tags',
-        'images',
-        'inventories',
-        'flat',
-        'attribute_values',
-        'up_sells',
-        'cross_sells',
-        'super_attributes'
-    ];
+    protected array $defaultRelations = Product::RELATION_KEYS;
 
     public function getModel()
     {
@@ -69,18 +59,6 @@ class ProductRepository extends BaseRepository
     {
         if (!empty($flatData)) {
             $this->saveFlatData($product, $flatData, $globalData);
-        }
-
-        // Sync global fields to all flat records (locales) to prevent desync
-        $globalFields = collect($globalData)->only(['weight', 'new', 'featured', 'visible_individually'])->toArray();
-        $productFields = [
-            'sku' => $product->sku,
-            'attribute_family_id' => $product->attribute_family_id,
-            'status' => $product->status,
-        ];
-        $fieldsToUpdate = array_merge($globalFields, $productFields);
-        if (!empty($fieldsToUpdate)) {
-            $product->flat()->update($fieldsToUpdate);
         }
 
         if (isset($relations['categories'])) {
@@ -162,7 +140,7 @@ class ProductRepository extends BaseRepository
             if (!$attribute)
                 continue;
 
-            $column = $this->getAttributeValueColumn($attribute->type);
+            $column = \App\Models\Attribute::getValueColumn($attribute->type);
 
             $upsertData[] = [
                 'product_id' => $product->id,
@@ -179,20 +157,6 @@ class ProductRepository extends BaseRepository
                 ['text_value', 'boolean_value', 'integer_value', 'float_value', 'datetime_value', 'date_value', 'json_value']
             );
         }
-    }
-
-    protected function getAttributeValueColumn($type): string
-    {
-        return match ($type) {
-            'text', 'textarea' => 'text_value',
-            'boolean' => 'boolean_value',
-            'integer', 'select' => 'integer_value',
-            'float' => 'float_value',
-            'datetime' => 'datetime_value',
-            'date' => 'date_value',
-            'multiselect', 'checkbox' => 'json_value',
-            default => 'text_value',
-        };
     }
 
     protected function generateUniqueUrlKey($name, $locale, $productId = null): string

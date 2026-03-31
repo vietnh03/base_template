@@ -44,6 +44,11 @@ class ProductObserver
                     'status' => $product->status,
                     'cost_price' => $product->cost_price,
                     'parent_id' => $product->parent_id,
+                    'weight' => $product->weight,
+                    'new' => $product->new,
+                    'featured' => $product->featured,
+                    'visible_individually' => $product->visible_individually,
+                    'attribute_family_id' => $product->attribute_family_id,
                 ]
             );
         }

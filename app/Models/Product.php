@@ -10,17 +10,37 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Product extends BaseModel
 {
+    public const RELATION_KEYS = [
+        'categories',
+        'tags',
+        'inventories',
+        'images',
+        'attribute_values',
+        'up_sells',
+        'cross_sells',
+        'super_attributes'
+    ];
+
     protected $fillable = [
         'sku',
         'status',
         'parent_id',
         'attribute_family_id',
         'additional',
+        'weight',
+        'thumbnail',
+        'new',
+        'featured',
+        'visible_individually',
     ];
 
     protected $casts = [
         'status' => 'boolean',
         'additional' => 'json',
+        'weight' => 'float',
+        'new' => 'boolean',
+        'featured' => 'boolean',
+        'visible_individually' => 'boolean',
     ];
 
     public function categories(): BelongsToMany

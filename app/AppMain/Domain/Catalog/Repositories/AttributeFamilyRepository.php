@@ -20,39 +20,35 @@ class AttributeFamilyRepository extends BaseRepository
 
     public function create(array $data)
     {
-        return DB::transaction(function () use ($data) {
-            $groups = $data['groups'] ?? [];
-            unset($data['groups']);
+        $groups = $data['groups'] ?? [];
+        unset($data['groups']);
 
-            $family = $this->model->create($data);
+        $family = $this->model->create($data);
 
-            if (!empty($groups)) {
-                $this->syncGroups($family, $groups);
-            }
+        if (!empty($groups)) {
+            $this->syncGroups($family, $groups);
+        }
 
-            return $family->load('groups.attribute_group_mappings.attribute');
-        });
+        return $family->load('groups.attribute_group_mappings.attribute');
     }
 
     public function update($id, array $data): bool
     {
-        return DB::transaction(function () use ($id, $data) {
-            $family = $this->findById($id);
-            if (!$family) {
-                throw new \Illuminate\Database\Eloquent\ModelNotFoundException();
-            }
+        $family = $this->findById($id);
+        if (!$family) {
+            throw new \Illuminate\Database\Eloquent\ModelNotFoundException();
+        }
 
-            $groups = $data['groups'] ?? [];
-            unset($data['groups']);
+        $groups = $data['groups'] ?? [];
+        unset($data['groups']);
 
-            $family->update($data);
+        $family->update($data);
 
-            if (!empty($groups)) {
-                $this->syncGroups($family, $groups);
-            }
+        if (!empty($groups)) {
+            $this->syncGroups($family, $groups);
+        }
 
-            return true;
-        });
+        return true;
     }
 
     protected function syncGroups($family, array $groups)

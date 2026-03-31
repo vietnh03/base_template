@@ -52,7 +52,7 @@ class ProductAttributeValueObserver
         }
 
         $column = $this->attributeMap[$attribute->code];
-        $flatValue = $isDeleted ? null : $this->getActualValue($value, $attribute);
+        $flatValue = $isDeleted ? null : $value->{$attribute->getValueColumn($attribute->type)};
 
         ProductFlat::updateOrCreate(
             ['product_id' => $value->product_id, 'locale' => $value->locale],
@@ -63,20 +63,6 @@ class ProductAttributeValueObserver
         if ($attribute->code === 'name' && !$isDeleted) {
             $this->ensureUrlKey($value->product_id, $value->locale, $flatValue);
         }
-    }
-
-    protected function getActualValue(ProductAttributeValue $value, Attribute $attribute)
-    {
-        return match ($attribute->type) {
-            'text', 'textarea' => $value->text_value,
-            'boolean' => $value->boolean_value,
-            'integer', 'select' => $value->integer_value,
-            'float' => $value->float_value,
-            'datetime' => $value->datetime_value,
-            'date' => $value->date_value,
-            'multiselect', 'checkbox' => $value->json_value,
-            default => $value->text_value,
-        };
     }
 
     protected function ensureUrlKey(int $productId, ?string $locale, string $name): void

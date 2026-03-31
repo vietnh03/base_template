@@ -9,16 +9,7 @@ use App\AppMain\Domain\Catalog\Repositories\ProductFlatRepository;
 
 class ProductService
 {
-    public const RELATION_KEYS = [
-        'categories',
-        'tags',
-        'inventories',
-        'images',
-        'attribute_values',
-        'up_sells',
-        'cross_sells',
-        'super_attributes'
-    ];
+    public const RELATION_KEYS = \App\Models\Product::RELATION_KEYS;
 
     protected ProductRepository $productRepository;
     protected ProductFlatRepository $productFlatRepository;
