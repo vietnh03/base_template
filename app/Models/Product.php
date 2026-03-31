@@ -12,7 +12,6 @@ class Product extends BaseModel
 {
     protected $fillable = [
         'sku',
-        'type',
         'status',
         'parent_id',
         'attribute_family_id',

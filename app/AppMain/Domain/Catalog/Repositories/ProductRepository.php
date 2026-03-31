@@ -75,7 +75,6 @@ class ProductRepository extends BaseRepository
         $globalFields = collect($globalData)->only(['weight', 'new', 'featured', 'visible_individually'])->toArray();
         $productFields = [
             'sku' => $product->sku,
-            'type' => $product->type,
             'attribute_family_id' => $product->attribute_family_id,
             'status' => $product->status,
         ];
@@ -237,7 +236,6 @@ class ProductRepository extends BaseRepository
                 ],
                 array_merge($flat, [
                     'sku' => $product->sku,
-                    'type' => $product->type,
                     'attribute_family_id' => $product->attribute_family_id,
                     'status' => $product->status,
                     'weight' => $globalData['weight'] ?? $product->weight ?? null,

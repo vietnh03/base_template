@@ -10,8 +10,6 @@ class ProductFlat extends BaseModel
 
     protected $fillable = [
         'sku',
-        'type',
-        'product_number',
         'name',
         'short_description',
         'description',

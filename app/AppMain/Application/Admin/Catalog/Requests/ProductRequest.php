@@ -21,7 +21,6 @@ class ProductRequest extends BaseFormRequest
                 'max:255',
                 Rule::unique('products', 'sku')->ignore($id, 'id')
             ],
-            'type' => 'nullable|string',
             'status' => 'nullable|boolean',
             'cost_price' => 'nullable|numeric',
             'attribute_family_id' => 'sometimes|exists:attribute_families,id',

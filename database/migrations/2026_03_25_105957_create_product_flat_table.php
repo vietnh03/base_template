@@ -13,8 +13,6 @@ return new class extends Migration {
         Schema::create('product_flat', function (Blueprint $table) {
             $table->increments('id');
             $table->string('sku');
-            $table->string('type')->nullable();
-            $table->string('product_number')->nullable();
             $table->string('name')->nullable();
             $table->text('short_description')->nullable();
             $table->text('description')->nullable();

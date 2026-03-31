@@ -8,7 +8,6 @@ class ProductResponse extends BaseResponseDTO
 {
     public string $id;
     public string $sku;
-    public ?string $type;
     public bool $status;
     public ?float $costPrice;
     public ?float $weight;
@@ -32,7 +31,6 @@ class ProductResponse extends BaseResponseDTO
         $dto = new self();
         $dto->id = (string) $model->id;
         $dto->sku = $model->sku;
-        $dto->type = $model->type;
         $dto->status = (bool) $model->status;
         $dto->costPrice = $model->cost_price ? (float) $model->cost_price : null;
         $dto->weight = $model->weight ? (float) $model->weight : null;

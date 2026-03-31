@@ -7,7 +7,6 @@ use App\AppMain\Core\BaseDTO;
 class ProductDTO extends BaseDTO
 {
     public string $sku;
-    public string $type = 'simple';
     public bool $status = true;
     public ?int $parent_id = null;
     public int $attribute_family_id = 1;
