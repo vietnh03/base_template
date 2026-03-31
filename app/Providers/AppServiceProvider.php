@@ -22,6 +22,8 @@ class AppServiceProvider extends ServiceProvider
         \Illuminate\Pagination\Paginator::useBootstrapFive();
 
         \App\Models\Product::observe(\App\Observers\ProductObserver::class);
-        \App\Models\ProductAttributeValue::observe(\App\Observers\ProductAttributeValueObserver::class);
+        // NOTE: ProductAttributeValueObserver removed — Eloquent upsert() bypasses
+        // model events, so the observer was never called. Flat sync is handled
+        // directly by ProductRepository::syncToFlat() after bulk upsert.
     }
 }

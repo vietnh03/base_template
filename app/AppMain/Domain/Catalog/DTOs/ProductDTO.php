@@ -17,9 +17,6 @@ class ProductDTO extends BaseDTO
     public bool $new = false;
     public bool $featured = false;
 
-    // Flat data (per locale)
-    public array $flat = [];
-
     // Relationships
     public array $categories = [];
     public array $tags = [];
@@ -33,7 +30,6 @@ class ProductDTO extends BaseDTO
     public function __construct(array $data)
     {
         parent::__construct($data);
-        $this->flat = $data['flat'] ?? [];
         $this->categories = $data['categories'] ?? [];
         $this->tags = $data['tags'] ?? [];
         $this->inventories = $data['inventories'] ?? [];

@@ -8,6 +8,23 @@ class ProductFlat extends BaseModel
 {
     protected $table = 'product_flat';
 
+    /**
+     * Mapping of Attribute codes → ProductFlat columns.
+     * Single source of truth used by ProductRepository::syncToFlat().
+     */
+    public const ATTRIBUTE_MAP = [
+        'name' => 'name',
+        'description' => 'description',
+        'url_key' => 'url_key',
+        'new' => 'new',
+        'featured' => 'featured',
+        'price' => 'price',
+        'weight' => 'weight',
+        'meta_title' => 'meta_title',
+        'meta_keywords' => 'meta_keywords',
+        'meta_description' => 'meta_description',
+    ];
+
     protected $fillable = [
         'sku',
         'name',

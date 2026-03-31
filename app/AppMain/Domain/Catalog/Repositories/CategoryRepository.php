@@ -22,27 +22,31 @@ class CategoryRepository extends BaseRepository
 
     public function create(array $data, array $translations = [])
     {
-        $category = $this->model->create($data);
+        return DB::transaction(function () use ($data, $translations) {
+            $category = $this->model->create($data);
 
-        $this->saveTranslations($category, $translations);
+            $this->saveTranslations($category, $translations);
 
-        return $category->load('translations');
+            return $category->load('translations');
+        });
     }
 
     public function update($id, array $data, array $translations = []): bool
     {
-        $category = $this->findById($id);
-        if (!$category) {
-            throw new \Illuminate\Database\Eloquent\ModelNotFoundException();
-        }
+        return DB::transaction(function () use ($id, $data, $translations) {
+            $category = $this->findById($id);
+            if (!$category) {
+                throw new \Illuminate\Database\Eloquent\ModelNotFoundException();
+            }
 
-        $category->update($data);
+            $category->update($data);
 
-        if (!empty($translations)) {
-            $this->saveTranslations($category, $translations);
-        }
+            if (!empty($translations)) {
+                $this->saveTranslations($category, $translations);
+            }
 
-        return true;
+            return true;
+        });
     }
 
     protected function saveTranslations($category, array $translations)

@@ -4,7 +4,6 @@ namespace App\AppMain\Domain\Catalog\Services;
 
 use App\AppMain\Domain\Catalog\DTOs\ProductDTO;
 use App\AppMain\Domain\Catalog\Repositories\ProductRepository;
-
 use App\AppMain\Domain\Catalog\Repositories\ProductFlatRepository;
 
 class ProductService
@@ -52,10 +51,7 @@ class ProductService
             }
         }
 
-        $flatData = $data['flat'] ?? [];
-        unset($data['flat']);
-
-        $product = $this->productRepository->create($data, $relations, $flatData);
+        $product = $this->productRepository->create($data, $relations);
 
         return $product->load(array_merge(self::RELATION_KEYS, ['flat']));
     }
@@ -72,10 +68,7 @@ class ProductService
             }
         }
 
-        $flatData = $data['flat'] ?? [];
-        unset($data['flat']);
-
-        return $this->productRepository->update($id, $data, $relations, $flatData);
+        return $this->productRepository->update($id, $data, $relations);
     }
 
     public function deleteProduct(string $id): bool
