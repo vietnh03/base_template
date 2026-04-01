@@ -58,7 +58,15 @@ class CartService
     public function addProduct(string $productId, int $qty = 1, ?string $customerId = null, ?string $cartId = null): Cart
     {
         return DB::transaction(function () use ($productId, $qty, $customerId, $cartId) {
+            if ($qty <= 0) {
+                throw new \InvalidArgumentException('Quantity must be positive');
+            }
+
             $cart = $this->getOrCreateCart($customerId, $cartId);
+
+            // Row-level lock on the cart to prevent race conditions during item addition
+            $this->cartRepository->getModel()::where('id', $cart->id)->lockForUpdate()->first();
+
             $product = $this->productRepository->findById($productId, ['flat']);
 
             $flat = $product->flat->first();
@@ -111,7 +119,11 @@ class CartService
     public function updateItem(string $itemId, int $qty): Cart
     {
         return DB::transaction(function () use ($itemId, $qty) {
-            $cartItem = $this->cartItemRepository->findOrFail($itemId);
+            if ($qty < 0) {
+                throw new \InvalidArgumentException('Quantity cannot be negative');
+            }
+
+            $cartItem = $this->cartItemRepository->findById($itemId);
 
             if ($qty <= 0) {
                 return $this->removeItem($itemId);
@@ -138,7 +150,7 @@ class CartService
     public function removeItem(string $itemId): Cart
     {
         return DB::transaction(function () use ($itemId) {
-            $cartItem = $this->cartItemRepository->findOrFail($itemId);
+            $cartItem = $this->cartItemRepository->findById($itemId);
             $cart = $cartItem->cart;
             $this->cartItemRepository->delete($itemId);
 

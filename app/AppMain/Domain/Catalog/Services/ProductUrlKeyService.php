@@ -29,23 +29,26 @@ class ProductUrlKeyService
             $lock->block(5);
 
             $i = 1;
-            while (true) {
-                $query = DB::table('product_flat')
-                    ->where('url_key', $urlKey)
-                    ->where('locale', $locale);
+            // Optimize by finding the highest existing suffix in one go
+            $existingKeys = DB::table('product_flat')
+                ->where('locale', $locale)
+                ->where('url_key', 'LIKE', $originalUrlKey . '%')
+                ->pluck('url_key')
+                ->toArray();
 
-                if ($productId) {
-                    $query->where('product_id', '!=', $productId);
-                }
-
-                if (!$query->exists()) {
-                    break;
-                }
-
-                $urlKey = $originalUrlKey . '-' . $i++;
+            if (!in_array($originalUrlKey, $existingKeys)) {
+                return $originalUrlKey;
             }
 
-            return $urlKey;
+            // Find the highest N in url-key-N
+            $maxSuffix = 0;
+            foreach ($existingKeys as $key) {
+                if (preg_match('/' . preg_quote($originalUrlKey, '/') . '-(\d+)$/', $key, $matches)) {
+                    $maxSuffix = max($maxSuffix, (int) $matches[1]);
+                }
+            }
+
+            return $originalUrlKey . '-' . ($maxSuffix + 1);
         } catch (LockTimeoutException $e) {
             throw new \RuntimeException('System is currently busy generating URL keys. Please try again.', 0, $e);
         } finally {

@@ -168,9 +168,9 @@ class OrderService
 
             // 1. Process items and calculate totals
             $productIds = collect($data['items'])->pluck('product_id')->sort()->values()->all();
-            $products = clone $this->productRepository->getModel()::with('flat')->whereIn('id', $productIds)->get()->keyBy('id');
+            $products = $this->productRepository->getModel()::with('flat')->whereIn('id', $productIds)->get()->keyBy('id');
             // Deal with inventory locks safely
-            $inventories = clone \App\Models\ProductInventory::whereIn('product_id', $productIds)
+            $inventories = \App\Models\ProductInventory::whereIn('product_id', $productIds)
                 ->lockForUpdate()
                 ->get()
                 ->keyBy('product_id');
@@ -188,6 +188,9 @@ class OrderService
                 $name = $flat ? ($flat->name ?? 'Product ' . $product->id) : 'Product ' . $product->id;
 
                 $qty = $itemInput['quantity'];
+                if ($qty <= 0) {
+                    throw new \InvalidArgumentException('Quantity must be positive');
+                }
 
                 $inventory = $inventories->get($product->id);
                 if (!$inventory || $inventory->qty < $qty) {
@@ -288,7 +291,11 @@ class OrderService
     public function cancel(string $orderId): bool
     {
         return DB::transaction(function () use ($orderId) {
-            $order = $this->orderRepository->findOrFail($orderId);
+            $order = $this->orderRepository->findById($orderId);
+
+            if (!$order) {
+                throw new \Exception("Order not found.");
+            }
 
             if ($order->status !== 'pending') {
                 throw new \Exception("Only pending orders can be canceled.");
@@ -297,7 +304,7 @@ class OrderService
             $this->orderRepository->update($orderId, ['status' => 'canceled']);
 
             // Restock items
-            $productIds = $order->items->pluck('product_id')->sort()->values()->all();
+            $productIds = collect($order->items)->pluck('product_id')->sort()->values()->all();
             if (!empty($productIds)) {
                 $inventories = \App\Models\ProductInventory::whereIn('product_id', $productIds)
                     ->lockForUpdate()
@@ -318,6 +325,16 @@ class OrderService
 
     protected function generateIncrementId(): string
     {
-        return date('Ymd') . strtoupper(\Illuminate\Support\Str::random(6));
+        $prefix = date('Ymd');
+
+        // Retry a few times if collision occurs (though random 6 is 1/68B, let's be safe)
+        for ($i = 0; $i < 5; $i++) {
+            $id = $prefix . strtoupper(\Illuminate\Support\Str::random(6));
+            if (!$this->orderRepository->getModel()::where('increment_id', $id)->exists()) {
+                return $id;
+            }
+        }
+
+        return $prefix . strtoupper(\Illuminate\Support\Str::random(10));
     }
 }

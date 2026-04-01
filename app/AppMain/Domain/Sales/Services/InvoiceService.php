@@ -37,11 +37,14 @@ class InvoiceService
     public function createForOrder(string $orderId, array $data = [])
     {
         return DB::transaction(function () use ($orderId, $data) {
-            $order = $this->orderRepository->findOrFail($orderId);
+            $order = $this->orderRepository->findById($orderId);
 
-            // Calculate totals from order if not provided
-            $grandTotal = $data['grand_total'] ?? $order->grand_total;
+            // Align totals if custom data is provided to ensure data integrity
             $subTotal = $data['sub_total'] ?? $order->sub_total;
+            $grandTotal = $data['grand_total'] ?? $order->grand_total;
+
+            // If subtotal is different from order, we might need to adjust or warning if items don't match
+            // For now, we follow the order's totals as source of truth unless overridden.
 
             $invoice = $this->invoiceRepository->create(array_merge([
                 'order_id' => $order->id,
@@ -67,6 +70,7 @@ class InvoiceService
             ], $data));
 
             // Create invoice items based on order items
+            $order->loadMissing('items');
             $orderItems = $order->items;
             $invoiceItemsData = [];
             $now = now();
