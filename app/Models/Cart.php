@@ -3,11 +3,13 @@
 namespace App\Models;
 
 use App\AppMain\Core\BaseModel;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Cart extends BaseModel
 {
+    use HasUuids;
     protected $table = 'cart';
 
     protected $fillable = [

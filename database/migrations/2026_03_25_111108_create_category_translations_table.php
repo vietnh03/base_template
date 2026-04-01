@@ -11,7 +11,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('category_translations', function (Blueprint $table) {
-            $table->increments('id');
+            $table->uuid('id')->primary();
             $table->string('name');
             $table->string('slug');
             $table->string('url_key')->nullable();
@@ -20,7 +20,7 @@ return new class extends Migration {
             $table->string('meta_keywords')->nullable();
             $table->text('meta_description')->nullable();
             $table->string('locale');
-            $table->integer('category_id')->unsigned();
+            $table->uuid('category_id');
             $table->unique(['category_id', 'locale'], 'category_translation_index_unique');
             $table->unique(['slug', 'locale'], 'category_translation_slug_index_unique');
             $table->timestamps();

@@ -13,15 +13,15 @@ return new class extends Migration {
     public function up()
     {
         Schema::create('order_transactions', function (Blueprint $table) {
-            $table->increments('id');
+            $table->uuid('id')->primary();
             $table->string('transaction_id');
             $table->string('status')->nullable();
             $table->string('type')->nullable();
             $table->decimal('amount', 12, 4)->default(0)->nullable();
             $table->string('payment_method')->nullable();
             $table->json('data')->nullable();
-            $table->integer('invoice_id')->unsigned()->nullable();
-            $table->integer('order_id')->unsigned();
+            $table->uuid('invoice_id')->nullable();
+            $table->uuid('order_id');
             $table->timestamps();
         });
     }

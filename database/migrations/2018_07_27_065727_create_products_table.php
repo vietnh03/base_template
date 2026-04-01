@@ -13,52 +13,52 @@ return new class extends Migration {
     public function up()
     {
         Schema::create('products', function (Blueprint $table) {
-            $table->increments('id');
+            $table->uuid('id')->primary();
             $table->string('sku')->unique();
             $table->boolean('status')->default(0);
-            $table->integer('parent_id')->unsigned()->nullable();
-            $table->integer('attribute_family_id')->unsigned()->nullable();
+            $table->uuid('parent_id')->nullable();
+            $table->uuid('attribute_family_id')->nullable();
             $table->json('additional')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
 
         Schema::create('product_categories', function (Blueprint $table) {
-            $table->integer('product_id')->unsigned();
-            $table->integer('category_id')->unsigned();
+            $table->uuid('product_id');
+            $table->uuid('category_id');
         });
 
         Schema::create('product_relations', function (Blueprint $table) {
-            $table->integer('parent_id')->unsigned();
-            $table->integer('child_id')->unsigned();
+            $table->uuid('parent_id');
+            $table->uuid('child_id');
         });
 
         Schema::create('product_super_attributes', function (Blueprint $table) {
-            $table->integer('product_id')->unsigned();
-            $table->integer('attribute_id')->unsigned();
+            $table->uuid('product_id');
+            $table->uuid('attribute_id');
         });
 
         Schema::create('product_up_sells', function (Blueprint $table) {
-            $table->integer('parent_id')->unsigned();
-            $table->integer('child_id')->unsigned();
+            $table->uuid('parent_id');
+            $table->uuid('child_id');
         });
 
         Schema::create('product_cross_sells', function (Blueprint $table) {
-            $table->integer('parent_id')->unsigned();
-            $table->integer('child_id')->unsigned();
+            $table->uuid('parent_id');
+            $table->uuid('child_id');
         });
 
         Schema::create('tags', function (Blueprint $table) {
-            $table->increments('id');
+            $table->uuid('id')->primary();
             $table->timestamps();
         });
 
         Schema::create('tag_translations', function (Blueprint $table) {
-            $table->increments('id');
+            $table->uuid('id')->primary();
             $table->string('name');
             $table->string('slug');
             $table->string('locale');
-            $table->integer('tag_id')->unsigned();
+            $table->uuid('tag_id');
             $table->unique(['tag_id', 'locale'], 'tag_translation_index_unique');
             $table->unique(['slug', 'locale'], 'tag_translation_slug_index_unique');
             $table->timestamps();
@@ -67,8 +67,8 @@ return new class extends Migration {
         });
 
         Schema::create('product_tags', function (Blueprint $table) {
-            $table->integer('product_id')->unsigned();
-            $table->integer('tag_id')->unsigned();
+            $table->uuid('product_id');
+            $table->uuid('tag_id');
 
             $table->primary(['product_id', 'tag_id']);
         });

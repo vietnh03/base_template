@@ -13,7 +13,7 @@ return new class extends Migration {
     public function up()
     {
         Schema::create('invoices', function (Blueprint $table) {
-            $table->increments('id');
+            $table->uuid('id')->primary();
             $table->string('increment_id')->nullable();
             $table->string('state')->nullable();
             $table->boolean('email_sent')->default(0);
@@ -31,8 +31,8 @@ return new class extends Migration {
             $table->decimal('base_tax_amount', 12, 4)->default(0)->nullable();
             $table->decimal('discount_amount', 12, 4)->default(0)->nullable();
             $table->decimal('base_discount_amount', 12, 4)->default(0)->nullable();
-            $table->integer('order_id')->unsigned()->nullable();
-            $table->integer('order_address_id')->unsigned()->nullable();
+            $table->uuid('order_id')->nullable();
+            $table->uuid('order_address_id')->nullable();
             $table->string('transaction_id')->nullable();
             $table->integer('reminders')->default(0);
             $table->timestamp('next_reminder_at')->nullable();

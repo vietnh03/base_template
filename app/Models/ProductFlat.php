@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use App\AppMain\Core\BaseModel;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class ProductFlat extends BaseModel
 {
+    use HasUuids;
     protected $table = 'product_flat';
 
     /**

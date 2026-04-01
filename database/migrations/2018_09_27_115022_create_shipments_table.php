@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -14,7 +13,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('shipments', function (Blueprint $table) {
-            $table->increments('id');
+            $table->uuid('id')->primary();
             $table->string('status')->nullable();
             $table->integer('total_qty')->nullable();
             $table->integer('total_weight')->nullable();
@@ -22,10 +21,10 @@ return new class extends Migration
             $table->string('carrier_title')->nullable();
             $table->text('track_number')->nullable();
             $table->boolean('email_sent')->default(0);
-            $table->integer('customer_id')->unsigned()->nullable();
+            $table->uuid('customer_id')->nullable();
             $table->string('customer_type')->nullable();
-            $table->integer('order_id')->unsigned();
-            $table->integer('order_address_id')->unsigned()->nullable();
+            $table->uuid('order_id');
+            $table->uuid('order_address_id')->nullable();
             $table->integer('inventory_source_id')->unsigned()->nullable();
             $table->string('inventory_source_name')->nullable();
             $table->timestamps();

@@ -13,11 +13,11 @@ return new class extends Migration {
     public function up()
     {
         Schema::create('addresses', function (Blueprint $table) {
-            $table->increments('id');
+            $table->uuid('id')->primary();
             $table->string('address_type');
-            $table->unsignedInteger('customer_id')->nullable()->comment('null if guest checkout');
-            $table->unsignedInteger('cart_id')->nullable()->comment('only for cart_addresses');
-            $table->unsignedInteger('order_id')->nullable()->comment('only for order_addresses');
+            $table->uuid('customer_id')->nullable()->comment('null if guest checkout');
+            $table->uuid('cart_id')->nullable()->comment('only for cart_addresses');
+            $table->uuid('order_id')->nullable()->comment('only for order_addresses');
             $table->string('first_name');
             $table->string('last_name');
             $table->string('gender')->nullable();

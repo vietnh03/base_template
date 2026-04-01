@@ -11,10 +11,10 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('attribute_options', function (Blueprint $table) {
-            $table->increments('id');
+            $table->uuid('id')->primary();
             $table->string('admin_name');
             $table->integer('sort_order')->nullable();
-            $table->integer('attribute_id')->unsigned();
+            $table->uuid('attribute_id');
             $table->timestamps();
         });
     }

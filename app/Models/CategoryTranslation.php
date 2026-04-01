@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use App\AppMain\Core\BaseModel;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class CategoryTranslation extends BaseModel
 {
+    use HasUuids;
     public $timestamps = false;
 
     protected $fillable = [

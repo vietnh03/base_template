@@ -13,7 +13,7 @@ return new class extends Migration {
     public function up()
     {
         Schema::create('product_attribute_values', function (Blueprint $table) {
-            $table->increments('id');
+            $table->uuid('id')->primary();
             $table->string('locale')->nullable();
             $table->text('text_value')->nullable();
             $table->boolean('boolean_value')->nullable();
@@ -22,8 +22,8 @@ return new class extends Migration {
             $table->dateTime('datetime_value')->nullable();
             $table->date('date_value')->nullable();
             $table->json('json_value')->nullable();
-            $table->integer('product_id')->unsigned();
-            $table->integer('attribute_id')->unsigned();
+            $table->uuid('product_id');
+            $table->uuid('attribute_id');
 
             $table->unique(['locale', 'attribute_id', 'product_id'], 'attribute_value_index_unique');
         });

@@ -11,11 +11,11 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('attribute_groups', function (Blueprint $table) {
-            $table->increments('id');
+            $table->uuid('id')->primary();
             $table->string('name');
             $table->integer('position');
             $table->boolean('is_user_defined')->default(1);
-            $table->integer('attribute_family_id')->unsigned();
+            $table->uuid('attribute_family_id');
             $table->timestamps();
         });
     }

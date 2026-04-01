@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -19,15 +18,15 @@ return new class extends Migration
             $table->enum('customer_type', ['Individual', 'Business'])->default('Individual');
             $table->enum('customer_status', ['Lead', 'Active', 'Inactive', 'VIP'])->default('Lead');
             $table->uuid('assigned_staff_id')->nullable()->comment('UUID của nhân viên phụ trách');
-            
+
             $table->text('address')->nullable();
             $table->date('date_of_birth')->nullable();
             $table->enum('gender', ['Male', 'Female', 'Other'])->nullable();
             $table->string('source', 50)->default('Other');
             $table->text('notes')->nullable();
-            
+
             $table->timestamps();
-            
+
             // Indexes
             $table->index('customer_status');
             $table->index('customer_type');

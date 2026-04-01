@@ -11,9 +11,9 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('product_inventories', function (Blueprint $table) {
-            $table->increments('id');
+            $table->uuid('id')->primary();
             $table->integer('qty')->default(0);
-            $table->integer('product_id')->unsigned();
+            $table->uuid('product_id');
             $table->timestamps();
         });
     }

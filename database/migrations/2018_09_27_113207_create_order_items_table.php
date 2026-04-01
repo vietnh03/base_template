@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -14,7 +13,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('order_items', function (Blueprint $table) {
-            $table->increments('id');
+            $table->uuid('id')->primary();
             $table->string('sku')->nullable();
             $table->string('name')->nullable();
             $table->string('coupon_code')->nullable();
@@ -47,9 +46,9 @@ return new class extends Migration
             $table->decimal('base_tax_amount_invoiced', 12, 4)->default(0)->nullable();
             $table->decimal('tax_amount_refunded', 12, 4)->default(0)->nullable();
             $table->decimal('base_tax_amount_refunded', 12, 4)->default(0)->nullable();
-            $table->integer('product_id')->unsigned()->nullable();
-            $table->integer('order_id')->unsigned()->nullable();
-            $table->integer('parent_id')->unsigned()->nullable();
+            $table->uuid('product_id')->nullable();
+            $table->uuid('order_id')->nullable();
+            $table->uuid('parent_id')->nullable();
             $table->json('additional')->nullable();
             $table->timestamps();
         });

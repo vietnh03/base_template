@@ -14,7 +14,7 @@ return new class extends Migration {
     public function up()
     {
         Schema::create('categories', function (Blueprint $table) {
-            $table->increments('id');
+            $table->uuid('id')->primary();
             $table->integer('position')->default(0);
             $table->string('logo_path')->nullable();
             $table->string('banner_path')->nullable();

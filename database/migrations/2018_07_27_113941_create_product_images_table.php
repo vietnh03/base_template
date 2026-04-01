@@ -13,10 +13,10 @@ return new class extends Migration {
     public function up()
     {
         Schema::create('product_images', function (Blueprint $table) {
-            $table->increments('id');
+            $table->uuid('id')->primary();
             $table->string('type')->nullable();
             $table->string('path');
-            $table->integer('product_id')->unsigned();
+            $table->uuid('product_id');
             $table->integer('position')->default(0)->unsigned();
         });
     }

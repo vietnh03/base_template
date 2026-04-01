@@ -11,8 +11,8 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('attribute_group_mappings', function (Blueprint $table) {
-            $table->integer('attribute_id')->unsigned();
-            $table->integer('attribute_group_id')->unsigned();
+            $table->uuid('attribute_id');
+            $table->uuid('attribute_group_id');
         });
     }
 

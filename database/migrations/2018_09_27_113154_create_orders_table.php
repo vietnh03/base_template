@@ -13,7 +13,7 @@ return new class extends Migration {
     public function up()
     {
         Schema::create('orders', function (Blueprint $table) {
-            $table->increments('id');
+            $table->uuid('id')->primary();
             $table->string('increment_id')->unique();
             $table->string('status')->nullable();
             $table->boolean('is_guest')->nullable();
@@ -62,9 +62,9 @@ return new class extends Migration {
             $table->decimal('base_shipping_refunded', 12, 4)->default(0)->nullable();
             $table->decimal('shipping_discount_amount', 12, 4)->default(0)->nullable();
             $table->decimal('base_shipping_discount_amount', 12, 4)->default(0)->nullable();
-            $table->integer('customer_id')->unsigned()->nullable();
+            $table->uuid('customer_id')->nullable();
             $table->string('customer_type')->nullable();
-            $table->integer('cart_id')->nullable();
+            $table->uuid('cart_id')->nullable();
             $table->string('applied_cart_rule_ids')->nullable();
             $table->timestamps();
         });

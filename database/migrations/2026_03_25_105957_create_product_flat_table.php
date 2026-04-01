@@ -11,7 +11,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('product_flat', function (Blueprint $table) {
-            $table->increments('id');
+            $table->uuid('id')->primary();
             $table->string('sku');
             $table->string('name')->nullable();
             $table->text('short_description')->nullable();
@@ -29,9 +29,9 @@ return new class extends Migration {
             $table->date('special_price_to')->nullable();
             $table->decimal('weight', 12, 4)->nullable();
 
-            $table->integer('product_id')->unsigned();
-            $table->integer('parent_id')->unsigned()->nullable();
-            $table->integer('attribute_family_id')->unsigned()->nullable();
+            $table->uuid('product_id');
+            $table->uuid('parent_id')->nullable();
+            $table->uuid('attribute_family_id')->nullable();
 
             $table->string('locale')->nullable();
 

@@ -13,7 +13,7 @@ return new class extends Migration {
     public function up()
     {
         Schema::create('cart', function (Blueprint $table) {
-            $table->increments('id');
+            $table->uuid('id')->primary();
             $table->string('customer_email')->nullable();
             $table->string('customer_first_name')->nullable();
             $table->string('customer_last_name')->nullable();
@@ -38,7 +38,7 @@ return new class extends Migration {
             $table->boolean('is_guest')->nullable();
             $table->boolean('is_active')->nullable()->default(1);
             $table->string('applied_cart_rule_ids')->nullable();
-            $table->integer('customer_id')->unsigned()->nullable();
+            $table->uuid('customer_id')->nullable();
             $table->timestamps();
         });
     }

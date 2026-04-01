@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use App\AppMain\Core\BaseModel;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Shipment extends BaseModel
 {
+    use HasUuids;
     protected $fillable = [
         'status',
         'total_qty',
