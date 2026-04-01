@@ -24,7 +24,7 @@ class CartService
         $this->productRepository = $productRepository;
     }
 
-    public function getCurrentCart(?int $customerId = null, ?int $cartId = null): ?Cart
+    public function getCurrentCart(?string $customerId = null, ?string $cartId = null): ?Cart
     {
         if ($customerId) {
             return $this->cartRepository->findActiveByCustomerId($customerId);
@@ -37,7 +37,7 @@ class CartService
         return null;
     }
 
-    public function getOrCreateCart(?int $customerId = null, ?int $cartId = null): Cart
+    public function getOrCreateCart(?string $customerId = null, ?string $cartId = null): Cart
     {
         $cart = $this->getCurrentCart($customerId, $cartId);
 
@@ -46,16 +46,16 @@ class CartService
                 'customer_id' => $customerId,
                 'is_active' => true,
                 'is_guest' => !$customerId,
-                'base_currency_code' => 'USD',
-                'cart_currency_code' => 'USD',
-                'global_currency_code' => 'USD',
+                'base_currency_code' => config('app.currency', 'VND'),
+                'cart_currency_code' => config('app.currency', 'VND'),
+                'global_currency_code' => config('app.currency', 'VND'),
             ]);
         }
 
         return $cart;
     }
 
-    public function addProduct(int $productId, int $qty = 1, ?int $customerId = null, ?int $cartId = null): Cart
+    public function addProduct(string $productId, int $qty = 1, ?string $customerId = null, ?string $cartId = null): Cart
     {
         return DB::transaction(function () use ($productId, $qty, $customerId, $cartId) {
             $cart = $this->getOrCreateCart($customerId, $cartId);

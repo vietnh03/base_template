@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->uuid('id')->primary();
             $table->string('increment_id')->unique();
             $table->string('status')->nullable();
+            $table->string('payment_status')->default('pending')->nullable();
             $table->boolean('is_guest')->nullable();
             $table->string('customer_email')->nullable();
             $table->string('customer_first_name')->nullable();

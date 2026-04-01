@@ -37,10 +37,12 @@ class CatalogAttributeSeeder extends Seeder
 
         // ── 1. Upsert attributes ──────────────────────────────────────────────
         foreach ($attributes as $attr) {
-            DB::table('attributes')->updateOrInsert(
-                ['code' => $attr['code']],
-                array_merge($attr, ['created_at' => $now, 'updated_at' => $now])
-            );
+            $exists = DB::table('attributes')->where('code', $attr['code'])->exists();
+            if (!$exists) {
+                DB::table('attributes')->insert(array_merge(['id' => \Illuminate\Support\Str::uuid()->toString(), 'created_at' => $now, 'updated_at' => $now], $attr));
+            } else {
+                DB::table('attributes')->where('code', $attr['code'])->update(array_merge(['updated_at' => $now], $attr));
+            }
         }
 
         // Reload attribute codes → IDs
@@ -49,10 +51,13 @@ class CatalogAttributeSeeder extends Seeder
             ->pluck('id', 'code');
 
         // ── 2. Attribute Family: default ──────────────────────────────────────
-        DB::table('attribute_families')->updateOrInsert(
-            ['code' => 'default'],
-            ['code' => 'default', 'name' => 'Default', 'status' => true, 'created_at' => $now, 'updated_at' => $now]
-        );
+        $familyExists = DB::table('attribute_families')->where('code', 'default')->exists();
+        if (!$familyExists) {
+            DB::table('attribute_families')->insert(['id' => \Illuminate\Support\Str::uuid()->toString(), 'code' => 'default', 'name' => 'Default', 'status' => true, 'created_at' => $now, 'updated_at' => $now]);
+        } else {
+            DB::table('attribute_families')->where('code', 'default')->update(['name' => 'Default', 'status' => true, 'updated_at' => $now]);
+        }
+
         $familyId = DB::table('attribute_families')->where('code', 'default')->value('id');
 
         // ── 3. Attribute Groups ───────────────────────────────────────────────
@@ -87,7 +92,9 @@ class CatalogAttributeSeeder extends Seeder
                     ->update(['position' => $groupData['position'], 'updated_at' => $now]);
                 $groupId = $existingGroupId;
             } else {
-                $groupId = DB::table('attribute_groups')->insertGetId([
+                $groupId = \Illuminate\Support\Str::uuid()->toString();
+                DB::table('attribute_groups')->insert([
+                    'id' => $groupId,
                     'attribute_family_id' => $familyId,
                     'name' => $groupData['name'],
                     'position' => $groupData['position'],
@@ -99,13 +106,21 @@ class CatalogAttributeSeeder extends Seeder
             // ── 4. Attribute Group Mappings ───────────────────────────────────
             foreach ($groupData['attributes'] as $code) {
                 $attrId = $attrMap[$code] ?? null;
-                if (!$attrId)
+                if (!$attrId) {
                     continue;
+                }
 
-                DB::table('attribute_group_mappings')->updateOrInsert(
-                    ['attribute_group_id' => $groupId, 'attribute_id' => $attrId],
-                    ['attribute_group_id' => $groupId, 'attribute_id' => $attrId]
-                );
+                $mappingExists = DB::table('attribute_group_mappings')
+                    ->where('attribute_group_id', $groupId)
+                    ->where('attribute_id', $attrId)
+                    ->exists();
+
+                if (!$mappingExists) {
+                    DB::table('attribute_group_mappings')->insert([
+                        'attribute_group_id' => $groupId,
+                        'attribute_id' => $attrId
+                    ]);
+                }
             }
         }
     }

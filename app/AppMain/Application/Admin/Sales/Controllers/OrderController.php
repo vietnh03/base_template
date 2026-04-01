@@ -58,7 +58,7 @@ class OrderController extends Controller
     public function cancel(string $id)
     {
         return $this->baseActionTransaction(function () use ($id) {
-            $this->orderService->cancel((int) $id);
+            $this->orderService->cancel($id);
             return ['message' => 'Order canceled successfully'];
         }, 'Order canceled successfully');
     }

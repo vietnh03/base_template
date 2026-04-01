@@ -8,6 +8,8 @@ use App\AppMain\Application\Admin\Catalog\Controllers\ProductController;
 use App\AppMain\Application\Admin\Catalog\Controllers\AttributeController;
 use App\AppMain\Application\Admin\Catalog\Controllers\AttributeFamilyController;
 use App\AppMain\Application\Admin\Sales\Controllers\OrderController;
+use App\AppMain\Application\Admin\Sales\Controllers\InvoiceController;
+use App\AppMain\Application\Admin\Sales\Controllers\OrderTransactionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -54,72 +56,74 @@ Route::middleware('auth:admin')->group(function () {
 });
 
 // Catalog Management (Temporarily PUBLIC for testing)
-Route::prefix('catalog')->group(function () {
-    // Tag Management
-    Route::prefix('tags')->group(function () {
-        Route::get('/', [TagController::class, 'index']);          // GET /api/admin/catalog/tags
-        Route::post('/', [TagController::class, 'store']);         // POST /api/admin/catalog/tags
-        Route::get('/{id}', [TagController::class, 'show']);       // GET /api/admin/catalog/tags/{id}
-        Route::put('/{id}', [TagController::class, 'update']);     // PUT /api/admin/catalog/tags/{id}
-        Route::delete('/{id}', [TagController::class, 'destroy']); // DELETE /api/admin/catalog/tags/{id}
+Route::middleware('auth:admin')->group(function () {
+    Route::prefix('catalog')->group(function () {
+        // Tag Management
+        Route::prefix('tags')->group(function () {
+            Route::get('/', [TagController::class, 'index']);          // GET /api/admin/catalog/tags
+            Route::post('/', [TagController::class, 'store']);         // POST /api/admin/catalog/tags
+            Route::get('/{id}', [TagController::class, 'show']);       // GET /api/admin/catalog/tags/{id}
+            Route::put('/{id}', [TagController::class, 'update']);     // PUT /api/admin/catalog/tags/{id}
+            Route::delete('/{id}', [TagController::class, 'destroy']); // DELETE /api/admin/catalog/tags/{id}
+        });
+
+        // Category Management
+        Route::prefix('categories')->group(function () {
+            Route::get('/', [CategoryController::class, 'index']);          // GET /api/admin/catalog/categories
+            Route::post('/', [CategoryController::class, 'store']);         // POST /api/admin/catalog/categories
+            Route::get('/{id}', [CategoryController::class, 'show']);       // GET /api/admin/catalog/categories/{id}
+            Route::put('/{id}', [CategoryController::class, 'update']);     // PUT /api/admin/catalog/categories/{id}
+            Route::delete('/{id}', [CategoryController::class, 'destroy']); // DELETE /api/admin/catalog/categories/{id}
+        });
+
+        // Product Management
+        Route::prefix('products')->group(function () {
+            Route::get('/', [ProductController::class, 'index']);          // GET /api/admin/catalog/products
+            Route::post('/', [ProductController::class, 'store']);         // POST /api/admin/catalog/products
+            Route::get('/{id}', [ProductController::class, 'show']);       // GET /api/admin/catalog/products/{id}
+            Route::put('/{id}', [ProductController::class, 'update']);     // PUT /api/admin/catalog/products/{id}
+            Route::delete('/{id}', [ProductController::class, 'destroy']); // DELETE /api/admin/catalog/products/{id}
+        });
+
+        // Attribute Management
+        Route::prefix('attributes')->group(function () {
+            Route::get('/', [AttributeController::class, 'index']);          // GET /api/admin/catalog/attributes
+            Route::post('/', [AttributeController::class, 'store']);         // POST /api/admin/catalog/attributes
+            Route::get('/{id}', [AttributeController::class, 'show']);       // GET /api/admin/catalog/attributes/{id}
+            Route::put('/{id}', [AttributeController::class, 'update']);     // PUT /api/admin/catalog/attributes/{id}
+            Route::delete('/{id}', [AttributeController::class, 'destroy']); // DELETE /api/admin/catalog/attributes/{id}
+        });
+
+        // Attribute Family Management
+        Route::prefix('attribute-families')->group(function () {
+            Route::get('/', [AttributeFamilyController::class, 'index']);          // GET /api/admin/catalog/attribute-families
+            Route::post('/', [AttributeFamilyController::class, 'store']);         // POST /api/admin/catalog/attribute-families
+            Route::get('/{id}', [AttributeFamilyController::class, 'show']);       // GET /api/admin/catalog/attribute-families/{id}
+            Route::put('/{id}', [AttributeFamilyController::class, 'update']);     // PUT /api/admin/catalog/attribute-families/{id}
+            Route::delete('/{id}', [AttributeFamilyController::class, 'destroy']); // DELETE /api/admin/catalog/attribute-families/{id}
+        });
     });
 
-    // Category Management
-    Route::prefix('categories')->group(function () {
-        Route::get('/', [CategoryController::class, 'index']);          // GET /api/admin/catalog/categories
-        Route::post('/', [CategoryController::class, 'store']);         // POST /api/admin/catalog/categories
-        Route::get('/{id}', [CategoryController::class, 'show']);       // GET /api/admin/catalog/categories/{id}
-        Route::put('/{id}', [CategoryController::class, 'update']);     // PUT /api/admin/catalog/categories/{id}
-        Route::delete('/{id}', [CategoryController::class, 'destroy']); // DELETE /api/admin/catalog/categories/{id}
-    });
+    // Sales Management
+    Route::prefix('sales')->group(function () {
+        Route::prefix('orders')->group(function () {
+            Route::get('/', [OrderController::class, 'index']);           // GET /api/admin/sales/orders
+            Route::post('/', [OrderController::class, 'store']);          // POST /api/admin/sales/orders
+            Route::get('/{id}', [OrderController::class, 'show']);        // GET /api/admin/sales/orders/{id}
+            Route::put('/{id}/status', [OrderController::class, 'updateStatus']); // PUT /api/admin/sales/orders/{id}/status
+            Route::post('/{id}/cancel', [OrderController::class, 'cancel']);   // POST /api/admin/sales/orders/{id}/cancel
+        });
 
-    // Product Management
-    Route::prefix('products')->group(function () {
-        Route::get('/', [ProductController::class, 'index']);          // GET /api/admin/catalog/products
-        Route::post('/', [ProductController::class, 'store']);         // POST /api/admin/catalog/products
-        Route::get('/{id}', [ProductController::class, 'show']);       // GET /api/admin/catalog/products/{id}
-        Route::put('/{id}', [ProductController::class, 'update']);     // PUT /api/admin/catalog/products/{id}
-        Route::delete('/{id}', [ProductController::class, 'destroy']); // DELETE /api/admin/catalog/products/{id}
-    });
+        Route::prefix('invoices')->group(function () {
+            Route::get('/', [InvoiceController::class, 'index']);
+            Route::post('/', [InvoiceController::class, 'store']);
+            Route::get('/{id}', [InvoiceController::class, 'show']);
+        });
 
-    // Attribute Management
-    Route::prefix('attributes')->group(function () {
-        Route::get('/', [AttributeController::class, 'index']);          // GET /api/admin/catalog/attributes
-        Route::post('/', [AttributeController::class, 'store']);         // POST /api/admin/catalog/attributes
-        Route::get('/{id}', [AttributeController::class, 'show']);       // GET /api/admin/catalog/attributes/{id}
-        Route::put('/{id}', [AttributeController::class, 'update']);     // PUT /api/admin/catalog/attributes/{id}
-        Route::delete('/{id}', [AttributeController::class, 'destroy']); // DELETE /api/admin/catalog/attributes/{id}
-    });
-
-    // Attribute Family Management
-    Route::prefix('attribute-families')->group(function () {
-        Route::get('/', [AttributeFamilyController::class, 'index']);          // GET /api/admin/catalog/attribute-families
-        Route::post('/', [AttributeFamilyController::class, 'store']);         // POST /api/admin/catalog/attribute-families
-        Route::get('/{id}', [AttributeFamilyController::class, 'show']);       // GET /api/admin/catalog/attribute-families/{id}
-        Route::put('/{id}', [AttributeFamilyController::class, 'update']);     // PUT /api/admin/catalog/attribute-families/{id}
-        Route::delete('/{id}', [AttributeFamilyController::class, 'destroy']); // DELETE /api/admin/catalog/attribute-families/{id}
-    });
-});
-
-// Sales Management
-Route::prefix('sales')->group(function () {
-    Route::prefix('orders')->group(function () {
-        Route::get('/', [OrderController::class, 'index']);           // GET /api/admin/sales/orders
-        Route::post('/', [OrderController::class, 'store']);          // POST /api/admin/sales/orders
-        Route::get('/{id}', [OrderController::class, 'show']);        // GET /api/admin/sales/orders/{id}
-        Route::put('/{id}/status', [OrderController::class, 'updateStatus']); // PUT /api/admin/sales/orders/{id}/status
-        Route::post('/{id}/cancel', [OrderController::class, 'cancel']);   // POST /api/admin/sales/orders/{id}/cancel
-    });
-
-    Route::prefix('invoices')->group(function () {
-        Route::get('/', [\App\AppMain\Application\Admin\Sales\Controllers\InvoiceController::class, 'index']);
-        Route::post('/', [\App\AppMain\Application\Admin\Sales\Controllers\InvoiceController::class, 'store']);
-        Route::get('/{id}', [\App\AppMain\Application\Admin\Sales\Controllers\InvoiceController::class, 'show']);
-    });
-
-    Route::prefix('transactions')->group(function () {
-        Route::get('/', [\App\AppMain\Application\Admin\Sales\Controllers\OrderTransactionController::class, 'index']);
-        Route::post('/', [\App\AppMain\Application\Admin\Sales\Controllers\OrderTransactionController::class, 'store']);
-        Route::get('/{id}', [\App\AppMain\Application\Admin\Sales\Controllers\OrderTransactionController::class, 'show']);
+        Route::prefix('transactions')->group(function () {
+            Route::get('/', [OrderTransactionController::class, 'index']);
+            Route::post('/', [OrderTransactionController::class, 'store']);
+            Route::get('/{id}', [OrderTransactionController::class, 'show']);
+        });
     });
 });

@@ -42,5 +42,8 @@ class Invoice extends BaseModel
         return $this->belongsTo(Order::class);
     }
 
-    // items... (invoice items)
+    public function items(): HasMany
+    {
+        return $this->hasMany(InvoiceItem::class);
+    }
 }

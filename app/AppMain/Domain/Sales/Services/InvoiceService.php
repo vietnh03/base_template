@@ -67,25 +67,22 @@ class InvoiceService
             ], $data));
 
             // Create invoice items based on order items
-            if ($order->relationLoaded('items') || true) {
-                // To keep simple, we can copy from order items
-                $orderItems = $order->items()->get();
-                foreach ($orderItems as $item) {
-                    $this->invoiceItemRepository->create([
-                        'invoice_id' => $invoice->id,
-                        'order_item_id' => $item->id,
-                        'name' => $item->name,
-                        'sku' => $item->sku,
-                        'qty' => $item->qty_ordered, // assuming full invoice
-                        'price' => $item->price,
-                        'base_price' => $item->base_price,
-                        'total' => $item->total,
-                        'base_total' => $item->base_total,
-                        'tax_amount' => $item->tax_amount,
-                        'base_tax_amount' => $item->base_tax_amount,
-                        'product_id' => $item->product_id,
-                    ]);
-                }
+            $orderItems = $order->items()->get();
+            foreach ($orderItems as $item) {
+                $this->invoiceItemRepository->create([
+                    'invoice_id' => $invoice->id,
+                    'order_item_id' => $item->id,
+                    'name' => $item->name,
+                    'sku' => $item->sku,
+                    'qty' => $item->qty_ordered, // assuming full invoice
+                    'price' => $item->price,
+                    'base_price' => $item->base_price,
+                    'total' => $item->total,
+                    'base_total' => $item->base_total,
+                    'tax_amount' => $item->tax_amount,
+                    'base_tax_amount' => $item->base_tax_amount,
+                    'product_id' => $item->product_id,
+                ]);
             }
 
             return $this->findById($invoice->id);
@@ -94,6 +91,6 @@ class InvoiceService
 
     protected function generateIncrementId(): string
     {
-        return 'INV-' . date('Ymd') . rand(1000, 9999);
+        return 'INV-' . date('Ymd') . str_pad((string) random_int(10000, 99999), 5, '0', STR_PAD_LEFT);
     }
 }

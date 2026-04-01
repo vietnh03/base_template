@@ -85,6 +85,11 @@ class Order extends BaseModel
         return $this->hasMany(OrderTransaction::class);
     }
 
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);

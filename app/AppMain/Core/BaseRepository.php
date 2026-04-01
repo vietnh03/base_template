@@ -39,14 +39,6 @@ abstract class BaseRepository
     }
 
     /**
-     * Find record by ID or throw exception
-     */
-    public function findOrFail($id)
-    {
-        return $this->model->findOrFail($id);
-    }
-
-    /**
      * Create new record
      */
     public function create(array $data)
@@ -59,7 +51,7 @@ abstract class BaseRepository
      */
     public function update($id, array $data): mixed
     {
-        $record = $this->findOrFail($id);
+        $record = $this->findById($id);
         return $record->update($data);
     }
 
@@ -68,7 +60,7 @@ abstract class BaseRepository
      */
     public function delete($id): bool
     {
-        $record = $this->findOrFail($id);
+        $record = $this->findById($id);
         return $record->delete();
     }
 

@@ -14,7 +14,7 @@ class OrderStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'customer_id' => 'nullable|integer|exists:customers,id',
+            'customer_id' => 'nullable|string|uuid|exists:customers,id',
             'customer_email' => 'required|email|max:255',
             'customer_first_name' => 'required|string|max:255',
             'customer_last_name' => 'required|string|max:255',
@@ -23,7 +23,7 @@ class OrderStoreRequest extends FormRequest
             'coupon_code' => 'nullable|string|max:255',
 
             'items' => 'required|array|min:1',
-            'items.*.product_id' => 'required|integer|exists:products,id',
+            'items.*.product_id' => 'required|string|uuid|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1',
 
             'shipping_address' => 'required|array',

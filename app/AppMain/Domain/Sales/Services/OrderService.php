@@ -188,8 +188,8 @@ class OrderService
                 'is_gift' => false,
                 'total_item_count' => count($itemsData),
                 'total_qty_ordered' => $totalQty,
-                'base_currency_code' => 'USD',
-                'order_currency_code' => 'USD',
+                'base_currency_code' => config('app.currency', 'VND'),
+                'order_currency_code' => config('app.currency', 'VND'),
                 'grand_total' => $grandTotal,
                 'base_grand_total' => $grandTotal,
                 'sub_total' => $subTotal,
@@ -221,7 +221,7 @@ class OrderService
         });
     }
 
-    public function cancel(int $orderId): bool
+    public function cancel(string $orderId): bool
     {
         return DB::transaction(function () use ($orderId) {
             $order = $this->orderRepository->findOrFail($orderId);
@@ -240,6 +240,6 @@ class OrderService
     protected function generateIncrementId(): string
     {
         // Simple increment ID generator, can be customized
-        return date('Ymd') . rand(1000, 9999);
+        return date('Ymd') . str_pad((string) random_int(10000, 99999), 5, '0', STR_PAD_LEFT);
     }
 }
