@@ -7,6 +7,7 @@ use App\AppMain\Application\Admin\Catalog\Controllers\CategoryController;
 use App\AppMain\Application\Admin\Catalog\Controllers\ProductController;
 use App\AppMain\Application\Admin\Catalog\Controllers\AttributeController;
 use App\AppMain\Application\Admin\Catalog\Controllers\AttributeFamilyController;
+use App\AppMain\Application\Admin\Sales\Controllers\OrderController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -97,5 +98,16 @@ Route::prefix('catalog')->group(function () {
         Route::get('/{id}', [AttributeFamilyController::class, 'show']);       // GET /api/admin/catalog/attribute-families/{id}
         Route::put('/{id}', [AttributeFamilyController::class, 'update']);     // PUT /api/admin/catalog/attribute-families/{id}
         Route::delete('/{id}', [AttributeFamilyController::class, 'destroy']); // DELETE /api/admin/catalog/attribute-families/{id}
+    });
+});
+
+// Sales Management
+Route::prefix('sales')->group(function () {
+    Route::prefix('orders')->group(function () {
+        Route::get('/', [OrderController::class, 'index']);           // GET /api/admin/sales/orders
+        Route::post('/', [OrderController::class, 'store']);          // POST /api/admin/sales/orders
+        Route::get('/{id}', [OrderController::class, 'show']);        // GET /api/admin/sales/orders/{id}
+        Route::put('/{id}/status', [OrderController::class, 'updateStatus']); // PUT /api/admin/sales/orders/{id}/status
+        Route::post('/{id}/cancel', [OrderController::class, 'cancel']);   // POST /api/admin/sales/orders/{id}/cancel
     });
 });

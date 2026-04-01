@@ -10,7 +10,6 @@ class OrderItem extends BaseModel
 {
     protected $fillable = [
         'sku',
-        'type',
         'name',
         'coupon_code',
         'weight',
@@ -43,7 +42,6 @@ class OrderItem extends BaseModel
         'tax_amount_refunded',
         'base_tax_amount_refunded',
         'product_id',
-        'product_type',
         'order_id',
         'parent_id',
         'additional',

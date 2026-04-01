@@ -4,21 +4,24 @@ namespace App\AppMain\Domain\Checkout\Services;
 
 use App\AppMain\Domain\Checkout\Repositories\CartRepository;
 use App\AppMain\Domain\Checkout\Repositories\CartItemRepository;
+use App\AppMain\Domain\Catalog\Repositories\ProductRepository;
 use App\Models\Cart;
-use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 
 class CartService
 {
     protected CartRepository $cartRepository;
     protected CartItemRepository $cartItemRepository;
+    protected ProductRepository $productRepository;
 
     public function __construct(
         CartRepository $cartRepository,
-        CartItemRepository $cartItemRepository
+        CartItemRepository $cartItemRepository,
+        ProductRepository $productRepository
     ) {
         $this->cartRepository = $cartRepository;
         $this->cartItemRepository = $cartItemRepository;
+        $this->productRepository = $productRepository;
     }
 
     public function getCurrentCart(?int $customerId = null, ?int $cartId = null): ?Cart
@@ -56,21 +59,23 @@ class CartService
     {
         return DB::transaction(function () use ($productId, $qty, $customerId, $cartId) {
             $cart = $this->getOrCreateCart($customerId, $cartId);
-            $product = Product::findOrFail($productId);
+            $product = $this->productRepository->findById($productId, ['flat']);
 
-            $flat = \App\Models\ProductFlat::where('product_id', $product->id)->first();
+            $flat = $product->flat->first();
 
             $cartItem = $this->cartItemRepository->getModel()::where('cart_id', $cart->id)
                 ->where('product_id', $productId)
                 ->first();
 
             if ($cartItem) {
-                $cartItem->quantity += $qty;
-                $cartItem->total = $cartItem->quantity * $cartItem->price;
-                $cartItem->base_total = $cartItem->quantity * $cartItem->base_price;
-                $cartItem->total_weight = $cartItem->quantity * $cartItem->weight;
-                $cartItem->base_total_weight = $cartItem->quantity * $cartItem->weight;
-                $cartItem->save();
+                $newQty = $cartItem->quantity + $qty;
+                $this->cartItemRepository->update($cartItem->id, [
+                    'quantity' => $newQty,
+                    'total' => $newQty * $cartItem->price,
+                    'base_total' => $newQty * $cartItem->base_price,
+                    'total_weight' => $newQty * $cartItem->weight,
+                    'base_total_weight' => $newQty * $cartItem->weight,
+                ]);
             } else {
                 $price = $flat ? ($flat->price ?? 0) : 0;
                 $weight = $flat ? ($flat->weight ?? 0) : 0;
@@ -92,7 +97,7 @@ class CartService
                 ]);
             }
 
-            return $this->recalculate($cart);
+            return $this->recalculate($cart->fresh());
         });
     }
 
@@ -105,14 +110,15 @@ class CartService
                 return $this->removeItem($itemId);
             }
 
-            $cartItem->quantity = $qty;
-            $cartItem->total = $cartItem->quantity * $cartItem->price;
-            $cartItem->base_total = $cartItem->quantity * $cartItem->base_price;
-            $cartItem->total_weight = $cartItem->quantity * $cartItem->weight;
-            $cartItem->base_total_weight = $cartItem->quantity * $cartItem->weight;
-            $cartItem->save();
+            $this->cartItemRepository->update($itemId, [
+                'quantity' => $qty,
+                'total' => $qty * $cartItem->price,
+                'base_total' => $qty * $cartItem->base_price,
+                'total_weight' => $qty * $cartItem->weight,
+                'base_total_weight' => $qty * $cartItem->weight,
+            ]);
 
-            return $this->recalculate($cartItem->cart);
+            return $this->recalculate($cartItem->cart->fresh());
         });
     }
 
@@ -121,9 +127,9 @@ class CartService
         return DB::transaction(function () use ($itemId) {
             $cartItem = $this->cartItemRepository->findOrFail($itemId);
             $cart = $cartItem->cart;
-            $cartItem->delete();
+            $this->cartItemRepository->delete($itemId);
 
-            return $this->recalculate($cart);
+            return $this->recalculate($cart->fresh());
         });
     }
 
@@ -140,7 +146,7 @@ class CartService
         $grandTotal = $subTotal;
         $baseGrandTotal = $baseSubTotal;
 
-        $cart->update([
+        $this->cartRepository->update($cart->id, [
             'items_count' => $itemsCount,
             'items_qty' => $itemsQty,
             'sub_total' => $subTotal,
@@ -150,5 +156,11 @@ class CartService
         ]);
 
         return $cart->fresh('items');
+    }
+
+    public function deactivateCart(int $cartId): bool
+    {
+        $this->cartRepository->update($cartId, ['is_active' => false]);
+        return true;
     }
 }

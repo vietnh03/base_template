@@ -41,8 +41,7 @@ class CheckoutService
             $order = $this->orderService->createFromCart($cart);
 
             // 4. Deactivate the cart
-            $cart->is_active = false;
-            $cart->save();
+            $this->cartService->deactivateCart($cart->id);
 
             return $order;
         });

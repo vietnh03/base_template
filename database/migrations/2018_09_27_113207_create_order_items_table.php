@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::create('order_items', function (Blueprint $table) {
             $table->increments('id');
             $table->string('sku')->nullable();
-            $table->string('type')->nullable();
             $table->string('name')->nullable();
             $table->string('coupon_code')->nullable();
             $table->decimal('weight', 12, 4)->default(0)->nullable();
@@ -49,7 +48,6 @@ return new class extends Migration
             $table->decimal('tax_amount_refunded', 12, 4)->default(0)->nullable();
             $table->decimal('base_tax_amount_refunded', 12, 4)->default(0)->nullable();
             $table->integer('product_id')->unsigned()->nullable();
-            $table->string('product_type')->nullable();
             $table->integer('order_id')->unsigned()->nullable();
             $table->integer('parent_id')->unsigned()->nullable();
             $table->json('additional')->nullable();

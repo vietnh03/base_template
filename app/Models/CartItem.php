@@ -11,7 +11,6 @@ class CartItem extends BaseModel
     protected $fillable = [
         'quantity',
         'sku',
-        'type',
         'name',
         'coupon_code',
         'weight',

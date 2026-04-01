@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Admin API Tester</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            background: #111;
+            color: #eee;
+        }
+
+        .card {
+            background: #222;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #444;
+        }
+
+        input,
+        select,
+        button {
+            padding: 8px;
+            margin: 4px;
+            background: #333;
+            color: white;
+            border: 1px solid #555;
+        }
+
+        button {
+            cursor: pointer;
+            background: #6366f1;
+            border-color: #6366f1;
+        }
+
+        button:hover {
+            background: #4f46e5;
+        }
+
+        pre {
+            background: #000;
+            padding: 10px;
+            color: #a5b4fc;
+            overflow: auto;
+            max-height: 400px;
+            border: 1px solid #333;
+        }
+
+        .success {
+            color: #10b981;
+        }
+
+        .error {
+            color: #ef4444;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Sales Admin API Tester</h1>
+
+    <div class="card">
+        <h3>1. Đăng nhập Admin (Lấy Sanctum Token)</h3>
+        <input type="email" id="email" value="admin@example.com" placeholder="Email">
+        <input type="password" id="password" value="password" placeholder="Password">
+        <button onclick="login()">Đăng nhập</button>
+        <span id="login-status"></span>
+    </div>
+
+    <div class="card">
+        <h3>2. Danh sách Đơn hàng (GET /api/admin/sales/orders)</h3>
+        <input type="text" id="filter-status" placeholder="Lọc Status (vd: pending)">
+        <input type="text" id="filter-email" placeholder="Lọc Email">
+        <button onclick="getOrders()">Lấy danh sách Order</button>
+    </div>
+
+    <div class="card">
+        <h3>3. Cập nhật trạng thái Đơn hàng (PUT /api/admin/sales/orders/{id}/status)</h3>
+        <input type="number" id="order-id" placeholder="Order ID">
+        <select id="order-status">
+            <option value="pending">pending</option>
+            <option value="processing">processing</option>
+            <option value="completed">completed</option>
+            <option value="canceled">canceled</option>
+            <option value="closed">closed</option>
+            <option value="fraud">fraud</option>
+        </select>
+        <button onclick="updateStatus()">Cập nhật Status</button>
+    </div>
+
+    <div class="card">
+        <h3>4. Xem chi tiết Đơn hàng (GET /api/admin/sales/orders/{id})</h3>
+        <input type="number" id="detail-id" placeholder="Order ID">
+        <button onclick="getOrderDetail()">Xem chi tiết</button>
+    </div>
+
+    <div class="card">
+        <h3>5. Tạo Đơn hàng mới từ Admin (POST /api/admin/sales/orders)</h3>
+        <textarea id="create-order-json" rows="15" style="width: 100%; font-family: monospace;">
+{
+    "customer_email": "customer@example.com",
+    "customer_first_name": "John",
+    "customer_last_name": "Doe",
+    "shipping_method": "flatrate",
+    "items": [
+        {
+            "product_id": 1,
+            "quantity": 2
+        }
+    ],
+    "shipping_address": {
+        "first_name": "John",
+        "last_name": "Doe",
+        "address1": "123 Main St",
+        "city": "Ho Chi Minh",
+        "country": "VN",
+        "postcode": "700000",
+        "phone": "0901234567"
+    },
+    "billing_address": {
+        "first_name": "John",
+        "last_name": "Doe",
+        "address1": "123 Main St",
+        "city": "Ho Chi Minh",
+        "country": "VN",
+        "postcode": "700000",
+        "phone": "0901234567"
+    }
+}
+        </textarea>
+        <br />
+        <button onclick="createOrder()">Tạo Order</button>
+    </div>
+
+    <div class="card">
+        <h3>Response Console</h3>
+        <pre id="response">...</pre>
+    </div>
+
+    <script>
+        let token = '';
+
+        async function api(method, url, body = null) {
+            const el = document.getElementById('response');
+            el.innerHTML = 'Đang gọi API...';
+            const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+            if (token) headers['Authorization'] = 'Bearer ' + token;
+
+            try {
+                const res = await fetch(url, { method, headers, body: body ? JSON.stringify(body) : null });
+                const json = await res.json();
+                el.innerHTML = JSON.stringify(json, null, 2);
+                if (!res.ok) el.classList.add('error'); else el.classList.remove('error');
+            } catch (e) {
+                el.innerHTML = 'Lỗi mạng: ' + e.message;
+            }
+        }
+
+        async function login() {
+            const res = await fetch('/api/admin/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({ email: document.getElementById('email').value, password: document.getElementById('password').value })
+            });
+            const data = await res.json();
+            if (data.data && data.data.token) {
+                token = data.data.token;
+                document.getElementById('login-status').innerHTML = '<span class="success">Đăng nhập thành công! Token đã lưu.</span>';
+                document.getElementById('response').innerHTML = JSON.stringify(data, null, 2);
+            } else {
+                document.getElementById('login-status').innerHTML = '<span class="error">Đăng nhập thất bại.</span>';
+                document.getElementById('response').innerHTML = JSON.stringify(data, null, 2);
+            }
+        }
+
+        async function getOrders() {
+            let url = '/api/admin/sales/orders?per_page=10';
+            const st = document.getElementById('filter-status').value;
+            const em = document.getElementById('filter-email').value;
+            if (st) url += `&status=${st}`;
+            if (em) url += `&customer_email=${em}`;
+            await api('GET', url);
+        }
+
+        async function updateStatus() {
+            const id = document.getElementById('order-id').value;
+            const status = document.getElementById('order-status').value;
+            if (!id) return alert('Nhập Order ID');
+            await api('PUT', `/api/admin/sales/orders/${id}/status`, { status });
+        }
+
+        async function getOrderDetail() {
+            const id = document.getElementById('detail-id').value;
+            if (!id) return alert('Nhập Order ID');
+            await api('GET', `/api/admin/sales/orders/${id}`);
+        }
+
+        async function createOrder() {
+            const jsonStr = document.getElementById('create-order-json').value;
+            let body;
+            try {
+                body = JSON.parse(jsonStr);
+            } catch (e) {
+                return alert('JSON không hợp lệ: ' + e.message);
+            }
+            await api('POST', `/api/admin/sales/orders`, body);
+        }
+    </script>
+</body>
+
+</html>

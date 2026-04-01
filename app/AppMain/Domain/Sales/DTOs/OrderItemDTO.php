@@ -7,7 +7,6 @@ use App\AppMain\Core\BaseDTO;
 class OrderItemDTO extends BaseDTO
 {
     public ?string $sku = null;
-    public ?string $type = null;
     public ?string $name = null;
     public ?string $coupon_code = null;
     public ?float $weight = 0;
@@ -17,7 +16,6 @@ class OrderItemDTO extends BaseDTO
     public ?float $total = 0;
     public ?float $base_total = 0;
     public ?int $product_id = null;
-    public ?string $product_type = null;
     public ?int $order_id = null;
     public ?int $parent_id = null;
 

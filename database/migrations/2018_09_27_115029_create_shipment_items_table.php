@@ -25,7 +25,6 @@ return new class extends Migration
             $table->decimal('total', 12, 4)->default(0)->nullable();
             $table->decimal('base_total', 12, 4)->default(0)->nullable();
             $table->integer('product_id')->unsigned()->nullable();
-            $table->string('product_type')->nullable();
             $table->integer('order_item_id')->unsigned()->nullable();
             $table->integer('shipment_id')->unsigned();
             $table->json('additional')->nullable();

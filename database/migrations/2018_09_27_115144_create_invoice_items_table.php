@@ -30,7 +30,6 @@ return new class extends Migration
             $table->decimal('discount_amount', 12, 4)->default(0)->nullable();
             $table->decimal('base_discount_amount', 12, 4)->default(0)->nullable();
             $table->integer('product_id')->unsigned()->nullable();
-            $table->string('product_type')->nullable();
             $table->integer('order_item_id')->unsigned()->nullable();
             $table->integer('invoice_id')->unsigned()->nullable();
             $table->json('additional')->nullable();

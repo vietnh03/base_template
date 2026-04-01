@@ -8,7 +8,6 @@ class CartItemDTO extends BaseDTO
 {
     public int $quantity = 0;
     public ?string $sku = null;
-    public ?string $type = null;
     public ?string $name = null;
     public ?string $coupon_code = null;
     public float $weight = 0;
