@@ -52,7 +52,8 @@ class ProductRequest extends BaseFormRequest
 
             'images' => 'nullable|array',
             'images.*.id' => 'sometimes|exists:product_images,id',
-            'images.*.path' => 'required|string',
+            'images.*.file' => 'required_without:images.*.id|image|mimes:jpeg,png,jpg,gif,svg|max:4096',
+            'images.*.path' => 'nullable|string',
             'images.*.type' => 'nullable|string',
             'images.*.position' => 'nullable|integer',
 

@@ -10,6 +10,8 @@ class CategoryResponse extends BaseResponseDTO
     public $parentId;
     public $position;
     public $status;
+    public $logoUrl;
+    public $bannerUrl;
     public $additional;
     public $translations = [];
     public $createdAt;
@@ -22,6 +24,8 @@ class CategoryResponse extends BaseResponseDTO
         $dto->parentId = $model->parent_id;
         $dto->position = $model->position;
         $dto->status = $model->status;
+        $dto->logoUrl = $model->logo_path ? \Illuminate\Support\Facades\Storage::url($model->logo_path) : null;
+        $dto->bannerUrl = $model->banner_path ? \Illuminate\Support\Facades\Storage::url($model->banner_path) : null;
         $dto->additional = $model->additional;
         $dto->createdAt = $model->created_at;
         $dto->updatedAt = $model->updated_at;

@@ -16,6 +16,8 @@ class CategoryRequest extends BaseFormRequest
             'parent_id' => 'nullable|exists:categories,id',
             'position' => 'nullable|integer',
             'status' => 'nullable|boolean',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'banner' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:4096',
             'additional' => 'nullable|array',
             'translations' => ($isUpdate ? 'sometimes|' : 'required|') . 'array',
             'translations.*.name' => 'required|string|max:255',

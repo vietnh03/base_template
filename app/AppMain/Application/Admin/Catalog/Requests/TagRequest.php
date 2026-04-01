@@ -13,6 +13,7 @@ class TagRequest extends BaseFormRequest
         $isUpdate = $id !== null;
 
         return [
+            'status' => 'sometimes|boolean',
             'translations' => ($isUpdate ? 'sometimes|' : 'required|') . 'array',
             'translations.*.name' => 'required|string|max:255',
             'translations.*.slug' => 'sometimes|string|max:255',

@@ -69,6 +69,7 @@ class ProductRepository extends BaseRepository
                 }
             }
 
+            $relations = $this->handleImages($product, $relations);
             $this->syncRelations($product, $relations);
 
             // If no attribute_values were provided, still ensure a flat row exists
@@ -115,6 +116,7 @@ class ProductRepository extends BaseRepository
                 }
             }
 
+            $relations = $this->handleImages($product, $relations);
             $this->syncRelations($product->fresh(), $relations);
 
             // Nếu không có attribute_values trong relations, vẫn phải sync flat
@@ -419,5 +421,42 @@ class ProductRepository extends BaseRepository
         $this->applySortingFilter($query, $filters);
 
         return $this->applyPagination($query, $filters) ?? $query->paginate($filters['per_page'] ?? 15);
+    }
+
+    protected function handleImages($product, array $relations): array
+    {
+        if (!isset($relations['images'])) {
+            return $relations;
+        }
+
+        $images = $relations['images'];
+        $processedImages = [];
+
+        // Identify images to keep/update and those to create
+        foreach ($images as $imageData) {
+            if (isset($imageData['file']) && $imageData['file'] instanceof \Illuminate\Http\UploadedFile) {
+                // Upload new image
+                $path = $imageData['file']->store('products/' . $product->id, 'public');
+                $imageData['path'] = $path;
+                unset($imageData['file']);
+            }
+            $processedImages[] = $imageData;
+        }
+
+        // Clean up physically deleted images
+        $existingImageIds = array_filter(array_column($processedImages, 'id'));
+        $imagesToDelete = $product->images()
+            ->when(!empty($existingImageIds), function ($q) use ($existingImageIds) {
+                $q->whereNotIn('id', $existingImageIds);
+            })
+            ->get();
+
+        foreach ($imagesToDelete as $image) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($image->path);
+        }
+
+        $relations['images'] = $processedImages;
+
+        return $relations;
     }
 }

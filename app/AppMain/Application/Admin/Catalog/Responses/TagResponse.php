@@ -7,6 +7,7 @@ use App\AppMain\Core\BaseResponseDTO;
 class TagResponse extends BaseResponseDTO
 {
     public $id;
+    public $status;
     public $translations = [];
     public $createdAt;
     public $updatedAt;
@@ -15,6 +16,7 @@ class TagResponse extends BaseResponseDTO
     {
         $dto = new self();
         $dto->id = $model->id;
+        $dto->status = $model->status;
         $dto->createdAt = $model->created_at;
         $dto->updatedAt = $model->updated_at;
 

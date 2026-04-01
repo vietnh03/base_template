@@ -50,6 +50,7 @@ return new class extends Migration {
 
         Schema::create('tags', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->boolean('status')->default(0);
             $table->timestamps();
         });
 
@@ -62,8 +63,6 @@ return new class extends Migration {
             $table->unique(['tag_id', 'locale'], 'tag_translation_index_unique');
             $table->unique(['slug', 'locale'], 'tag_translation_slug_index_unique');
             $table->timestamps();
-
-            $table->foreign('tag_id')->references('id')->on('tags')->onDelete('cascade');
         });
 
         Schema::create('product_tags', function (Blueprint $table) {

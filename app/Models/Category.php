@@ -15,6 +15,8 @@ class Category extends BaseModel
         'parent_id',
         'position',
         'status',
+        'logo_path',
+        'banner_path',
         'additional',
     ];
 

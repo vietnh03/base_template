@@ -58,6 +58,10 @@ class TagRepository extends BaseRepository
     {
         $query = $this->model->newQuery()->with('translations');
 
+        if (isset($filters['status'])) {
+            $query->where('status', (bool) $filters['status']);
+        }
+
         if (!empty($filters['name'])) {
             $query->whereHas('translations', function ($q) use ($filters) {
                 $q->where('name', 'like', '%' . $filters['name'] . '%');

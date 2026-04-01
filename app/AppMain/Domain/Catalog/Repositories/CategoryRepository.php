@@ -22,6 +22,7 @@ class CategoryRepository extends BaseRepository
     public function create(array $data, array $translations = [])
     {
         return DB::transaction(function () use ($data, $translations) {
+            $data = $this->handleImages($data);
             $category = $this->model->create($data);
 
             $this->saveTranslations($category, $translations);
@@ -35,6 +36,7 @@ class CategoryRepository extends BaseRepository
         return DB::transaction(function () use ($id, $data, $translations) {
             $category = $this->findById($id);
 
+            $data = $this->handleImages($data, $category);
             $category->update($data);
 
             if (!empty($translations)) {
@@ -97,5 +99,26 @@ class CategoryRepository extends BaseRepository
 
             return $category->delete();
         });
+    }
+
+    protected function handleImages(array $data, $category = null): array
+    {
+        if (isset($data['logo']) && $data['logo'] instanceof \Illuminate\Http\UploadedFile) {
+            if ($category && $category->logo_path) {
+                \Illuminate\Support\Facades\Storage::delete($category->logo_path);
+            }
+            $data['logo_path'] = $data['logo']->store('categories/logo', 'public');
+        }
+
+        if (isset($data['banner']) && $data['banner'] instanceof \Illuminate\Http\UploadedFile) {
+            if ($category && $category->banner_path) {
+                \Illuminate\Support\Facades\Storage::delete($category->banner_path);
+            }
+            $data['banner_path'] = $data['banner']->store('categories/banner', 'public');
+        }
+
+        unset($data['logo'], $data['banner']);
+
+        return $data;
     }
 }

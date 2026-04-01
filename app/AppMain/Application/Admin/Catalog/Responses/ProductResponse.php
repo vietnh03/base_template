@@ -72,6 +72,7 @@ class ProductResponse extends BaseResponseDTO
             $dto->images = $model->images->map(fn($i) => [
                 'id' => $i->id,
                 'path' => $i->path,
+                'url' => $i->path ? \Illuminate\Support\Facades\Storage::url($i->path) : null,
                 'type' => $i->type,
                 'position' => $i->position,
             ])->toArray();
