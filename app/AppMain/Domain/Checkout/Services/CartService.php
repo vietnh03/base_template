@@ -63,12 +63,19 @@ class CartService
 
             $flat = $product->flat->first();
 
+            $inventory = \App\Models\ProductInventory::where('product_id', $productId)->first();
+            $availableQty = $inventory ? $inventory->qty : 0;
+
             $cartItem = $this->cartItemRepository->getModel()::where('cart_id', $cart->id)
                 ->where('product_id', $productId)
                 ->first();
 
+            $newQty = $cartItem ? $cartItem->quantity + $qty : $qty;
+            if ($newQty > $availableQty) {
+                throw new \Exception("Not enough stock available for this product. Available: {$availableQty}");
+            }
+
             if ($cartItem) {
-                $newQty = $cartItem->quantity + $qty;
                 $this->cartItemRepository->update($cartItem->id, [
                     'quantity' => $newQty,
                     'total' => $newQty * $cartItem->price,
@@ -97,7 +104,7 @@ class CartService
                 ]);
             }
 
-            return $this->recalculate($cart->fresh());
+            return $this->recalculate($cart);
         });
     }
 
@@ -110,6 +117,12 @@ class CartService
                 return $this->removeItem($itemId);
             }
 
+            $inventory = \App\Models\ProductInventory::where('product_id', $cartItem->product_id)->first();
+            $availableQty = $inventory ? $inventory->qty : 0;
+            if ($qty > $availableQty) {
+                throw new \Exception("Not enough stock available for this product. Available: {$availableQty}");
+            }
+
             $this->cartItemRepository->update($itemId, [
                 'quantity' => $qty,
                 'total' => $qty * $cartItem->price,
@@ -118,7 +131,7 @@ class CartService
                 'base_total_weight' => $qty * $cartItem->weight,
             ]);
 
-            return $this->recalculate($cartItem->cart->fresh());
+            return $this->recalculate($cartItem->cart);
         });
     }
 
@@ -129,13 +142,14 @@ class CartService
             $cart = $cartItem->cart;
             $this->cartItemRepository->delete($itemId);
 
-            return $this->recalculate($cart->fresh());
+            return $this->recalculate($cart);
         });
     }
 
     public function recalculate(Cart $cart): Cart
     {
-        $items = $cart->items()->get();
+        $cart->load('items');
+        $items = $cart->items;
 
         $itemsCount = $items->count();
         $itemsQty = $items->sum('quantity');
@@ -146,16 +160,22 @@ class CartService
         $grandTotal = $subTotal;
         $baseGrandTotal = $baseSubTotal;
 
-        $this->cartRepository->update($cart->id, [
+        $updates = [
             'items_count' => $itemsCount,
             'items_qty' => $itemsQty,
             'sub_total' => $subTotal,
             'base_sub_total' => $baseSubTotal,
             'grand_total' => $grandTotal,
             'base_grand_total' => $baseGrandTotal,
-        ]);
+        ];
 
-        return $cart->fresh('items');
+        $this->cartRepository->update($cart->id, $updates);
+
+        foreach ($updates as $key => $val) {
+            $cart->{$key} = $val;
+        }
+
+        return $cart;
     }
 
     public function deactivateCart(string $cartId): bool

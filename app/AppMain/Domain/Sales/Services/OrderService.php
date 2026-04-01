@@ -86,8 +86,25 @@ class OrderService
                 'cart_id' => $cart->id,
             ], $orderData));
 
+            // Deadlock prevention: sort product IDs before locked query
+            $productIds = $cart->items->pluck('product_id')->sort()->values()->all();
+            $inventories = \App\Models\ProductInventory::whereIn('product_id', $productIds)
+                ->lockForUpdate()
+                ->get()
+                ->keyBy('product_id');
+
+            $orderItemsData = [];
+            $now = now();
+
             foreach ($cart->items as $cartItem) {
-                $this->orderItemRepository->create([
+                $inventory = $inventories->get($cartItem->product_id);
+                if (!$inventory || $inventory->qty < $cartItem->quantity) {
+                    throw new \Exception("Product {$cartItem->name} is out of stock or insufficient quantity.");
+                }
+                $inventory->qty -= $cartItem->quantity;
+                $inventory->save();
+
+                $orderItemsData[] = [
                     'sku' => $cartItem->sku,
                     'name' => $cartItem->name,
                     'coupon_code' => $cartItem->coupon_code,
@@ -108,21 +125,34 @@ class OrderService
                     'order_id' => $order->id,
                     'parent_id' => $cartItem->parent_id,
                     'additional' => $cartItem->additional,
-                ]);
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
+            }
+
+            if (!empty($orderItemsData)) {
+                $this->orderItemRepository->getModel()::insert($orderItemsData);
             }
 
             // Also copy addresses from cart to order
+            $addressesData = [];
             foreach ($cart->addresses as $address) {
                 $addressData = $address->toArray();
                 unset($addressData['id'], $addressData['created_at'], $addressData['updated_at']);
                 $addressData['address_type'] = str_replace('cart_', 'order_', $addressData['address_type']);
                 $addressData['cart_id'] = null;
                 $addressData['order_id'] = $order->id;
+                $addressData['created_at'] = $now;
+                $addressData['updated_at'] = $now;
 
-                $this->addressRepository->create($addressData);
+                $addressesData[] = $addressData;
+            }
+            if (!empty($addressesData)) {
+                $this->addressRepository->getModel()::insert($addressesData);
             }
 
-            return $this->findOrder($order->id, []);
+            $order->load(['items', 'addresses', 'customer']);
+            return $order;
         });
     }
 
@@ -137,8 +167,20 @@ class OrderService
             $itemsData = [];
 
             // 1. Process items and calculate totals
+            $productIds = collect($data['items'])->pluck('product_id')->sort()->values()->all();
+            $products = clone $this->productRepository->getModel()::with('flat')->whereIn('id', $productIds)->get()->keyBy('id');
+            // Deal with inventory locks safely
+            $inventories = clone \App\Models\ProductInventory::whereIn('product_id', $productIds)
+                ->lockForUpdate()
+                ->get()
+                ->keyBy('product_id');
+
             foreach ($data['items'] as $itemInput) {
-                $product = $this->productRepository->findById($itemInput['product_id'], ['flat']);
+                $product = $products->get($itemInput['product_id']);
+                if (!$product) {
+                    throw new \Exception("Product with ID {$itemInput['product_id']} not found.");
+                }
+
                 $flat = $product->flat->first();
 
                 $price = $flat ? ($flat->price ?? 0) : 0;
@@ -146,6 +188,13 @@ class OrderService
                 $name = $flat ? ($flat->name ?? 'Product ' . $product->id) : 'Product ' . $product->id;
 
                 $qty = $itemInput['quantity'];
+
+                $inventory = $inventories->get($product->id);
+                if (!$inventory || $inventory->qty < $qty) {
+                    throw new \Exception("Product {$product->sku} is out of stock or insufficient quantity.");
+                }
+                $inventory->qty -= $qty;
+                $inventory->save();
 
                 $total = $price * $qty;
 
@@ -201,23 +250,38 @@ class OrderService
             ]);
 
             // 3. Create Order Items
-            foreach ($itemsData as $itemInfo) {
+            $now = now();
+            foreach ($itemsData as &$itemInfo) {
                 $itemInfo['order_id'] = $order->id;
-                $this->orderItemRepository->create($itemInfo);
+                $itemInfo['created_at'] = $now;
+                $itemInfo['updated_at'] = $now;
+            }
+            if (!empty($itemsData)) {
+                $this->orderItemRepository->getModel()::insert($itemsData);
             }
 
             // 4. Create Addresses
+            $addressesData = [];
             $shippingAddress = $data['shipping_address'];
             $shippingAddress['address_type'] = 'order_shipping';
             $shippingAddress['order_id'] = $order->id;
-            $this->addressRepository->create($shippingAddress);
+            $shippingAddress['created_at'] = $now;
+            $shippingAddress['updated_at'] = $now;
+            $addressesData[] = $shippingAddress;
 
             $billingAddress = $data['billing_address'];
             $billingAddress['address_type'] = 'order_billing';
             $billingAddress['order_id'] = $order->id;
-            $this->addressRepository->create($billingAddress);
+            $billingAddress['created_at'] = $now;
+            $billingAddress['updated_at'] = $now;
+            $addressesData[] = $billingAddress;
 
-            return $this->findOrder($order->id, []);
+            if (!empty($addressesData)) {
+                $this->addressRepository->getModel()::insert($addressesData);
+            }
+
+            $order->load(['items', 'addresses', 'customer']);
+            return $order;
         });
     }
 
@@ -232,14 +296,28 @@ class OrderService
 
             $this->orderRepository->update($orderId, ['status' => 'canceled']);
 
-            // Typically we should return items to stock here
+            // Restock items
+            $productIds = $order->items->pluck('product_id')->sort()->values()->all();
+            if (!empty($productIds)) {
+                $inventories = \App\Models\ProductInventory::whereIn('product_id', $productIds)
+                    ->lockForUpdate()
+                    ->get()
+                    ->keyBy('product_id');
+
+                foreach ($order->items as $item) {
+                    if ($inventory = $inventories->get($item->product_id)) {
+                        $inventory->qty += $item->qty_ordered;
+                        $inventory->save();
+                    }
+                }
+            }
+
             return true;
         });
     }
 
     protected function generateIncrementId(): string
     {
-        // Simple increment ID generator, can be customized
-        return date('Ymd') . str_pad((string) random_int(10000, 99999), 5, '0', STR_PAD_LEFT);
+        return date('Ymd') . strtoupper(\Illuminate\Support\Str::random(6));
     }
 }

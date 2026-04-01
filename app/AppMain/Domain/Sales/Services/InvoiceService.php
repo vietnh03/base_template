@@ -67,9 +67,12 @@ class InvoiceService
             ], $data));
 
             // Create invoice items based on order items
-            $orderItems = $order->items()->get();
+            $orderItems = $order->items;
+            $invoiceItemsData = [];
+            $now = now();
+
             foreach ($orderItems as $item) {
-                $this->invoiceItemRepository->create([
+                $invoiceItemsData[] = [
                     'invoice_id' => $invoice->id,
                     'order_item_id' => $item->id,
                     'name' => $item->name,
@@ -82,15 +85,21 @@ class InvoiceService
                     'tax_amount' => $item->tax_amount,
                     'base_tax_amount' => $item->base_tax_amount,
                     'product_id' => $item->product_id,
-                ]);
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
+            }
+            if (!empty($invoiceItemsData)) {
+                $this->invoiceItemRepository->getModel()::insert($invoiceItemsData);
             }
 
-            return $this->findById($invoice->id);
+            $invoice->load(['order']);
+            return $invoice;
         });
     }
 
     protected function generateIncrementId(): string
     {
-        return 'INV-' . date('Ymd') . str_pad((string) random_int(10000, 99999), 5, '0', STR_PAD_LEFT);
+        return 'INV-' . date('Ymd') . strtoupper(\Illuminate\Support\Str::random(6));
     }
 }
