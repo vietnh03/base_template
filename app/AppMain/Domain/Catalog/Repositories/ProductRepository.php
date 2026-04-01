@@ -382,9 +382,31 @@ class ProductRepository extends BaseRepository
             $query->where('status', $filters['status']);
         }
 
+        if (!empty($filters['attribute_family_id'])) {
+            $query->where('attribute_family_id', $filters['attribute_family_id']);
+        }
+
         if (!empty($filters['name'])) {
             $query->whereHas('flat', function ($q) use ($filters) {
                 $q->where('name', 'like', '%' . $filters['name'] . '%');
+            });
+        }
+
+        if (isset($filters['price_min'])) {
+            $query->whereHas('flat', function ($q) use ($filters) {
+                $q->where('price', '>=', $filters['price_min']);
+            });
+        }
+
+        if (isset($filters['price_max'])) {
+            $query->whereHas('flat', function ($q) use ($filters) {
+                $q->where('price', '<=', $filters['price_max']);
+            });
+        }
+
+        if (!empty($filters['tag_id'])) {
+            $query->whereHas('tags', function ($q) use ($filters) {
+                $q->where('tags.id', $filters['tag_id']);
             });
         }
 

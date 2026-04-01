@@ -20,6 +20,27 @@ class ProductFlatRepository extends BaseRepository
         $query->where('status', true)
             ->where('locale', $locale);
 
+        if (!empty($filters['name'])) {
+            $query->where('name', 'like', '%' . $filters['name'] . '%');
+        }
+
+        if (isset($filters['price_min'])) {
+            $query->where('price', '>=', $filters['price_min']);
+        }
+
+        if (isset($filters['price_max'])) {
+            $query->where('price', '<=', $filters['price_max']);
+        }
+
+        if (!empty($filters['tag_id'])) {
+            $tagId = $filters['tag_id'];
+            $query->whereIn('product_id', function ($q) use ($tagId) {
+                $q->select('product_id')
+                    ->from('product_tags')
+                    ->where('tag_id', $tagId);
+            });
+        }
+
         if (!empty($filters['category_id'])) {
             $categoryId = $filters['category_id'];
             $query->whereIn('product_id', function ($q) use ($categoryId) {
