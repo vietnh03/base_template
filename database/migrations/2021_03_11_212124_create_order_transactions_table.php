@@ -20,7 +20,7 @@ return new class extends Migration {
             $table->decimal('amount', 12, 4)->default(0)->nullable();
             $table->string('payment_method')->nullable();
             $table->json('data')->nullable();
-            $table->integer('invoice_id')->unsigned();
+            $table->integer('invoice_id')->unsigned()->nullable();
             $table->integer('order_id')->unsigned();
             $table->timestamps();
         });

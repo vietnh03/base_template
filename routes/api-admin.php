@@ -110,4 +110,16 @@ Route::prefix('sales')->group(function () {
         Route::put('/{id}/status', [OrderController::class, 'updateStatus']); // PUT /api/admin/sales/orders/{id}/status
         Route::post('/{id}/cancel', [OrderController::class, 'cancel']);   // POST /api/admin/sales/orders/{id}/cancel
     });
+
+    Route::prefix('invoices')->group(function () {
+        Route::get('/', [\App\AppMain\Application\Admin\Sales\Controllers\InvoiceController::class, 'index']);
+        Route::post('/', [\App\AppMain\Application\Admin\Sales\Controllers\InvoiceController::class, 'store']);
+        Route::get('/{id}', [\App\AppMain\Application\Admin\Sales\Controllers\InvoiceController::class, 'show']);
+    });
+
+    Route::prefix('transactions')->group(function () {
+        Route::get('/', [\App\AppMain\Application\Admin\Sales\Controllers\OrderTransactionController::class, 'index']);
+        Route::post('/', [\App\AppMain\Application\Admin\Sales\Controllers\OrderTransactionController::class, 'store']);
+        Route::get('/{id}', [\App\AppMain\Application\Admin\Sales\Controllers\OrderTransactionController::class, 'show']);
+    });
 });

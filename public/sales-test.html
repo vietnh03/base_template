@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales API Tester</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        :root {
+            --bg: #0f1117;
+            --surface: #1a1d27;
+            --surface2: #22263a;
+            --border: #2e3348;
+            --accent: #10b981;
+            --ah: #34d399;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warn: #f59e0b;
+            --text: #e2e8f0;
+            --muted: #64748b;
+            --code: #111827;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            height: 100vh;
+            overflow: hidden
+        }
+
+        /* sidebar */
+        #sidebar {
+            width: 230px;
+            min-width: 230px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto
+        }
+
+        .logo {
+            padding: 18px 16px 14px;
+            font-size: 14.5px;
+            font-weight: 700;
+            color: var(--accent);
+            border-bottom: 1px solid var(--border)
+        }
+
+        .nav-group {
+            padding: 10px 0 4px 14px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 14px;
+            cursor: pointer;
+            font-size: 13px;
+            border-left: 3px solid transparent;
+            transition: all .15s;
+            color: #94a3b8
+        }
+
+        .nav-item:hover {
+            background: var(--surface2);
+            color: var(--text)
+        }
+
+        .nav-item.active {
+            background: rgba(16, 185, 129, .13);
+            border-left-color: var(--accent);
+            color: var(--accent);
+            font-weight: 500
+        }
+
+        /* main */
+        #main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden
+        }
+
+        .topbar {
+            padding: 12px 22px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--surface)
+        }
+
+        .topbar h1 {
+            font-size: 16px;
+            font-weight: 600
+        }
+
+        .env {
+            margin-left: auto;
+            font-size: 11px;
+            background: rgba(16, 185, 129, .18);
+            color: var(--accent);
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-weight: 500
+        }
+
+        /* split */
+        .split {
+            flex: 1;
+            display: flex;
+            overflow: hidden
+        }
+
+        .left {
+            flex: 1;
+            overflow-y: auto;
+            padding: 18px 20px
+        }
+
+        .right {
+            width: 42%;
+            min-width: 360px;
+            background: var(--surface);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden
+        }
+
+        .right-head {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12.5px;
+            font-weight: 500
+        }
+
+        #response-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            color: #a5b4fc;
+            background: var(--code);
+            line-height: 1.6
+        }
+
+        /* card */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 14px;
+            overflow: hidden
+        }
+
+        .card-head {
+            padding: 10px 14px;
+            background: var(--surface2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+            user-select: none
+        }
+
+        .card-head:hover {
+            background: #272b3f
+        }
+
+        .card-body {
+            padding: 14px;
+            display: none
+        }
+
+        .card-body.open {
+            display: block
+        }
+
+        .chevron {
+            margin-left: auto;
+            transition: transform .2s;
+            font-size: 11px;
+            color: var(--muted)
+        }
+
+        .card-head.open .chevron {
+            transform: rotate(180deg)
+        }
+
+        /* method badge */
+        .mb {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace
+        }
+
+        .get {
+            background: rgba(16, 185, 129, .15);
+            color: #34d399
+        }
+
+        .post {
+            background: rgba(99, 102, 241, .15);
+            color: #818cf8
+        }
+
+        .put {
+            background: rgba(245, 158, 11, .15);
+            color: #fbbf24
+        }
+
+        .del {
+            background: rgba(239, 68, 68, .15);
+            color: #f87171
+        }
+
+        /* status */
+        .sbadge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 9px;
+            border-radius: 100px
+        }
+
+        .s2 {
+            background: rgba(16, 185, 129, .15);
+            color: var(--success)
+        }
+
+        .s4,
+        .s5 {
+            background: rgba(239, 68, 68, .15);
+            color: var(--danger)
+        }
+
+        .sp {
+            background: rgba(100, 116, 139, .15);
+            color: var(--muted)
+        }
+
+        /* form */
+        label {
+            display: block;
+            font-size: 11.5px;
+            color: var(--muted);
+            margin-bottom: 4px;
+            font-weight: 500
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 7px 11px;
+            background: var(--code);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            outline: none;
+            transition: border-color .15s;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            border-color: var(--accent)
+        }
+
+        .fr {
+            margin-bottom: 10px
+        }
+
+        .row {
+            display: flex;
+            gap: 10px
+        }
+
+        .row>.fr {
+            flex: 1
+        }
+
+        /* buttons */
+        .btn {
+            padding: 7px 16px;
+            border: none;
+            border-radius: 7px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px
+        }
+
+        .btn-p {
+            background: var(--accent);
+            color: #fff
+        }
+
+        .btn-p:hover {
+            background: var(--ah)
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px
+        }
+    </style>
+</head>
+
+<body>
+    <nav id="sidebar">
+        <div class="logo">🛒 Admin Sales API Tester</div>
+        <div class="nav-group">Sales</div>
+        <div class="nav-item active" data-t="invoices" onclick="switchTab(this,'invoices')"><span>📄</span> Invoices
+        </div>
+        <div class="nav-item" data-t="transactions" onclick="switchTab(this,'transactions')"><span>💳</span>
+            Transactions</div>
+        <div class="nav-item" data-t="auth" onclick="switchTab(this,'auth')"><span>🔑</span> Authentication</div>
+    </nav>
+
+    <div id="main">
+        <div class="topbar">
+            <span style="font-size:17px">🛍️</span>
+            <h1 id="top-title">Invoices</h1>
+            <span class="env">localhost · /api/admin/sales</span>
+        </div>
+
+        <div class="split">
+            <div class="left" id="left"></div>
+            <div class="right">
+                <div class="right-head">
+                    <span>Response</span>
+                    <span id="sbadge" class="sbadge sp">—</span>
+                </div>
+                <div id="rb">// Kết quả sẽ hiển thị ở đây...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const B = '/api/admin/sales';
+
+        let token = localStorage.getItem('admin_api_token') || '';
+
+        async function api(method, url, body = null, returnRaw = false) {
+            setStatus('sp', '...');
+            document.getElementById('rb').textContent = '⏳ Đang gọi...';
+
+            const headers = {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            };
+
+            if (token) {
+                headers['Authorization'] = 'Bearer ' + token;
+            }
+
+            const opts = { method, headers };
+            if (body) opts.body = JSON.stringify(body);
+
+            try {
+                const r = await fetch(url, opts);
+                const txt = await r.text();
+                let parsed; try { parsed = JSON.parse(txt); } catch { parsed = txt; }
+                const code = r.status;
+                const cls = code >= 500 ? 's5' : code >= 400 ? 's4' : 's2';
+                setStatus(cls, code + ' ' + r.statusText);
+                document.getElementById('rb').textContent = typeof parsed === 'string' ? parsed : JSON.stringify(parsed, null, 2);
+
+                if (returnRaw) return { ok: code >= 200 && code < 300, data: parsed };
+            } catch (e) {
+                setStatus('s5', 'Network Error');
+                document.getElementById('rb').textContent = '❌ ' + e.message;
+                if (returnRaw) return { ok: false, data: null };
+            }
+        }
+
+        function setStatus(cls, txt) { const el = document.getElementById('sbadge'); el.className = 'sbadge ' + cls; el.textContent = txt; }
+        function v(id) { return document.getElementById(id)?.value?.trim() || ''; }
+
+        function toggle(el) { const b = el.nextElementSibling; el.classList.toggle('open'); b.classList.toggle('open'); }
+
+        function switchTab(el, t) {
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
+            const titles = { invoices: 'Invoices', transactions: 'Transactions', auth: 'Authentication' };
+            document.getElementById('top-title').textContent = titles[t];
+            ({ invoices: renderInvoices, transactions: renderTransactions, auth: renderAuth })[t]();
+        }
+
+        function card(method, title, body, open = false) {
+            const cls = { GET: 'get', POST: 'post', PUT: 'put', DEL: 'del' }[method];
+            const m = method === 'DEL' ? 'DELETE' : method;
+            const openCls = open ? 'open' : '';
+            return `<div class="card"><div class="card-head ${openCls}" onclick="toggle(this)"><span class="mb ${cls}">` + m + `</span>` + title + `<span class="chevron">▼</span></div><div class="card-body ${openCls}">` + body + `</div></div>`;
+        }
+
+        // ════════════════ AUTH ════════════════
+        function renderAuth() {
+            const left = document.getElementById('left');
+            left.innerHTML = `
+                <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Gọi API Admin Login để lấy Token.</div>
+                
+                <div class="card" style="margin-bottom:20px;">
+                    <div class="card-body open" style="display:block;">
+                        <div class="fr"><label>Bearer Token (Admin)</label>
+                        <input id="f-auth-token" value="` + token + `" onchange="saveToken(this.value)"></div>
+                    </div>
+                </div>
+
+                ` + card('POST', '/api/admin/auth/login', `
+                    <div class="row">
+                        <div class="fr"><label>Email</label><input id="f-login-email" value="admin@example.com"></div>
+                        <div class="fr"><label>Password</label><input id="f-login-pass" value="password" type="password"></div>
+                    </div>
+                    <button class="btn btn-p" onclick="doLogin()">🔑 Login & Lưu Token</button>
+                `, true) + `
+            `;
+        }
+
+        function saveToken(val) {
+            token = val;
+            localStorage.setItem('admin_api_token', token);
+            const el = document.getElementById('f-auth-token');
+            if (el) el.value = token;
+        }
+
+        async function doLogin() {
+            const body = { email: v('f-login-email'), password: v('f-login-pass') };
+            const r = await api('POST', '/api/admin/auth/login', body, true);
+            if (r && r.ok && r.data && r.data.token) {
+                saveToken(r.data.token);
+                alert('Login thành công và Token đã được lưu tự động!');
+            } else if (r && r.ok && r.data && r.data.data && r.data.data.token) {
+                saveToken(r.data.data.token);
+                alert('Login thành công và Token đã được lưu tự động!');
+            }
+        }
+
+        // ════════════════ INVOICES ════════════════
+        function renderInvoices() {
+            const left = document.getElementById('left');
+            left.innerHTML = `
+  <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Quản lý Invoices của Admin.</div>
+
+  ` + card('GET', '/invoices', `
+    <button class="btn btn-p" onclick="api('GET', B + '/invoices')">📄 Danh sách Invoices</button>
+  `, true) + `
+
+  ` + card('POST', '/invoices', `
+    <div class="row">
+      <div class="fr"><label>order_id (Bắt buộc)</label><input id="f-inv-order" value="1"></div>
+      <div class="fr"><label>grand_total (Tuỳ chọn)</label><input id="f-inv-total" value=""></div>
+    </div>
+    <button class="btn btn-p" onclick="addInvoice()">➕ Tạo Invoice cho Order</button>
+  `) + `
+
+  ` + card('GET', '/invoices/{id}', `
+    <div class="fr"><label>Invoice ID</label><input id="f-inv-show-id" value="1"></div>
+    <button class="btn btn-p" onclick="api('GET', B + '/invoices/' + v('f-inv-show-id'))">🔍 Xem chi tiết Invoice</button>
+  `) + `
+  `;
+        }
+
+        async function addInvoice() {
+            const body = { order_id: parseInt(v('f-inv-order')) };
+            if (v('f-inv-total')) body.grand_total = parseFloat(v('f-inv-total'));
+            await api('POST', B + '/invoices', body);
+        }
+
+        // ════════════════ TRANSACTIONS ════════════════
+        function renderTransactions() {
+            const left = document.getElementById('left');
+            left.innerHTML = `
+  <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Quản lý Order Transactions của Admin.</div>
+
+  ` + card('GET', '/transactions', `
+    <button class="btn btn-p" onclick="api('GET', B + '/transactions')">💳 Danh sách Transactions</button>
+  `, true) + `
+
+  ` + card('POST', '/transactions', `
+    <div class="row">
+      <div class="fr"><label>order_id (Bắt buộc)</label><input id="f-txn-order" value="1"></div>
+      <div class="fr"><label>transaction_id (Mã GD)</label><input id="f-txn-tid" value="TXN-12345"></div>
+    </div>
+    <div class="row">
+      <div class="fr"><label>amount</label><input id="f-txn-amt" type="number" value="100.00"></div>
+      <div class="fr"><label>payment_method</label><input id="f-txn-pm" value="stripe"></div>
+    </div>
+    <button class="btn btn-p" onclick="addTransaction()">➕ Thêm Transaction</button>
+  `) + `
+
+  ` + card('GET', '/transactions/{id}', `
+    <div class="fr"><label>Transaction DB ID (không phải mã GD)</label><input id="f-txn-show-id" value="1"></div>
+    <button class="btn btn-p" onclick="api('GET', B + '/transactions/' + v('f-txn-show-id'))">🔍 Xem chi tiết Transaction</button>
+  `) + `
+  `;
+        }
+
+        async function addTransaction() {
+            const body = {
+                order_id: parseInt(v('f-txn-order')),
+                transaction_id: v('f-txn-tid'),
+                amount: parseFloat(v('f-txn-amt')),
+                payment_method: v('f-txn-pm')
+            };
+            await api('POST', B + '/transactions', body);
+        }
+
+        // Init
+        renderInvoices();
+    </script>
+</body>
+
+</html>

@@ -19,6 +19,7 @@ return new class extends Migration {
             $table->boolean('email_sent')->default(0);
             $table->integer('total_qty')->nullable();
             $table->string('base_currency_code')->nullable();
+            $table->string('invoice_currency_code')->nullable();
             $table->string('order_currency_code')->nullable();
             $table->decimal('sub_total', 12, 4)->default(0)->nullable();
             $table->decimal('base_sub_total', 12, 4)->default(0)->nullable();
@@ -31,6 +32,7 @@ return new class extends Migration {
             $table->decimal('discount_amount', 12, 4)->default(0)->nullable();
             $table->decimal('base_discount_amount', 12, 4)->default(0)->nullable();
             $table->integer('order_id')->unsigned()->nullable();
+            $table->integer('order_address_id')->unsigned()->nullable();
             $table->string('transaction_id')->nullable();
             $table->integer('reminders')->default(0);
             $table->timestamp('next_reminder_at')->nullable();
