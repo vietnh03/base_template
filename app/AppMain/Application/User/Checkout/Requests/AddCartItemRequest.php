@@ -14,7 +14,7 @@ class AddCartItemRequest extends FormRequest
     public function rules()
     {
         return [
-            'product_id' => 'required|integer|exists:products,id',
+            'product_id' => 'required|string|exists:products,id',
             'quantity' => 'nullable|integer|min:1',
         ];
     }

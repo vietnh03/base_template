@@ -27,7 +27,7 @@ class OrderTransactionController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'order_id' => 'required|integer|exists:orders,id',
+            'order_id' => 'required|string|exists:orders,id',
             'transaction_id' => 'required|string',
             'amount' => 'required|numeric',
             'payment_method' => 'required|string',

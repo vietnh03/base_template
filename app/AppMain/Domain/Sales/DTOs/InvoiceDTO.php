@@ -23,8 +23,8 @@ class InvoiceDTO extends BaseDTO
     public ?float $base_tax_amount = null;
     public ?float $discount_amount = null;
     public ?float $base_discount_amount = null;
-    public ?int $order_id = null;
-    public ?int $order_address_id = null;
+    public ?string $order_id = null;
+    public ?string $order_address_id = null;
     public ?string $transaction_id = null;
 
     public function __construct(array $data)

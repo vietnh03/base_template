@@ -12,14 +12,14 @@ class CartRepository extends BaseRepository
         return Cart::class;
     }
 
-    public function findActiveByCustomerId(int $customerId): ?Cart
+    public function findActiveByCustomerId(string $customerId): ?Cart
     {
         return $this->model->where('customer_id', $customerId)
             ->where('is_active', true)
             ->first();
     }
 
-    public function findActiveByGuestId(int $cartId): ?Cart
+    public function findActiveByGuestId(string $cartId): ?Cart
     {
         return $this->model->where('id', $cartId)
             ->where('is_active', true)

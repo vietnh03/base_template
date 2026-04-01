@@ -30,7 +30,7 @@ class CartDTO extends BaseDTO
     public bool $is_guest = true;
     public bool $is_active = true;
     public ?string $applied_cart_rule_ids = null;
-    public ?int $customer_id = null;
+    public ?string $customer_id = null;
 
     public function __construct(array $data)
     {

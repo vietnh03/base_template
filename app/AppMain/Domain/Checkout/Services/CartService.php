@@ -101,7 +101,7 @@ class CartService
         });
     }
 
-    public function updateItem(int $itemId, int $qty): Cart
+    public function updateItem(string $itemId, int $qty): Cart
     {
         return DB::transaction(function () use ($itemId, $qty) {
             $cartItem = $this->cartItemRepository->findOrFail($itemId);
@@ -122,7 +122,7 @@ class CartService
         });
     }
 
-    public function removeItem(int $itemId): Cart
+    public function removeItem(string $itemId): Cart
     {
         return DB::transaction(function () use ($itemId) {
             $cartItem = $this->cartItemRepository->findOrFail($itemId);
@@ -158,7 +158,7 @@ class CartService
         return $cart->fresh('items');
     }
 
-    public function deactivateCart(int $cartId): bool
+    public function deactivateCart(string $cartId): bool
     {
         $this->cartRepository->update($cartId, ['is_active' => false]);
         return true;

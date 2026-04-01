@@ -24,10 +24,10 @@ class CartItemDTO extends BaseDTO
     public float $discount_percent = 0;
     public float $discount_amount = 0;
     public float $base_discount_amount = 0;
-    public ?int $parent_id = null;
-    public int $product_id;
-    public int $cart_id;
-    public ?int $tax_category_id = null;
+    public ?string $parent_id = null;
+    public string $product_id;
+    public string $cart_id;
+    public ?string $tax_category_id = null;
     public ?string $applied_cart_rule_ids = null;
     public ?array $additional = null;
 

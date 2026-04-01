@@ -34,7 +34,7 @@ class InvoiceService
         return $this->invoiceRepository->getModel()::with($with)->findOrFail($id);
     }
 
-    public function createForOrder(int $orderId, array $data = [])
+    public function createForOrder(string $orderId, array $data = [])
     {
         return DB::transaction(function () use ($orderId, $data) {
             $order = $this->orderRepository->findOrFail($orderId);

@@ -16,7 +16,7 @@ class ProductUrlKeyService
      * @param int|null $productId
      * @return string
      */
-    public function generateUniqueUrlKey(string $name, string $locale, ?int $productId = null): string
+    public function generateUniqueUrlKey(string $name, string $locale, ?string $productId = null): string
     {
         $urlKey = Str::slug($name);
         $originalUrlKey = $urlKey;

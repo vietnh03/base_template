@@ -15,9 +15,9 @@ class OrderItemDTO extends BaseDTO
     public ?float $base_price = 0;
     public ?float $total = 0;
     public ?float $base_total = 0;
-    public ?int $product_id = null;
-    public ?int $order_id = null;
-    public ?int $parent_id = null;
+    public ?string $product_id = null;
+    public ?string $order_id = null;
+    public ?string $parent_id = null;
 
     public function __construct(array $data)
     {

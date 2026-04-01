@@ -8,8 +8,8 @@ class ProductDTO extends BaseDTO
 {
     public string $sku;
     public bool $status = true;
-    public ?int $parent_id = null;
-    public ?int $attribute_family_id = null;
+    public ?string $parent_id = null;
+    public ?string $attribute_family_id = null;
     public ?array $additional = null;
 
     public ?float $weight = null;

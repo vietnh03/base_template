@@ -27,7 +27,7 @@ class InvoiceController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'order_id' => 'required|integer|exists:orders,id',
+            'order_id' => 'required|string|exists:orders,id',
             'grand_total' => 'nullable|numeric',
         ]);
 

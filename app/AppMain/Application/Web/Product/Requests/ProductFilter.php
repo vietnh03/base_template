@@ -6,7 +6,7 @@ use App\AppMain\Core\BaseFilterDTO;
 
 class ProductFilter extends BaseFilterDTO
 {
-    public ?int $category_id = null;
+    public ?string $category_id = null;
     public ?bool $featured = null;
     public ?bool $new = null;
 
@@ -20,7 +20,7 @@ class ProductFilter extends BaseFilterDTO
     protected function getSpecificValidationRules(): array
     {
         return [
-            'category_id' => 'nullable|integer|exists:categories,id',
+            'category_id' => 'nullable|string|exists:categories,id',
             'featured' => 'nullable|boolean',
             'new' => 'nullable|boolean',
         ];

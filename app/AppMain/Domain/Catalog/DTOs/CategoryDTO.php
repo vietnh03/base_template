@@ -6,7 +6,7 @@ use App\AppMain\Core\BaseDTO;
 
 class CategoryDTO extends BaseDTO
 {
-    public ?int $parent_id = null;
+    public ?string $parent_id = null;
     public ?int $position = null;
     public bool $status = true;
     public ?array $additional = null;

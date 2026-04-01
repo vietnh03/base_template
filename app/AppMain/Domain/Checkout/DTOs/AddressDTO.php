@@ -7,9 +7,9 @@ use App\AppMain\Core\BaseDTO;
 class AddressDTO extends BaseDTO
 {
     public string $address_type;
-    public ?int $customer_id = null;
-    public ?int $cart_id = null;
-    public ?int $order_id = null;
+    public ?string $customer_id = null;
+    public ?string $cart_id = null;
+    public ?string $order_id = null;
     public string $first_name;
     public string $last_name;
     public ?string $gender = null;

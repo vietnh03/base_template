@@ -9,7 +9,7 @@ class ProductFilter extends BaseFilterDTO
     public ?string $sku = null;
     public ?string $name = null;
     public ?int $status = null;
-    public ?int $category_id = null;
+    public ?string $category_id = null;
 
     protected function initializeSpecificFields(array $data): void
     {
@@ -25,7 +25,7 @@ class ProductFilter extends BaseFilterDTO
             'sku' => 'nullable|string|max:255',
             'name' => 'nullable|string|max:255',
             'status' => 'nullable|in:0,1',
-            'category_id' => 'nullable|integer|exists:categories,id',
+            'category_id' => 'nullable|string|exists:categories,id',
         ];
     }
 

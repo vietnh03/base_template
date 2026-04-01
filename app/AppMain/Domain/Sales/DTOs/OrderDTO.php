@@ -25,9 +25,9 @@ class OrderDTO extends BaseDTO
     public ?float $grand_total = 0;
     public ?float $base_grand_total = 0;
     // ... we can add all remaining properties similarly ...
-    public ?int $customer_id = null;
+    public ?string $customer_id = null;
     public ?string $customer_type = null;
-    public ?int $cart_id = null;
+    public ?string $cart_id = null;
 
     public function __construct(array $data)
     {

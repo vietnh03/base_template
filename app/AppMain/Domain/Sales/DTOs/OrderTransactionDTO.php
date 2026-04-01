@@ -12,8 +12,8 @@ class OrderTransactionDTO extends BaseDTO
     public ?float $amount = null;
     public ?string $payment_method = null;
     public ?array $data = null;
-    public ?int $invoice_id = null;
-    public ?int $order_id = null;
+    public ?string $invoice_id = null;
+    public ?string $order_id = null;
 
     public function __construct(array $data)
     {
