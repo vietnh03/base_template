@@ -10,21 +10,19 @@ This document details the Customer management APIs.
 
 ### [GET] `/`
 List customers with filters.
-**Filters**: `full_name`, `phone_number`, `email`, `customer_type`, `customer_status`.
+**Filters**: `name`, `phone`, `email`, `status`, `is_verified`.
 
 **Response (Item)**:
 ```json
 {
     "id": "uuid",
-    "fullName": "string",
-    "phoneNumber": "string",
+    "name": "string",
+    "phone": "string",
     "email": "string|null",
-    "customerType": "Individual|Business",
-    "customerStatus": "Lead|Active|Inactive|VIP",
-    "assignedStaffId": "uuid|null",
-    "address": "string|null",
-    "gender": "Male|Female|Other|null",
-    "source": "string|null",
+    "image": "string|null",
+    "status": "integer",
+    "isVerified": "boolean",
+    "gender": "string|null",
     "dateOfBirth": "date|null",
     "createdAt": "date-time",
     "updatedAt": "date-time"
@@ -33,26 +31,26 @@ List customers with filters.
 
 ### [POST] `/` | [PUT/PATCH] `/{id}`
 **Payload**:
-- `full_name`: string (required on create)
-- `phone_number`: string (required on create, unique)
-- `customer_type`: "Individual" | "Business" (required on create)
+- `name`: string (required on create)
+- `phone`: string (required on create, unique)
 - `email`: string (email, unique, optional)
-- `customer_status`: "Lead" | "Active" | "Inactive" | "VIP" (optional)
-- `assigned_staff_id`: UUID (optional)
-- `address`: string (optional)
-- `gender`: "Male" | "Female" | "Other" (optional)
+- `password`: string (min 8 chars, optional)
+- `status`: integer (optional, default: 1)
+- `is_verified`: boolean (optional)
+- `token`: string (optional)
+- `gender`: string (optional)
 - `date_of_birth`: date (optional)
-- `source`: string (optional)
+- `image`: string (optional)
 - `notes`: string (optional, hidden in GET responses)
 
 #### Example Request (JSON)
 ```json
 {
-    "full_name": "Nguyễn Văn A",
-    "phone_number": "0987654321",
-    "customer_type": "Individual",
+    "name": "Nguyễn Văn A",
+    "phone": "0987654321",
     "email": "vana@example.com",
-    "customer_status": "Active"
+    "status": 1,
+    "is_verified": true
 }
 ```
 
