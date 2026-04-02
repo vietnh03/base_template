@@ -23,7 +23,7 @@ class UserRepository extends BaseRepository
         // Exact filters
         $this->applyExactFilters($query, collect($filters)->only([
             'status',
-            'is_verified',
+            'email_verified_at',
             'gender'
         ])->toArray());
 

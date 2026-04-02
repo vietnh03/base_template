@@ -14,7 +14,7 @@ class UserDTO extends BaseDTO
     public $image;
     public $status;
     public $password;
-    public $is_verified;
+    public $email_verified_at;
     public $token;
     public $notes;
 }

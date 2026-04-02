@@ -18,8 +18,7 @@ return new class extends Migration {
             $table->uuid('user_id')->nullable()->comment('null if guest checkout');
             $table->uuid('cart_id')->nullable()->comment('only for cart_addresses');
             $table->uuid('order_id')->nullable()->comment('only for order_addresses');
-            $table->string('first_name');
-            $table->string('last_name');
+            $table->string('name');
             $table->string('gender')->nullable();
             $table->string('company_name')->nullable();
             $table->string('address');

@@ -10,7 +10,7 @@ This document details the User management APIs.
 
 ### [GET] `/`
 List users with filters.
-**Filters**: `name`, `phone`, `email`, `status`, `is_verified`.
+**Filters**: `name`, `phone`, `email`, `status`, `email_verified_at`.
 
 **Response (Item)**:
 ```json
@@ -21,7 +21,7 @@ List users with filters.
     "email": "string|null",
     "image": "string|null",
     "status": "integer",
-    "isVerified": "boolean",
+    "emailVerifiedAt": "date-time|null",
     "gender": "string|null",
     "dateOfBirth": "date|null",
     "createdAt": "date-time",
@@ -36,7 +36,7 @@ List users with filters.
 - `email`: string (email, unique, optional)
 - `password`: string (min 8 chars, optional)
 - `status`: integer (optional, default: 1)
-- `is_verified`: boolean (optional)
+- `email_verified_at`: date-time (optional)
 - `token`: string (optional)
 - `gender`: string (optional)
 - `date_of_birth`: date (optional)
@@ -50,7 +50,7 @@ List users with filters.
     "phone": "0987654321",
     "email": "vana@example.com",
     "status": 1,
-    "is_verified": true
+    "email_verified_at": "2024-04-02T15:35:00Z"
 }
 ```
 

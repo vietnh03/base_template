@@ -14,10 +14,12 @@ return new class extends Migration {
             $table->uuid('id')->primary();
             $table->string('name');
             $table->string('email')->unique();
+            $table->string('gender')->nullable();
+            $table->date('date_of_birth')->nullable();
             $table->string('phone', 20)->unique()->nullable();
             $table->string('image')->nullable();
             $table->integer('status')->default(1);
-            $table->boolean('is_verified')->default(false);
+            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('token')->nullable();
             $table->text('notes')->nullable();

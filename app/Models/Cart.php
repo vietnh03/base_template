@@ -14,8 +14,7 @@ class Cart extends BaseModel
 
     protected $fillable = [
         'user_email',
-        'user_first_name',
-        'user_last_name',
+        'user_name',
         'shipping_method',
         'coupon_code',
         'is_gift',

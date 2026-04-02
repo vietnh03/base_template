@@ -64,7 +64,7 @@ class UserAuthService
             'email' => $email,
             'password' => Hash::make($password),
             'status' => 1,
-            'is_verified' => false,
+            'email_verified_at' => null,
         ]);
 
         // Create Passport token

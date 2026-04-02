@@ -22,10 +22,10 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password'),
         ]);
 
-        // Call Customer seeder
+        // Call User seeder
         $this->call([
             AdminSeeder::class,
-            CustomerSeeder::class,
+            UserSeeder::class,
             CatalogAttributeSeeder::class,
             CmsSeeder::class
         ]);

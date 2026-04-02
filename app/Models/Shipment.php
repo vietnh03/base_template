@@ -13,6 +13,7 @@ class Shipment extends BaseModel
         'status',
         'total_qty',
         'total_weight',
+        'carrier_code',
         'carrier_title',
         'track_number',
         'email_sent',
@@ -20,6 +21,8 @@ class Shipment extends BaseModel
         'user_type',
         'order_id',
         'order_address_id',
+        'inventory_source_id',
+        'inventory_source_name',
     ];
 
     protected $casts = [

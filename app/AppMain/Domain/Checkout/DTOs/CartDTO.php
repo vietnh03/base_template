@@ -7,8 +7,7 @@ use App\AppMain\Core\BaseDTO;
 class CartDTO extends BaseDTO
 {
     public ?string $user_email = null;
-    public ?string $user_first_name = null;
-    public ?string $user_last_name = null;
+    public ?string $user_name = null;
     public ?string $shipping_method = null;
     public ?string $coupon_code = null;
     public bool $is_gift = false;

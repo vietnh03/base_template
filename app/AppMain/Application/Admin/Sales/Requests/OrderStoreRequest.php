@@ -16,8 +16,7 @@ class OrderStoreRequest extends FormRequest
         return [
             'user_id' => 'nullable|string|uuid|exists:users,id',
             'user_email' => 'required|email|max:255',
-            'user_first_name' => 'required|string|max:255',
-            'user_last_name' => 'required|string|max:255',
+            'user_name' => 'required|string|max:255',
 
             'shipping_method' => 'nullable|string|max:255',
             'coupon_code' => 'nullable|string|max:255',
@@ -27,8 +26,7 @@ class OrderStoreRequest extends FormRequest
             'items.*.quantity' => 'required|integer|min:1',
 
             'shipping_address' => 'required|array',
-            'shipping_address.first_name' => 'required|string|max:255',
-            'shipping_address.last_name' => 'required|string|max:255',
+            'shipping_address.name' => 'required|string|max:255',
             'shipping_address.address' => 'required|string|max:255',
             'shipping_address.city' => 'required|string|max:255',
             'shipping_address.country' => 'required|string|max:2',
@@ -36,8 +34,7 @@ class OrderStoreRequest extends FormRequest
             'shipping_address.phone' => 'required|string|max:255',
 
             'billing_address' => 'required|array',
-            'billing_address.first_name' => 'required|string|max:255',
-            'billing_address.last_name' => 'required|string|max:255',
+            'billing_address.name' => 'required|string|max:255',
             'billing_address.address' => 'required|string|max:255',
             'billing_address.city' => 'required|string|max:255',
             'billing_address.country' => 'required|string|max:2',

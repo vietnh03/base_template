@@ -15,8 +15,7 @@ return new class extends Migration {
         Schema::create('cart', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('user_email')->nullable();
-            $table->string('user_first_name')->nullable();
-            $table->string('user_last_name')->nullable();
+            $table->string('user_name')->nullable();
             $table->string('shipping_method')->nullable();
             $table->string('coupon_code')->nullable();
             $table->boolean('is_gift')->default(0);

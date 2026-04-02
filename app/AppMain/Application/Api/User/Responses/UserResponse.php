@@ -14,7 +14,7 @@ class UserResponse extends BaseResponseDTO
     public $date_of_birth;
     public $image;
     public $status;
-    public $is_verified;
+    public $email_verified_at;
     public $notes;
     public $created_at;
 
@@ -36,7 +36,7 @@ class UserResponse extends BaseResponseDTO
         $this->date_of_birth = $model->date_of_birth;
         $this->image = $model->image;
         $this->status = $model->status;
-        $this->is_verified = $model->is_verified;
+        $this->email_verified_at = $model->email_verified_at;
         $this->notes = $model->notes;
         $this->created_at = $model->created_at;
     }

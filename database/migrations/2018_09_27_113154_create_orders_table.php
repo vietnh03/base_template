@@ -19,8 +19,7 @@ return new class extends Migration {
             $table->string('payment_status')->default('pending')->nullable();
             $table->boolean('is_guest')->nullable();
             $table->string('user_email')->nullable();
-            $table->string('user_first_name')->nullable();
-            $table->string('user_last_name')->nullable();
+            $table->string('user_name')->nullable();
             $table->string('shipping_method')->nullable();
             $table->string('shipping_title')->nullable();
             $table->string('shipping_description')->nullable();

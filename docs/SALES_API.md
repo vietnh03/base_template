@@ -38,7 +38,7 @@ Create a direct order (Admin creation).
         { "id": "uuid", "sku": "string", "name": "string", "qty_ordered": integer, "price": decimal }
     ],
     "addresses": [
-        { "id": "uuid", "address_type": "shipping|billing", "first_name": "string", "last_name": "string", "address1": "string" }
+        { "id": "uuid", "address_type": "shipping|billing", "name": "string", "address1": "string" }
     ],
     "customer": { "id": "uuid", "email": "string" }
 }
