@@ -31,7 +31,8 @@ class InvoiceController extends Controller
     public function store(StoreInvoiceRequest $request)
     {
         return $this->baseActionTransaction(function () use ($request) {
-            return $this->invoiceService->createForOrder($request->order_id, $request->except('order_id'));
+            $invoice = $this->invoiceService->createForOrder($request->order_id, $request->except('order_id'));
+            return InvoiceResponse::single($invoice);
         }, 'Invoice created successfully');
     }
 

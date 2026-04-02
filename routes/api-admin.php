@@ -139,32 +139,30 @@ Route::middleware('auth:admin')->group(function () {
     });
 
     // Post Management
+    Route::prefix('posts')->group(function () {
+        // Post Category Management
+        Route::prefix('categories')->group(function () {
+            Route::get('/', [PostCategoryController::class, 'index']);
+            Route::post('/', [PostCategoryController::class, 'store']);
+            Route::get('/{id}', [PostCategoryController::class, 'show']);
+            Route::put('/{id}', [PostCategoryController::class, 'update']);
+            Route::delete('/{id}', [PostCategoryController::class, 'destroy']);
+        });
 
-});
+        // Post Tag Management
+        Route::prefix('tags')->group(function () {
+            Route::get('/', [PostTagController::class, 'index']);
+            Route::post('/', [PostTagController::class, 'store']);
+            Route::get('/{id}', [PostTagController::class, 'show']);
+            Route::put('/{id}', [PostTagController::class, 'update']);
+            Route::delete('/{id}', [PostTagController::class, 'destroy']);
+        });
 
-Route::prefix('posts')->group(function () {
-    // Post Category Management
-    Route::prefix('categories')->group(function () {
-        Route::get('/', [PostCategoryController::class, 'index']);
-        Route::post('/', [PostCategoryController::class, 'store']);
-        Route::get('/{id}', [PostCategoryController::class, 'show']);
-        Route::put('/{id}', [PostCategoryController::class, 'update']);
-        Route::delete('/{id}', [PostCategoryController::class, 'destroy']);
+        // Post Management
+        Route::get('/', [PostController::class, 'index']);
+        Route::post('/', [PostController::class, 'store']);
+        Route::get('/{id}', [PostController::class, 'show']);
+        Route::put('/{id}', [PostController::class, 'update']);
+        Route::delete('/{id}', [PostController::class, 'destroy']);
     });
-
-    // Post Tag Management
-    Route::prefix('tags')->group(function () {
-        Route::get('/', [PostTagController::class, 'index']);
-        Route::post('/', [PostTagController::class, 'store']);
-        Route::get('/{id}', [PostTagController::class, 'show']);
-        Route::put('/{id}', [PostTagController::class, 'update']);
-        Route::delete('/{id}', [PostTagController::class, 'destroy']);
-    });
-
-    // Post Management
-    Route::get('/', [PostController::class, 'index']);
-    Route::post('/', [PostController::class, 'store']);
-    Route::get('/{id}', [PostController::class, 'show']);
-    Route::put('/{id}', [PostController::class, 'update']);
-    Route::delete('/{id}', [PostController::class, 'destroy']);
 });
