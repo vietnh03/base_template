@@ -26,8 +26,10 @@ class UserController extends Controller
      */
     public function index(UserFilter $request)
     {
-        $users = $this->userService->getUsersWithFilters($request->validated());
-        return responseJsonSuccess(UserResponse::paginated($users));
+        return $this->baseAction(function () use ($request) {
+            $users = $this->userService->getUsersWithFilters($request->validated());
+            return UserResponse::paginated($users);
+        }, 'Users retrieved successfully');
     }
 
     /**
@@ -35,8 +37,10 @@ class UserController extends Controller
      */
     public function store(UserRequest $request)
     {
-        $user = $this->userService->createUser(UserDTO::fromRequest($request));
-        return responseJsonSuccess(new UserResponse($user), 'User created successfully');
+        return $this->baseActionTransaction(function () use ($request) {
+            $user = $this->userService->createUser(UserDTO::fromRequest($request));
+            return new UserResponse($user);
+        }, 'User created successfully');
     }
 
     /**
@@ -44,8 +48,10 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-        $user = $this->userService->findUser($id);
-        return responseJsonSuccess(new UserResponse($user));
+        return $this->baseAction(function () use ($id) {
+            $user = $this->userService->findUser($id);
+            return new UserResponse($user);
+        }, 'User retrieved successfully');
     }
 
     /**
@@ -53,8 +59,10 @@ class UserController extends Controller
      */
     public function update(UserRequest $request, string $id)
     {
-        $this->userService->updateUser($id, UserDTO::fromRequest($request));
-        return responseJsonSuccess(null, 'User updated successfully');
+        return $this->baseActionTransaction(function () use ($request, $id) {
+            $this->userService->updateUser($id, UserDTO::fromRequest($request));
+            return null;
+        }, 'User updated successfully');
     }
 
     /**
@@ -62,7 +70,9 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        $this->userService->deleteUser($id);
-        return responseJsonSuccess(null, 'User deleted successfully');
+        return $this->baseActionTransaction(function () use ($id) {
+            $this->userService->deleteUser($id);
+            return null;
+        }, 'User deleted successfully');
     }
 }

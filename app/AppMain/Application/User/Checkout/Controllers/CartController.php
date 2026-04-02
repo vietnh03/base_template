@@ -6,7 +6,7 @@ use App\AppMain\Application\User\Checkout\Requests\AddCartItemRequest;
 use App\AppMain\Application\User\Checkout\Requests\UpdateCartItemRequest;
 use App\AppMain\Domain\Checkout\Services\CartService;
 use App\AppMain\Domain\Checkout\Services\CheckoutService;
-use App\Http\Controllers\Controller;
+use App\AppMain\Core\Controller;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
@@ -22,73 +22,57 @@ class CartController extends Controller
 
     public function get(Request $request)
     {
-        $user = $request->user('api');
-        $cart = $this->cartService->getCurrentCart($user ? $user->id : null);
+        return $this->baseAction(function () use ($request) {
+            $user = $request->user('api');
+            $cart = $this->cartService->getCurrentCart($user ? $user->id : null);
 
-        if (!$cart) {
-            return response()->json(['message' => 'Cart is empty', 'data' => null], 404);
-        }
+            if (!$cart) {
+                throw new \Exception('Cart is empty', 404);
+            }
 
-        return response()->json([
-            'data' => $cart->load('items')
-        ]);
+            return $cart->load('items');
+        }, 'Cart retrieved successfully');
     }
 
     public function add(AddCartItemRequest $request)
     {
-        $user = $request->user('api');
-        $qty = $request->input('quantity', 1);
+        return $this->baseAction(function () use ($request) {
+            $user = $request->user('api');
+            $qty = $request->input('quantity', 1);
 
-        $cart = $this->cartService->addProduct(
-            $request->product_id,
-            $qty,
-            $user ? $user->id : null
-        );
-
-        return response()->json([
-            'message' => 'Product added to cart successfully',
-            'data' => $cart
-        ]);
+            return $this->cartService->addProduct(
+                $request->product_id,
+                $qty,
+                $user ? $user->id : null
+            );
+        }, 'Product added to cart successfully');
     }
 
     public function update(UpdateCartItemRequest $request, $itemId)
     {
-        $cart = $this->cartService->updateItem($itemId, $request->quantity);
-
-        return response()->json([
-            'message' => 'Cart updated successfully',
-            'data' => $cart
-        ]);
+        return $this->baseAction(function () use ($itemId, $request) {
+            return $this->cartService->updateItem($itemId, $request->quantity);
+        }, 'Cart updated successfully');
     }
 
     public function remove($itemId)
     {
-        $cart = $this->cartService->removeItem($itemId);
-
-        return response()->json([
-            'message' => 'Item removed successfully',
-            'data' => $cart
-        ]);
+        return $this->baseAction(function () use ($itemId) {
+            return $this->cartService->removeItem($itemId);
+        }, 'Item removed successfully');
     }
 
     public function checkout(Request $request)
     {
-        $user = $request->user('api');
-        $cart = $this->cartService->getCurrentCart($user ? $user->id : null);
+        return $this->baseActionTransaction(function () use ($request) {
+            $user = $request->user('api');
+            $cart = $this->cartService->getCurrentCart($user ? $user->id : null);
 
-        if (!$cart) {
-            return response()->json(['message' => 'No active cart found for checkout'], 404);
-        }
+            if (!$cart) {
+                throw new \Exception('No active cart found for checkout', 404);
+            }
 
-        try {
-            $order = $this->checkoutService->placeOrder($cart);
-
-            return response()->json([
-                'message' => 'Order placed successfully',
-                'data' => $order
-            ], 201);
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 400);
-        }
+            return $this->checkoutService->placeOrder($cart);
+        }, 'Order placed successfully');
     }
 }

@@ -3,13 +3,11 @@
 namespace App\AppMain\Application\User\Auth\Controllers;
 
 use App\AppMain\Application\User\Auth\Requests\UserRegisterRequest;
+use App\AppMain\Application\User\Auth\Requests\LoginRequest;
 use App\AppMain\Application\User\Auth\Responses\UserAuthResponse;
 use App\AppMain\Domain\Auth\Services\UserAuthService;
 use App\AppMain\Core\Controller;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use function App\AppMain\Core\Helpers\responseJsonFail;
-use function App\AppMain\Core\Helpers\responseJsonSuccess;
 
 class UserAuthController extends Controller
 {
@@ -22,7 +20,7 @@ class UserAuthController extends Controller
 
     public function register(UserRegisterRequest $request)
     {
-        try {
+        return $this->baseAction(function () use ($request) {
             $result = $this->userAuthService->register(
                 $request->name,
                 $request->email,
@@ -30,40 +28,35 @@ class UserAuthController extends Controller
                 $request->ip()
             );
 
-            return responseJsonSuccess(UserAuthResponse::fromArray($result), 'Registration successful');
-        } catch (\Exception $e) {
-            return responseJsonFail($e->getMessage(), 400);
-        }
+            return UserAuthResponse::fromArray($result);
+        }, 'Registration successful');
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-
-        try {
+        return $this->baseAction(function () use ($request) {
             $result = $this->userAuthService->login(
                 $request->email,
                 $request->password,
                 $request->ip()
             );
 
-            return responseJsonSuccess(UserAuthResponse::fromArray($result), 'Login successful');
-        } catch (\Exception $e) {
-            return responseJsonFail($e->getMessage(), 401);
-        }
+            return UserAuthResponse::fromArray($result);
+        }, 'Login successful');
     }
 
     public function me(Request $request)
     {
-        return responseJsonSuccess($request->user());
+        return $this->baseAction(function () use ($request) {
+            return $request->user();
+        });
     }
 
     public function logout(Request $request)
     {
-        $this->userAuthService->logout($request->user()->token());
-        return responseJsonSuccess(null, 'Logged out successfully');
+        return $this->baseAction(function () use ($request) {
+            $this->userAuthService->logout($request->user()->token());
+            return null;
+        }, 'Logged out successfully');
     }
 }

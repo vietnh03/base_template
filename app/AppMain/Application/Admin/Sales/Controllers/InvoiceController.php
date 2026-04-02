@@ -4,6 +4,7 @@ namespace App\AppMain\Application\Admin\Sales\Controllers;
 
 use App\AppMain\Core\Controller;
 use App\AppMain\Domain\Sales\Services\InvoiceService;
+use App\AppMain\Application\Admin\Sales\Requests\StoreInvoiceRequest;
 use App\AppMain\Application\Admin\Sales\Responses\InvoiceResponse;
 use Illuminate\Http\Request;
 
@@ -24,17 +25,11 @@ class InvoiceController extends Controller
         }, 'Invoices retrieved successfully');
     }
 
-    public function store(Request $request)
+    public function store(StoreInvoiceRequest $request)
     {
-        $request->validate([
-            'order_id' => 'required|string|exists:orders,id',
-            'grand_total' => 'nullable|numeric',
-        ]);
-
         return $this->baseActionTransaction(function () use ($request) {
-            $invoice = $this->invoiceService->createForOrder($request->order_id, $request->except('order_id'));
-            return InvoiceResponse::single($invoice);
-        }, 'Invoice created successfully', 201);
+            return $this->invoiceService->createForOrder($request->order_id, $request->except('order_id'));
+        }, 'Invoice created successfully');
     }
 
     public function show($id)

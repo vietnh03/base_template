@@ -4,6 +4,7 @@ namespace App\AppMain\Application\Admin\Sales\Controllers;
 
 use App\AppMain\Core\Controller;
 use App\AppMain\Domain\Sales\Services\OrderTransactionService;
+use App\AppMain\Application\Admin\Sales\Requests\StoreTransactionRequest;
 use App\AppMain\Application\Admin\Sales\Responses\OrderTransactionResponse;
 use Illuminate\Http\Request;
 
@@ -24,19 +25,11 @@ class OrderTransactionController extends Controller
         }, 'Transactions retrieved successfully');
     }
 
-    public function store(Request $request)
+    public function store(StoreTransactionRequest $request)
     {
-        $request->validate([
-            'order_id' => 'required|string|exists:orders,id',
-            'transaction_id' => 'required|string',
-            'amount' => 'required|numeric',
-            'payment_method' => 'required|string',
-        ]);
-
         return $this->baseActionTransaction(function () use ($request) {
-            $transaction = $this->transactionService->create($request->all());
-            return OrderTransactionResponse::single($transaction);
-        }, 'Transaction created successfully', 201);
+            return $this->transactionService->create($request->all());
+        }, 'Transaction created successfully');
     }
 
     public function show($id)

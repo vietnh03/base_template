@@ -5,6 +5,8 @@ namespace App\AppMain\Application\Api\Post\Controllers;
 use App\AppMain\Core\Controller;
 use App\AppMain\Domain\Post\Services\PostService;
 use App\AppMain\Domain\Post\Services\PostCategoryService;
+use App\AppMain\Application\Admin\Post\Requests\PostFilter;
+use App\AppMain\Application\Admin\Post\Requests\PostCategoryFilter;
 use App\AppMain\Application\Api\Post\Responses\PostResponse;
 use App\AppMain\Application\Api\Post\Responses\PostCategoryResponse;
 use Illuminate\Http\Request;
@@ -20,7 +22,8 @@ class PostController extends Controller
     public function index(Request $request)
     {
         return $this->baseAction(function () use ($request) {
-            $filters = $request->only(['category_id', 'tag_id', 'sort_by', 'sort_direction', 'per_page']);
+            $filter = PostFilter::fromRequest($request);
+            $filters = $filter->toArray();
             $filters['status'] = true; // Only show active posts
 
             $posts = $this->postService->getPostsWithFilters($filters);
@@ -44,7 +47,8 @@ class PostController extends Controller
     public function categories(Request $request)
     {
         return $this->baseAction(function () use ($request) {
-            $filters = $request->only(['parent_id', 'sort_by', 'sort_direction', 'per_page']);
+            $filter = PostCategoryFilter::fromRequest($request);
+            $filters = $filter->toArray();
             $filters['status'] = true;
 
             $categories = $this->postCategoryService->getCategoriesWithFilters($filters);

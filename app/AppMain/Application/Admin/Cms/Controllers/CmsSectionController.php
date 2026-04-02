@@ -2,10 +2,9 @@
 
 namespace App\AppMain\Application\Admin\Cms\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\AppMain\Core\Controller;
 use App\AppMain\Application\Admin\Cms\Requests\UpdateCmsSectionRequest;
 use App\AppMain\Domain\Cms\Services\CmsAdminService;
-use Illuminate\Http\JsonResponse;
 
 class CmsSectionController extends Controller
 {
@@ -17,33 +16,16 @@ class CmsSectionController extends Controller
     /**
      * Update the translation content of a CMS Section.
      */
-    public function update(UpdateCmsSectionRequest $request, string $id): JsonResponse
+    public function update(UpdateCmsSectionRequest $request, string $id)
     {
-        $validated = $request->validated();
+        return $this->baseAction(function () use ($id, $request) {
+            $validated = $request->validated();
 
-        try {
-            $translation = $this->cmsAdminService->updateSectionTranslation(
+            return $this->cmsAdminService->updateSectionTranslation(
                 $id,
                 $validated['locale'],
                 $validated['content']
             );
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'CMS Section translation updated successfully',
-                'data' => $translation
-            ]);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'CMS Section not found',
-            ], 404);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'An error occurred while updating the CMS Section',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        }, 'CMS Section translation updated successfully');
     }
 }

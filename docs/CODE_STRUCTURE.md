@@ -8,8 +8,11 @@ This project uses **Domain-Driven Design (DDD)** architecture combined with **Se
 app/AppMain/
 ├── Core/                   # Base classes and shared utilities
 │   ├── Traits/            # Reusable traits (HasUuid, etc.)
-│   ├── Helpers/           # Helper functions
-│   └── Services/          # Core services (FileUploadService, etc.)
+│   ├── Helpers/           # Helper functions & Services
+│   │   └── FileUploadService.php
+│   ├── common.php         # Shared helper functions
+│   ├── response.php       # JSON response helpers
+│   └── Controller.php     # Base Controller
 │
 ├── Application/            # Application Layer - API (Controllers, Requests, Responses)
 │   ├── User/              # End-User API Context

@@ -26,7 +26,7 @@ class Controller extends BaseController
      * @param  string|null $messageSuccess
      * @param  string|null $messageError
      * @param  string|null  ...$params
-     * @return \App\AppMain\Helpers\responseJsonSuccess|\App\AppMain\Helpers\responseJsonFail
+     * @return \Illuminate\Http\Response
      */
     protected function baseAction(Closure $closure, $messageSuccess = 'Success', $messageError = 'Error', ...$params)
     {
@@ -38,11 +38,10 @@ class Controller extends BaseController
                 Log::error($e->getTraceAsString());
             }
             $errorMessage = $e->getMessage() ?: __($messageError);
-            if ($e->getCode() == CoreConst::NOT_FOUND){
-                return responseJsonFail($e->getMessage() ??  __($messageError), $e->getCode());
+            if ($e->getCode() == CoreConst::NOT_FOUND) {
+                return responseJsonFail($e->getMessage() ?? __($messageError), $e->getCode());
             }
-            // return responseJsonFail(AppConst::CODE_EXCEPTION_MESSAGE == $e->getCode() ? $e->getMessage() :  __($messageError));
-            return responseJsonFail(CoreConst::CODE_EXCEPTION_MESSAGE == $e->getCode() ? $e->getMessage() :  __($errorMessage));
+            return responseJsonFail(CoreConst::CODE_EXCEPTION_MESSAGE == $e->getCode() ? $e->getMessage() : __($errorMessage));
         }
 
         return ($result || is_array($result)) ? responseJsonSuccess($result, __($messageSuccess)) : responseJsonFail(__($messageError));
@@ -55,7 +54,7 @@ class Controller extends BaseController
      * @param  string|null $messageSuccess
      * @param  string|null $messageError
      * @param  string|null  ...$params
-     * @return \App\AppMain\Helpers\responseJsonSuccess|\App\AppMain\Helpers\responseJsonFail
+     * @return \Illuminate\Http\Response
      */
     protected function baseActionTransaction(Closure $closure, $messageSuccess = 'Success', $messageError = 'Error', ...$params)
     {
@@ -69,8 +68,7 @@ class Controller extends BaseController
                 Log::warning($e->getMessage());
             }
             $errorMessage = $e->getMessage() ?: __($messageError);
-            return responseJsonFail(CoreConst::CODE_EXCEPTION_MESSAGE == $e->getCode() ? $e->getMessage() :  __($errorMessage));
-            // return responseJsonFail(AppConst::CODE_EXCEPTION_MESSAGE == $e->getCode() ? $e->getMessage() :  __($messageError));
+            return responseJsonFail(CoreConst::CODE_EXCEPTION_MESSAGE == $e->getCode() ? $e->getMessage() : __($errorMessage));
         }
 
         return $result ? responseJsonSuccess($result, __($messageSuccess)) : responseJsonFail(__($messageError));

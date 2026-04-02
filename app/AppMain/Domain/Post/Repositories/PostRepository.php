@@ -10,6 +10,14 @@ use Illuminate\Support\Facades\Storage;
 
 class PostRepository extends BaseRepository
 {
+    protected $fileUploadService;
+
+    public function __construct(Post $model, \App\AppMain\Core\Helpers\FileUploadService $fileUploadService)
+    {
+        $this->model = $model;
+        $this->fileUploadService = $fileUploadService;
+    }
+
     public function getModel()
     {
         return Post::class;
@@ -118,9 +126,9 @@ class PostRepository extends BaseRepository
     {
         if (isset($data['image']) && $data['image'] instanceof \Illuminate\Http\UploadedFile) {
             if ($post && $post->image_path) {
-                Storage::delete($post->image_path);
+                $this->fileUploadService->delete($post->image_path);
             }
-            $data['image_path'] = $data['image']->store('posts/images', config('filesystems.default'));
+            $data['image_path'] = $this->fileUploadService->upload($data['image'], 'posts/images');
         }
 
         unset($data['image']);
@@ -133,6 +141,9 @@ class PostRepository extends BaseRepository
         $post = $this->findById($id);
 
         return DB::transaction(function () use ($post) {
+            if ($post->image_path) {
+                $this->fileUploadService->delete($post->image_path);
+            }
             $post->translations()->delete();
             $post->categories()->detach();
             $post->tags()->detach();
