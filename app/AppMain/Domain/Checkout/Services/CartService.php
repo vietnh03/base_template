@@ -24,10 +24,10 @@ class CartService
         $this->productRepository = $productRepository;
     }
 
-    public function getCurrentCart(?string $customerId = null, ?string $cartId = null): ?Cart
+    public function getCurrentCart(?string $userId = null, ?string $cartId = null): ?Cart
     {
-        if ($customerId) {
-            return $this->cartRepository->findActiveByCustomerId($customerId);
+        if ($userId) {
+            return $this->cartRepository->findActiveByUserId($userId);
         }
 
         if ($cartId) {
@@ -37,15 +37,15 @@ class CartService
         return null;
     }
 
-    public function getOrCreateCart(?string $customerId = null, ?string $cartId = null): Cart
+    public function getOrCreateCart(?string $userId = null, ?string $cartId = null): Cart
     {
-        $cart = $this->getCurrentCart($customerId, $cartId);
+        $cart = $this->getCurrentCart($userId, $cartId);
 
         if (!$cart) {
             $cart = $this->cartRepository->create([
-                'customer_id' => $customerId,
+                'user_id' => $userId,
                 'is_active' => true,
-                'is_guest' => !$customerId,
+                'is_guest' => !$userId,
                 'base_currency_code' => config('app.currency', 'VND'),
                 'cart_currency_code' => config('app.currency', 'VND'),
                 'global_currency_code' => config('app.currency', 'VND'),
@@ -55,14 +55,14 @@ class CartService
         return $cart;
     }
 
-    public function addProduct(string $productId, int $qty = 1, ?string $customerId = null, ?string $cartId = null): Cart
+    public function addProduct(string $productId, int $qty = 1, ?string $userId = null, ?string $cartId = null): Cart
     {
-        return DB::transaction(function () use ($productId, $qty, $customerId, $cartId) {
+        return DB::transaction(function () use ($productId, $qty, $userId, $cartId) {
             if ($qty <= 0) {
                 throw new \InvalidArgumentException('Quantity must be positive');
             }
 
-            $cart = $this->getOrCreateCart($customerId, $cartId);
+            $cart = $this->getOrCreateCart($userId, $cartId);
 
             // Row-level lock on the cart to prevent race conditions during item addition
             $this->cartRepository->getModel()::where('id', $cart->id)->lockForUpdate()->first();

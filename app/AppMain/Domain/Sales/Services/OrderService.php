@@ -34,7 +34,7 @@ class OrderService
         return $this->orderRepository->getOrdersWithFilters($filters);
     }
 
-    public function findOrder($id, array $with = ['items', 'addresses', 'customer'])
+    public function findOrder($id, array $with = ['items', 'addresses', 'user'])
     {
         $query = $this->orderRepository->getModel()::with($with);
         return $query->findOrFail($id);
@@ -64,9 +64,9 @@ class OrderService
                 'increment_id' => $this->generateIncrementId(),
                 'status' => 'pending',
                 'is_guest' => $cart->is_guest,
-                'customer_email' => $cart->customer_email,
-                'customer_first_name' => $cart->customer_first_name,
-                'customer_last_name' => $cart->customer_last_name,
+                'user_email' => $cart->user_email,
+                'user_first_name' => $cart->user_first_name,
+                'user_last_name' => $cart->user_last_name,
                 'shipping_method' => $cart->shipping_method,
                 'coupon_code' => $cart->coupon_code,
                 'is_gift' => $cart->is_gift,
@@ -82,7 +82,7 @@ class OrderService
                 'base_tax_amount' => $cart->base_tax_total,
                 'discount_amount' => $cart->discount_amount,
                 'base_discount_amount' => $cart->base_discount_amount,
-                'customer_id' => $cart->customer_id,
+                'user_id' => $cart->user_id,
                 'cart_id' => $cart->id,
             ], $orderData));
 
@@ -151,7 +151,7 @@ class OrderService
                 $this->addressRepository->getModel()::insert($addressesData);
             }
 
-            $order->load(['items', 'addresses', 'customer']);
+            $order->load(['items', 'addresses', 'user']);
             return $order;
         });
     }
@@ -230,11 +230,11 @@ class OrderService
             $order = $this->orderRepository->create([
                 'increment_id' => $this->generateIncrementId(),
                 'status' => 'pending',
-                'is_guest' => empty($data['customer_id']),
-                'customer_email' => $data['customer_email'],
-                'customer_first_name' => $data['customer_first_name'],
-                'customer_last_name' => $data['customer_last_name'],
-                'customer_id' => $data['customer_id'] ?? null,
+                'is_guest' => empty($data['user_id']),
+                'user_email' => $data['user_email'],
+                'user_first_name' => $data['user_first_name'],
+                'user_last_name' => $data['user_last_name'],
+                'user_id' => $data['user_id'] ?? null,
                 'shipping_method' => $data['shipping_method'] ?? null,
                 'coupon_code' => $data['coupon_code'] ?? null,
                 'is_gift' => false,
@@ -283,7 +283,7 @@ class OrderService
                 $this->addressRepository->getModel()::insert($addressesData);
             }
 
-            $order->load(['items', 'addresses', 'customer']);
+            $order->load(['items', 'addresses', 'user']);
             return $order;
         });
     }

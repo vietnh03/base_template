@@ -10,9 +10,9 @@ class OrderDTO extends BaseDTO
     public ?string $increment_id = null;
     public ?string $status = null;
     public bool $is_guest = true;
-    public ?string $customer_email = null;
-    public ?string $customer_first_name = null;
-    public ?string $customer_last_name = null;
+    public ?string $user_email = null;
+    public ?string $user_first_name = null;
+    public ?string $user_last_name = null;
     public ?string $shipping_method = null;
     public ?string $shipping_title = null;
     public ?string $shipping_description = null;
@@ -25,8 +25,8 @@ class OrderDTO extends BaseDTO
     public ?float $grand_total = 0;
     public ?float $base_grand_total = 0;
     // ... we can add all remaining properties similarly ...
-    public ?string $customer_id = null;
-    public ?string $customer_type = null;
+    public ?string $user_id = null;
+    public ?string $user_type = null;
     public ?string $cart_id = null;
 
     public function __construct(array $data)

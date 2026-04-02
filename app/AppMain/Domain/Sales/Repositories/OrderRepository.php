@@ -14,14 +14,14 @@ class OrderRepository extends BaseRepository
 
     public function getOrdersWithFilters($filters = [])
     {
-        $query = $this->model->newQuery()->with(['items', 'addresses', 'customer']);
+        $query = $this->model->newQuery()->with(['items', 'addresses', 'user']);
 
         if (isset($filters['status'])) {
             $query->where('status', $filters['status']);
         }
 
-        if (!empty($filters['customer_email'])) {
-            $query->where('customer_email', 'like', '%' . $filters['customer_email'] . '%');
+        if (!empty($filters['user_email'])) {
+            $query->where('user_email', 'like', '%' . $filters['user_email'] . '%');
         }
 
         if (!empty($filters['increment_id'])) {
