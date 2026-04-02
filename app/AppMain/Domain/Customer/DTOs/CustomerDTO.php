@@ -6,15 +6,15 @@ use App\AppMain\Core\BaseDTO;
 
 class CustomerDTO extends BaseDTO
 {
-    public $full_name;
-    public $phone_number;
-    public $email;
-    public $customer_type;
-    public $customer_status;
-    public $assigned_staff_id;
-    public $address;
-    public $date_of_birth;
+    public $name;
     public $gender;
-    public $source;
+    public $date_of_birth;
+    public $email;
+    public $phone;
+    public $image;
+    public $status;
+    public $password;
+    public $is_verified;
+    public $token;
     public $notes;
 }

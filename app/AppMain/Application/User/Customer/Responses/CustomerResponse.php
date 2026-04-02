@@ -7,16 +7,14 @@ use App\AppMain\Core\BaseResponseDTO;
 class CustomerResponse extends BaseResponseDTO
 {
     public $id;
-    public $fullName;
-    public $phoneNumber;
+    public $name;
+    public $phone;
     public $email;
-    public $customerType;
-    public $customerStatus;
-    public $assignedStaffId;
-    public $address;
+    public $image;
+    public $status;
+    public $isVerified;
     public $dateOfBirth;
     public $gender;
-    public $source;
     public $createdAt;
     public $updatedAt;
 
@@ -26,15 +24,13 @@ class CustomerResponse extends BaseResponseDTO
         $dto = new self();
 
         $dto->id = $model->id;
-        $dto->fullName = $model->full_name;
-        $dto->phoneNumber = $model->phone_number;
+        $dto->name = $model->name;
+        $dto->phone = $model->phone;
         $dto->email = $model->email;
-        $dto->customerType = $model->customer_type;
-        $dto->customerStatus = $model->customer_status;
-        $dto->assignedStaffId = $model->assigned_staff_id;
-        $dto->address = $model->address;
+        $dto->image = $model->image;
+        $dto->status = $model->status;
+        $dto->isVerified = (bool) $model->is_verified;
         $dto->gender = $model->gender;
-        $dto->source = $model->source;
         $dto->dateOfBirth = $model->date_of_birth;
         $dto->createdAt = $model->created_at;
         $dto->updatedAt = $model->updated_at;

@@ -22,17 +22,16 @@ class CustomerRepository extends BaseRepository
 
         // Apply exact match filters
         $exactFilters = [
-            'customer_type' => $filters['customer_type'] ?? null,
-            'customer_status' => $filters['customer_status'] ?? null,
-            'assigned_staff_id' => $filters['assigned_staff_id'] ?? null,
+            'status' => $filters['status'] ?? null,
+            'is_verified' => $filters['is_verified'] ?? null,
         ];
 
         $this->applyExactFilters($query, $exactFilters);
 
         // Apply LIKE search filters
         $likeFilters = [
-            'full_name' => $filters['full_name'] ?? null,
-            'phone_number' => $filters['phone_number'] ?? null,
+            'name' => $filters['name'] ?? null,
+            'phone' => $filters['phone'] ?? null,
         ];
 
         $this->applyLikeFilters($query, $likeFilters);
@@ -59,7 +58,7 @@ class CustomerRepository extends BaseRepository
 
         // Apply global search
         $searchTerm = $filters['search'] ?? null;
-        $searchableFields = ['full_name', 'email', 'phone_number'];
+        $searchableFields = ['name', 'email', 'phone'];
         $this->applyGlobalSearch($query, $searchableFields, $searchTerm);
 
         // Apply sorting

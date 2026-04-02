@@ -18,28 +18,31 @@ class CustomerRequest extends BaseFormRequest
 
         return [
             // Required for create, optional for update
-            'full_name' => ($isUpdate ? 'sometimes|' : '') . 'required|string|max:100',
-            'phone_number' => [
+            'name' => ($isUpdate ? 'sometimes|' : '') . 'required|string|max:255',
+            'phone' => [
                 $isUpdate ? 'sometimes' : 'required',
                 'string',
                 'max:20',
-                Rule::unique('customers', 'phone_number')->ignore($customerId, 'id')
+                Rule::unique('customers', 'phone')->ignore($customerId, 'id')
             ],
-            'customer_type' => ($isUpdate ? 'sometimes|' : '') . 'required|in:Individual,Business',
+
+            // Authentication and Status
+            'password' => ($isUpdate ? 'sometimes|' : 'nullable|') . 'string|min:8',
+            'status' => 'nullable|integer',
+            'is_verified' => 'nullable|boolean',
+            'token' => 'nullable|string|max:255',
 
             // Optional fields
             'email' => [
                 'nullable',
                 'email',
-                'max:100',
+                'max:255',
                 Rule::unique('customers', 'email')->ignore($customerId, 'id')
             ],
-            'customer_status' => 'nullable|in:Lead,Active,Inactive,VIP',
-            'assigned_staff_id' => 'nullable|uuid',
-            'address' => 'nullable|string|max:1000',
+
+            'gender' => 'nullable|string|max:50',
             'date_of_birth' => 'nullable|date|before:today',
-            'gender' => 'nullable|in:Male,Female,Other',
-            'source' => 'nullable|string|max:50',
+            'image' => 'nullable|string|max:255',
             'notes' => 'nullable|string|max:1000',
         ];
     }
@@ -50,13 +53,11 @@ class CustomerRequest extends BaseFormRequest
     public function messages(): array
     {
         return [
-            'full_name.required' => 'Customer name is required',
-            'phone_number.required' => 'Phone number is required',
-            'phone_number.unique' => 'This phone number is already registered',
+            'name.required' => 'Customer name is required',
+            'phone.required' => 'Phone number is required',
+            'phone.unique' => 'This phone number is already registered',
             'email.unique' => 'This email is already registered',
             'email.email' => 'Please provide a valid email address',
-            'customer_type.required' => 'Customer type is required',
-            'customer_type.in' => 'Customer type must be Individual or Business',
             'date_of_birth.before' => 'Date of birth must be in the past',
         ];
     }

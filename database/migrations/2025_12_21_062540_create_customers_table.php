@@ -12,26 +12,19 @@ return new class extends Migration {
     {
         Schema::create('customers', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('full_name', 100)->comment('Tên khách hàng');
-            $table->string('phone_number', 20)->comment('Số điện thoại');
-            $table->string('email', 100)->nullable()->comment('Email');
-            $table->enum('customer_type', ['Individual', 'Business'])->default('Individual');
-            $table->enum('customer_status', ['Lead', 'Active', 'Inactive', 'VIP'])->default('Lead');
-            $table->uuid('assigned_staff_id')->nullable()->comment('UUID của nhân viên phụ trách');
-
-            $table->text('address')->nullable();
+            $table->string('name');
+            $table->string('gender')->length(50)->nullable();
             $table->date('date_of_birth')->nullable();
-            $table->enum('gender', ['Male', 'Female', 'Other'])->nullable();
-            $table->string('source', 50)->default('Other');
+            $table->string('email')->unique()->nullable();
+            $table->string('phone')->unique()->nullable();
+            $table->string('image')->nullable();
+            $table->tinyInteger('status')->default(1);
+            $table->string('password')->nullable();
+            $table->boolean('is_verified')->default(0);
+            $table->string('token')->nullable();
             $table->text('notes')->nullable();
-
+            $table->rememberToken();
             $table->timestamps();
-
-            // Indexes
-            $table->index('customer_status');
-            $table->index('customer_type');
-            $table->index('assigned_staff_id');
-            $table->index('email');
         });
     }
 

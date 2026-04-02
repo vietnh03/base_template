@@ -6,6 +6,8 @@ use App\AppMain\Core\BaseModel;
 use App\AppMain\Core\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class Customer extends BaseModel
 {
     use HasFactory, HasUuid;
@@ -16,16 +18,25 @@ class Customer extends BaseModel
      * The attributes that are mass assignable.
      */
     protected $fillable = [
-        'full_name',
-        'phone_number',
-        'email',
-        'customer_type',
-        'customer_status',
-        'assigned_staff_id',
-        'address',
-        'date_of_birth',
+        'name',
         'gender',
-        'source',
+        'date_of_birth',
+        'email',
+        'phone',
+        'image',
+        'status',
+        'password',
+        'is_verified',
+        'token',
         'notes',
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     */
+    protected $hidden = [
+        'password',
+        'token',
+        'remember_token',
     ];
 }
