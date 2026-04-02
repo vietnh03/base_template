@@ -14,9 +14,9 @@ class Order extends BaseModel
         'increment_id',
         'status',
         'is_guest',
-        'customer_email',
-        'customer_first_name',
-        'customer_last_name',
+        'user_email',
+        'user_first_name',
+        'user_last_name',
         'shipping_method',
         'shipping_title',
         'shipping_description',
@@ -59,8 +59,8 @@ class Order extends BaseModel
         'base_shipping_refunded',
         'shipping_discount_amount',
         'base_shipping_discount_amount',
-        'customer_id',
-        'customer_type',
+        'user_id',
+        'user_type',
         'cart_id',
         'applied_cart_rule_ids',
     ];
@@ -90,9 +90,9 @@ class Order extends BaseModel
         return $this->hasMany(Invoice::class);
     }
 
-    public function customer(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(User::class);
     }
 
     public function cart(): BelongsTo

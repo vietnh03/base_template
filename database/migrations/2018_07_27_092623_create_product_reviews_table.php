@@ -20,7 +20,7 @@ return new class extends Migration {
             $table->text('comment')->nullable();
             $table->string('status');
             $table->uuid('product_id');
-            $table->uuid('customer_id')->nullable();
+            $table->uuid('user_id')->nullable();
             $table->timestamps();
         });
     }

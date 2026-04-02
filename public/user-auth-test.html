@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Auth Tester</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --border: #334155;
+            --accent: #10b981;
+            /* Green for user auth */
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+            --code: #020617;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: var(--accent);
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            background: var(--code);
+            border: 1px solid var(--border);
+            color: white;
+            border-radius: 6px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent);
+            border: none;
+            color: black;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        #response {
+            grid-column: 2;
+            background: var(--code);
+            padding: 20px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: #7dd3fc;
+            overflow-y: auto;
+            height: fit-content;
+            min-height: 400px;
+            white-space: pre-wrap;
+        }
+
+        .token-display {
+            word-break: break-all;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px dashed var(--accent);
+            border-radius: 6px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="left">
+            <h1>🔐 User Auth Tester</h1>
+            <p style="color:var(--muted); margin-bottom: 20px;">Test registration and login for users.</p>
+
+            <!-- Registration -->
+            <div class="card">
+                <h2>📝 User Register</h2>
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="reg-name" placeholder="John Doe">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="reg-email" placeholder="john@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="text" id="reg-phone" placeholder="0123456789">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="reg-password" placeholder="Min 8 chars">
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" id="reg-password-conf" placeholder="Repeat password">
+                </div>
+                <button onclick="register()">Register</button>
+            </div>
+
+            <!-- Login -->
+            <div class="card">
+                <h2>🔑 User Login</h2>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="login-email" placeholder="john@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="login-password" placeholder="password">
+                </div>
+                <button onclick="login()">Login</button>
+            </div>
+
+            <!-- Profile -->
+            <div class="card">
+                <h2>👤 My Profile</h2>
+                <button onclick="getMe()" style="background:var(--border); color:white;">Get My Profile
+                    (Protected)</button>
+                <div id="token-status" class="token-display">No token stored.</div>
+            </div>
+        </div>
+
+        <div id="response">// Response will appear here...</div>
+    </div>
+
+    <script>
+        async function register() {
+            const data = {
+                name: document.getElementById('reg-name').value,
+                email: document.getElementById('reg-email').value,
+                phone: document.getElementById('reg-phone').value,
+                password: document.getElementById('reg-password').value,
+                password_confirmation: document.getElementById('reg-password-conf').value
+            };
+            call('/api/auth/register', 'POST', data);
+        }
+
+        async function login() {
+            const data = {
+                email: document.getElementById('login-email').value,
+                password: document.getElementById('login-password').value
+            };
+            call('/api/auth/login', 'POST', data);
+        }
+
+        async function getMe() {
+            const token = localStorage.getItem('user_token');
+            if (!token) {
+                alert('Please login first to get a token!');
+                return;
+            }
+            call('/api/auth/me', 'GET', null, token);
+        }
+
+        async function call(url, method, body = null, token = null) {
+            const resEl = document.getElementById('response');
+            resEl.textContent = '⏳ Loading...';
+
+            try {
+                const headers = { 'Accept': 'application/json', 'Content-Type': 'application/json' };
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+
+                const options = { method, headers };
+                if (body) options.body = JSON.stringify(body);
+
+                const r = await fetch(url, options);
+                const data = await r.json();
+
+                resEl.textContent = `HTTP ${r.status}\n\n` + JSON.stringify(data, null, 2);
+
+                if (data.accessToken) {
+                    localStorage.setItem('user_token', data.accessToken);
+                    document.getElementById('token-status').textContent = '✅ Token stored: ' + data.accessToken.substring(0, 20) + '...';
+                }
+            } catch (e) {
+                resEl.textContent = '❌ Error: ' + e.message;
+            }
+        }
+    </script>
+</body>
+
+</html>

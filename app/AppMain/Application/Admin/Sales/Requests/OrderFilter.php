@@ -7,7 +7,7 @@ use App\AppMain\Core\BaseFilterDTO;
 class OrderFilter extends BaseFilterDTO
 {
     public ?string $status = null;
-    public ?string $customer_email = null;
+    public ?string $user_email = null;
     public ?string $increment_id = null;
     public ?string $created_after = null;
     public ?string $created_before = null;
@@ -15,7 +15,7 @@ class OrderFilter extends BaseFilterDTO
     protected function initializeSpecificFields(array $data): void
     {
         $this->status = $data['status'] ?? null;
-        $this->customer_email = $data['customer_email'] ?? null;
+        $this->user_email = $data['user_email'] ?? null;
         $this->increment_id = $data['increment_id'] ?? null;
         $this->created_after = $data['created_after'] ?? null;
         $this->created_before = $data['created_before'] ?? null;
@@ -25,7 +25,7 @@ class OrderFilter extends BaseFilterDTO
     {
         return [
             'status' => 'nullable|string',
-            'customer_email' => 'nullable|string',
+            'user_email' => 'nullable|string',
             'increment_id' => 'nullable|string',
             'created_after' => 'nullable|date',
             'created_before' => 'nullable|date',
@@ -41,7 +41,7 @@ class OrderFilter extends BaseFilterDTO
     {
         return [
             'status' => $this->status,
-            'customer_email' => $this->customer_email,
+            'user_email' => $this->user_email,
             'increment_id' => $this->increment_id,
             'created_after' => $this->created_after,
             'created_before' => $this->created_before,

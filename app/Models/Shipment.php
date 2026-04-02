@@ -16,8 +16,8 @@ class Shipment extends BaseModel
         'carrier_title',
         'track_number',
         'email_sent',
-        'customer_id',
-        'customer_type',
+        'user_id',
+        'user_type',
         'order_id',
         'order_address_id',
     ];

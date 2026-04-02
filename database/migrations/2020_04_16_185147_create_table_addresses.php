@@ -15,7 +15,7 @@ return new class extends Migration {
         Schema::create('addresses', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('address_type');
-            $table->uuid('customer_id')->nullable()->comment('null if guest checkout');
+            $table->uuid('user_id')->nullable()->comment('null if guest checkout');
             $table->uuid('cart_id')->nullable()->comment('only for cart_addresses');
             $table->uuid('order_id')->nullable()->comment('only for order_addresses');
             $table->string('first_name');
@@ -31,7 +31,7 @@ return new class extends Migration {
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
             $table->string('vat_id')->nullable();
-            $table->boolean('default_address')->default(false)->comment('only for customer_addresses');
+            $table->boolean('default_address')->default(false)->comment('only for user_addresses');
             $table->json('additional')->nullable();
             $table->timestamps();
         });

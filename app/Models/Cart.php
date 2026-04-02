@@ -13,9 +13,9 @@ class Cart extends BaseModel
     protected $table = 'cart';
 
     protected $fillable = [
-        'customer_email',
-        'customer_first_name',
-        'customer_last_name',
+        'user_email',
+        'user_first_name',
+        'user_last_name',
         'shipping_method',
         'coupon_code',
         'is_gift',
@@ -37,7 +37,7 @@ class Cart extends BaseModel
         'is_guest',
         'is_active',
         'applied_cart_rule_ids',
-        'customer_id',
+        'user_id',
     ];
 
     protected $casts = [
@@ -56,8 +56,8 @@ class Cart extends BaseModel
         return $this->hasMany(Address::class)->whereIn('address_type', ['cart_billing', 'cart_shipping']);
     }
 
-    public function customer(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(User::class);
     }
 }

@@ -21,8 +21,8 @@ return new class extends Migration {
             $table->string('carrier_title')->nullable();
             $table->text('track_number')->nullable();
             $table->boolean('email_sent')->default(0);
-            $table->uuid('customer_id')->nullable();
-            $table->string('customer_type')->nullable();
+            $table->uuid('user_id')->nullable();
+            $table->string('user_type')->nullable();
             $table->uuid('order_id');
             $table->uuid('order_address_id')->nullable();
             $table->integer('inventory_source_id')->unsigned()->nullable();

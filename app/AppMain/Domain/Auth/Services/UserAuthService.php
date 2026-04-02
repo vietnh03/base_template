@@ -22,7 +22,7 @@ class UserAuthService
             throw new \Exception('Invalid credentials');
         }
 
-        if ($user->status !== 'active') {
+        if ($user->status != 1) {
             throw new \Exception('Account is inactive');
         }
 
@@ -63,8 +63,8 @@ class UserAuthService
             'name' => $name,
             'email' => $email,
             'password' => Hash::make($password),
-            'role' => 'user',
-            'status' => 'active',
+            'status' => 1,
+            'is_verified' => false,
         ]);
 
         // Create Passport token

@@ -1,8 +1,8 @@
 <?php
 
-use App\AppMain\Application\User\Auth\Controllers\AuthController;
+use App\AppMain\Application\User\Auth\Controllers\UserAuthController;
+use App\AppMain\Application\Admin\User\Controllers\UserController;
 use App\AppMain\Application\User\Checkout\Controllers\CartController;
-use App\AppMain\Application\User\Customer\Controllers\CustomerController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 | Prefix: /api
 |
 | Use cases:
-| - Manage customers
+| - Manage users
 | - Manage orders
 | - Business operations
 |
@@ -29,8 +29,8 @@ Route::get('/health', function () {
 
 // Auth Routes (Public - No authentication required)
 Route::prefix('auth')->group(function () {
-    Route::post('/register', [AuthController::class, 'register']);  // POST /api/auth/register
-    Route::post('/login', [AuthController::class, 'login']);        // POST /api/auth/login
+    Route::post('/register', [UserAuthController::class, 'register']);
+    Route::post('/login', [UserAuthController::class, 'login']);
 });
 
 // CMS Routes (Public - serves frontend page data)
@@ -45,23 +45,22 @@ Route::prefix('posts')->group(function () {
     Route::get('/{id}', [\App\AppMain\Application\Api\Post\Controllers\PostController::class, 'show']); // GET /api/posts/{id}
 });
 
-// Protected Routes (Require Passport authentication)
+// Protected Routes (Require Passport authentication - now uses users table)
 Route::middleware('auth:api')->group(function () {
     // Auth Routes (Authenticated)
     Route::prefix('auth')->group(function () {
-        Route::get('/me', [AuthController::class, 'me']);           // GET /api/auth/me
-        Route::post('/logout', [AuthController::class, 'logout']);  // POST /api/auth/logout
-        Route::post('/logout-all', [AuthController::class, 'logoutAll']); // POST /api/auth/logout-all
+        Route::get('/me', [UserAuthController::class, 'me']);
+        Route::post('/logout', [UserAuthController::class, 'logout']);
     });
 
-    // Customer Management (for Business/Tenant users)
-    Route::prefix('customers')->group(function () {
-        Route::get('/', [CustomerController::class, 'index']);           // GET /api/customers
-        Route::post('/', [CustomerController::class, 'store']);          // POST /api/customers
-        Route::get('/{id}', [CustomerController::class, 'show']);        // GET /api/customers/{id}
-        Route::put('/{id}', [CustomerController::class, 'update']);      // PUT /api/customers/{id}
-        Route::patch('/{id}', [CustomerController::class, 'update']);    // PATCH /api/customers/{id}
-        Route::delete('/{id}', [CustomerController::class, 'destroy']);  // DELETE /api/customers/{id}
+    // User Management (Actions on other users, if any, or self-management)
+    Route::prefix('users')->group(function () {
+        Route::get('/', [UserController::class, 'index']);           // GET /api/users
+        Route::post('/', [UserController::class, 'store']);          // POST /api/users
+        Route::get('/{id}', [UserController::class, 'show']);        // GET /api/users/{id}
+        Route::put('/{id}', [UserController::class, 'update']);      // PUT /api/users/{id}
+        Route::patch('/{id}', [UserController::class, 'update']);    // PATCH /api/users/{id}
+        Route::delete('/{id}', [UserController::class, 'destroy']);  // DELETE /api/users/{id}
     });
 
     // Cart and Checkout endpoints

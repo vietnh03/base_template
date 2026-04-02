@@ -14,10 +14,10 @@ class OrderStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'customer_id' => 'nullable|string|uuid|exists:customers,id',
-            'customer_email' => 'required|email|max:255',
-            'customer_first_name' => 'required|string|max:255',
-            'customer_last_name' => 'required|string|max:255',
+            'user_id' => 'nullable|string|uuid|exists:users,id',
+            'user_email' => 'required|email|max:255',
+            'user_first_name' => 'required|string|max:255',
+            'user_last_name' => 'required|string|max:255',
 
             'shipping_method' => 'nullable|string|max:255',
             'coupon_code' => 'nullable|string|max:255',

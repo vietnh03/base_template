@@ -14,9 +14,9 @@ return new class extends Migration {
     {
         Schema::create('cart', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('customer_email')->nullable();
-            $table->string('customer_first_name')->nullable();
-            $table->string('customer_last_name')->nullable();
+            $table->string('user_email')->nullable();
+            $table->string('user_first_name')->nullable();
+            $table->string('user_last_name')->nullable();
             $table->string('shipping_method')->nullable();
             $table->string('coupon_code')->nullable();
             $table->boolean('is_gift')->default(0);
@@ -38,7 +38,7 @@ return new class extends Migration {
             $table->boolean('is_guest')->nullable();
             $table->boolean('is_active')->nullable()->default(1);
             $table->string('applied_cart_rule_ids')->nullable();
-            $table->uuid('customer_id')->nullable();
+            $table->uuid('user_id')->nullable();
             $table->timestamps();
         });
     }

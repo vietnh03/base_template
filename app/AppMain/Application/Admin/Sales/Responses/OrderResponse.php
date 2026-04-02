@@ -52,8 +52,8 @@ class OrderResponse
             })->toArray();
         }
 
-        if ($order->relationLoaded('customer')) {
-            $result['customer'] = $order->customer ? $order->customer->toArray() : null;
+        if ($order->relationLoaded('user')) {
+            $result['user'] = $order->user ? $order->user->toArray() : null;
         }
 
         return $result;

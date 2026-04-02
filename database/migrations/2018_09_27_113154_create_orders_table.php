@@ -18,9 +18,9 @@ return new class extends Migration {
             $table->string('status')->nullable();
             $table->string('payment_status')->default('pending')->nullable();
             $table->boolean('is_guest')->nullable();
-            $table->string('customer_email')->nullable();
-            $table->string('customer_first_name')->nullable();
-            $table->string('customer_last_name')->nullable();
+            $table->string('user_email')->nullable();
+            $table->string('user_first_name')->nullable();
+            $table->string('user_last_name')->nullable();
             $table->string('shipping_method')->nullable();
             $table->string('shipping_title')->nullable();
             $table->string('shipping_description')->nullable();
@@ -63,8 +63,8 @@ return new class extends Migration {
             $table->decimal('base_shipping_refunded', 12, 4)->default(0)->nullable();
             $table->decimal('shipping_discount_amount', 12, 4)->default(0)->nullable();
             $table->decimal('base_shipping_discount_amount', 12, 4)->default(0)->nullable();
-            $table->uuid('customer_id')->nullable();
-            $table->string('customer_type')->nullable();
+            $table->uuid('user_id')->nullable();
+            $table->string('user_type')->nullable();
             $table->uuid('cart_id')->nullable();
             $table->string('applied_cart_rule_ids')->nullable();
             $table->timestamps();

@@ -2,9 +2,9 @@
 
 namespace App\AppMain\Domain\User\Services;
 
-use App\AppMain\Domain\User\DTOs\UserDTO;
+use App\AppMain\Core\BaseService;
 use App\AppMain\Domain\User\Repositories\UserRepository;
-use Illuminate\Support\Facades\Hash;
+use App\AppMain\Domain\User\DTOs\UserDTO;
 
 class UserService
 {
@@ -36,14 +36,7 @@ class UserService
      */
     public function createUser(UserDTO $dto)
     {
-        $data = $dto->onlyFilled();
-
-        // Hash password before saving
-        if (isset($data['password'])) {
-            $data['password'] = Hash::make($data['password']);
-        }
-
-        return $this->userRepository->create($data);
+        return $this->userRepository->create($dto->onlyFilled());
     }
 
     /**
@@ -51,14 +44,7 @@ class UserService
      */
     public function updateUser(string $id, UserDTO $dto)
     {
-        $data = $dto->onlyFilled();
-
-        // Hash password if provided
-        if (isset($data['password'])) {
-            $data['password'] = Hash::make($data['password']);
-        }
-
-        return $this->userRepository->update($id, $data);
+        return $this->userRepository->update($id, $dto->onlyFilled());
     }
 
     /**

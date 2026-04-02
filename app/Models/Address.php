@@ -13,7 +13,7 @@ class Address extends BaseModel
 
     protected $fillable = [
         'address_type',
-        'customer_id',
+        'user_id',
         'cart_id',
         'order_id',
         'first_name',
@@ -38,9 +38,9 @@ class Address extends BaseModel
         'additional' => 'json',
     ];
 
-    public function customer(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(User::class);
     }
 
     public function cart(): BelongsTo

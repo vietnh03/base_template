@@ -1,15 +1,15 @@
-# Customer API Documentation (Exhaustive)
+# User API Documentation (Exhaustive)
 
-This document details the Customer management APIs.
-**Base URL**: `/api/customers`
+This document details the User management APIs.
+**Base URL**: `/api/users`
 **Auth**: Bearer Token (Passport) - *Note: Requires `auth:api` middleware*
 
 ---
 
-## 1. Customers API
+## 1. Users API
 
 ### [GET] `/`
-List customers with filters.
+List users with filters.
 **Filters**: `name`, `phone`, `email`, `status`, `is_verified`.
 
 **Response (Item)**:
@@ -55,7 +55,45 @@ List customers with filters.
 ```
 
 ### [GET] `/{id}`
-Retrieve a single customer by ID.
+Retrieve a single user by ID.
 
 ### [DELETE] `/{id}`
-Delete a customer.
+Delete a user.
+
+---
+
+## 2. User Authentication
+
+### [POST] `/api/auth/register`
+Register a new user account.
+**Payload**:
+- `name`: string (required)
+- `email`: string (required, unique)
+- `phone`: string (required, unique)
+- `password`: string (min 8, required)
+- `password_confirmation`: string (required)
+
+### [POST] `/api/auth/login`
+**Payload**:
+- `email`: string (required)
+- `password`: string (required)
+
+**Success Response**:
+```json
+{
+    "id": "uuid",
+    "name": "string",
+    "email": "string",
+    "accessToken": "jwt_token",
+    "tokenType": "Bearer",
+    "expiresAt": "date-time"
+}
+```
+
+### [GET] `/api/auth/me`
+Retrieve the authenticated user's profile.
+**Auth**: Bearer Token (standard `api` guard).
+
+### [POST] `/api/auth/logout`
+Revoke the current authentication token.
+**Auth**: Bearer Token (standard `api` guard).

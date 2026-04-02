@@ -102,9 +102,9 @@
         <h3>5. Tạo Đơn hàng mới từ Admin (POST /api/admin/sales/orders)</h3>
         <textarea id="create-order-json" rows="15" style="width: 100%; font-family: monospace;">
 {
-    "customer_email": "customer@example.com",
-    "customer_first_name": "John",
-    "customer_last_name": "Doe",
+    "user_email": "customer@example.com",
+    "user_first_name": "John",
+    "user_last_name": "Doe",
     "shipping_method": "flatrate",
     "items": [
         {
@@ -182,7 +182,7 @@
             const st = document.getElementById('filter-status').value;
             const em = document.getElementById('filter-email').value;
             if (st) url += `&status=${st}`;
-            if (em) url += `&customer_email=${em}`;
+            if (em) url += `&user_email=${em}`;
             await api('GET', url);
         }
 

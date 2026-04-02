@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 abstract class BaseRepository
 {
-    protected BaseModel $model;
+    protected \Illuminate\Database\Eloquent\Model $model;
     protected $dbConnection = null;
 
     public function __construct()
@@ -26,8 +26,7 @@ abstract class BaseRepository
 
     public function newQuery()
     {
-        $newQuery = $this->model->getQuery();
-        return $newQuery;
+        return $this->model->newQuery();
     }
 
     /**
