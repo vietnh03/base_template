@@ -126,4 +126,12 @@ Route::middleware('auth:admin')->group(function () {
             Route::get('/{id}', [OrderTransactionController::class, 'show']);
         });
     });
+
+    // CMS Management
+    Route::prefix('cms')->group(function () {
+        Route::prefix('sections')->group(function () {
+            Route::put('/{id}', [\App\AppMain\Application\Admin\Cms\Controllers\CmsSectionController::class, 'update']);
+        });
+    });
 });
+

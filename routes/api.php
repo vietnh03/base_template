@@ -32,6 +32,11 @@ Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);        // POST /api/auth/login
 });
 
+// CMS Routes (Public - serves frontend page data)
+Route::prefix('cms')->group(function () {
+    Route::get('/pages/{slug}', [\App\AppMain\Application\Api\Cms\Controllers\CmsController::class, 'getPageData']); // GET /api/cms/pages/{slug}
+});
+
 // Protected Routes (Require Passport authentication)
 Route::middleware('auth:api')->group(function () {
     // Auth Routes (Authenticated)
