@@ -107,14 +107,14 @@ class CategoryRepository extends BaseRepository
             if ($category && $category->logo_path) {
                 \Illuminate\Support\Facades\Storage::delete($category->logo_path);
             }
-            $data['logo_path'] = $data['logo']->store('categories/logo', 'public');
+            $data['logo_path'] = $data['logo']->store('categories/logo', config('filesystems.default'));
         }
 
         if (isset($data['banner']) && $data['banner'] instanceof \Illuminate\Http\UploadedFile) {
             if ($category && $category->banner_path) {
                 \Illuminate\Support\Facades\Storage::delete($category->banner_path);
             }
-            $data['banner_path'] = $data['banner']->store('categories/banner', 'public');
+            $data['banner_path'] = $data['banner']->store('categories/banner', config('filesystems.default'));
         }
 
         unset($data['logo'], $data['banner']);

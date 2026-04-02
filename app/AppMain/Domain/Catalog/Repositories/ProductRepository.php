@@ -6,6 +6,7 @@ use App\AppMain\Core\BaseRepository;
 use App\Models\Product;
 use App\Models\ProductFlat;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class ProductRepository extends BaseRepository
 {
@@ -244,6 +245,7 @@ class ProductRepository extends BaseRepository
             $column = \App\Models\Attribute::getValueColumn($attribute->type);
 
             $upsertData[] = [
+                'id' => (string) Str::uuid(),
                 'product_id' => $product->id,
                 'attribute_id' => $attribute->id, // Use resolved ID
                 'locale' => $locale,
@@ -436,7 +438,7 @@ class ProductRepository extends BaseRepository
         foreach ($images as $imageData) {
             if (isset($imageData['file']) && $imageData['file'] instanceof \Illuminate\Http\UploadedFile) {
                 // Upload new image
-                $path = $imageData['file']->store('products/' . $product->id, 'public');
+                $path = $imageData['file']->store('products/' . $product->id, config('filesystems.default'));
                 $imageData['path'] = $path;
                 unset($imageData['file']);
             }
@@ -452,7 +454,7 @@ class ProductRepository extends BaseRepository
             ->get();
 
         foreach ($imagesToDelete as $image) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($image->path);
+            \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->delete($image->path);
         }
 
         $relations['images'] = $processedImages;

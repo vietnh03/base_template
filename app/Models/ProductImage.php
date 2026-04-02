@@ -20,7 +20,7 @@ class ProductImage extends BaseModel
     protected static function booted()
     {
         static::deleting(function ($image) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($image->path);
+            \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->delete($image->path);
         });
     }
 }
