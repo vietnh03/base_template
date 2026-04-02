@@ -5,6 +5,7 @@ namespace App\AppMain\Application\Admin\Sales\Controllers;
 use App\AppMain\Core\Controller;
 use App\AppMain\Domain\Sales\Services\InvoiceService;
 use App\AppMain\Application\Admin\Sales\Requests\StoreInvoiceRequest;
+use App\AppMain\Application\Admin\Sales\Requests\InvoiceFilter;
 use App\AppMain\Application\Admin\Sales\Responses\InvoiceResponse;
 use Illuminate\Http\Request;
 
@@ -20,7 +21,9 @@ class InvoiceController extends Controller
     public function index(Request $request)
     {
         return $this->baseAction(function () use ($request) {
-            $invoices = $this->invoiceService->getAll($request->all());
+            $filter = InvoiceFilter::fromRequest($request);
+            $request->validate($filter->validate());
+            $invoices = $this->invoiceService->getAll($filter->toArray());
             return InvoiceResponse::paginated($invoices);
         }, 'Invoices retrieved successfully');
     }

@@ -10,8 +10,6 @@ use App\AppMain\Domain\User\Services\UserService;
 use App\AppMain\Core\Controller;
 use Illuminate\Http\Request;
 
-use function App\AppMain\Core\Helpers\responseJsonSuccess;
-
 class UserController extends Controller
 {
     protected UserService $userService;
@@ -24,10 +22,12 @@ class UserController extends Controller
     /**
      * Display a listing of users
      */
-    public function index(UserFilter $request)
+    public function index(Request $request)
     {
         return $this->baseAction(function () use ($request) {
-            $users = $this->userService->getUsersWithFilters($request->validated());
+            $filter = UserFilter::fromRequest($request);
+            $request->validate($filter->validate());
+            $users = $this->userService->getUsersWithFilters($filter->toArray());
             return UserResponse::paginated($users);
         }, 'Users retrieved successfully');
     }
@@ -60,6 +60,7 @@ class UserController extends Controller
     public function update(UserRequest $request, string $id)
     {
         return $this->baseActionTransaction(function () use ($request, $id) {
+            $this->userService->findUser($id); // Ensure exists
             $this->userService->updateUser($id, UserDTO::fromRequest($request));
             return null;
         }, 'User updated successfully');
@@ -71,6 +72,7 @@ class UserController extends Controller
     public function destroy(string $id)
     {
         return $this->baseActionTransaction(function () use ($id) {
+            $this->userService->findUser($id); // Ensure exists
             $this->userService->deleteUser($id);
             return null;
         }, 'User deleted successfully');

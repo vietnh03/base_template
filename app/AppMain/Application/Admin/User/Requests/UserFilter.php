@@ -2,25 +2,37 @@
 
 namespace App\AppMain\Application\Admin\User\Requests;
 
-use App\AppMain\Core\BaseFormRequest;
+use App\AppMain\Core\BaseFilterDTO;
 
-class UserFilter extends BaseFormRequest
+class UserFilter extends BaseFilterDTO
 {
-    public function authorize(): bool
+    public ?int $status = null;
+    public ?string $gender = null;
+
+    protected function initializeSpecificFields(array $data): void
     {
-        return true;
+        $this->status = isset($data['status']) ? (int) $data['status'] : null;
+        $this->gender = $data['gender'] ?? null;
     }
 
-    public function rules(): array
+    protected function getSpecificValidationRules(): array
     {
         return [
-            'search' => 'nullable|string',
             'status' => 'nullable|integer',
             'gender' => 'nullable|string',
-            'per_page' => 'nullable|integer',
-            'page' => 'nullable|integer',
-            'sort_by' => 'nullable|string',
-            'sort_direction' => 'nullable|string|in:asc,desc',
+        ];
+    }
+
+    protected function getAllowedSortFields(): array
+    {
+        return ['name', 'email', 'status', 'created_at', 'updated_at'];
+    }
+
+    protected function getSpecificArray(): array
+    {
+        return [
+            'status' => $this->status,
+            'gender' => $this->gender,
         ];
     }
 }

@@ -5,6 +5,7 @@ namespace App\AppMain\Application\Admin\Sales\Controllers;
 use App\AppMain\Core\Controller;
 use App\AppMain\Domain\Sales\Services\OrderTransactionService;
 use App\AppMain\Application\Admin\Sales\Requests\StoreTransactionRequest;
+use App\AppMain\Application\Admin\Sales\Requests\OrderTransactionFilter;
 use App\AppMain\Application\Admin\Sales\Responses\OrderTransactionResponse;
 use Illuminate\Http\Request;
 
@@ -20,7 +21,9 @@ class OrderTransactionController extends Controller
     public function index(Request $request)
     {
         return $this->baseAction(function () use ($request) {
-            $transactions = $this->transactionService->getAll($request->all());
+            $filter = OrderTransactionFilter::fromRequest($request);
+            $request->validate($filter->validate());
+            $transactions = $this->transactionService->getAll($filter->toArray());
             return OrderTransactionResponse::paginated($transactions);
         }, 'Transactions retrieved successfully');
     }
