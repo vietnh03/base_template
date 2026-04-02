@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post API Tester – Admin</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        :root {
+            --bg: #0f1117;
+            --surface: #1a1d27;
+            --surface2: #22263a;
+            --border: #2e3348;
+            --accent: #10b981;
+            --ah: #34d399;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warn: #f59e0b;
+            --text: #e2e8f0;
+            --muted: #64748b;
+            --code: #111827;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            height: 100vh;
+            overflow: hidden
+        }
+
+        /* sidebar */
+        #sidebar {
+            width: 230px;
+            min-width: 230px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto
+        }
+
+        .logo {
+            padding: 18px 16px 14px;
+            font-size: 14.5px;
+            font-weight: 700;
+            color: var(--accent);
+            border-bottom: 1px solid var(--border)
+        }
+
+        .nav-group {
+            padding: 10px 0 4px 14px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 14px;
+            cursor: pointer;
+            font-size: 13px;
+            border-left: 3px solid transparent;
+            transition: all .15s;
+            color: #94a3b8
+        }
+
+        .nav-item:hover {
+            background: var(--surface2);
+            color: var(--text)
+        }
+
+        .nav-item.active {
+            background: rgba(16, 185, 129, .13);
+            border-left-color: var(--accent);
+            color: var(--accent);
+            font-weight: 500
+        }
+
+        /* main */
+        #main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden
+        }
+
+        .topbar {
+            padding: 12px 22px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--surface)
+        }
+
+        .topbar h1 {
+            font-size: 16px;
+            font-weight: 600
+        }
+
+        .env {
+            margin-left: auto;
+            font-size: 11px;
+            background: rgba(16, 185, 129, .18);
+            color: var(--accent);
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-weight: 500
+        }
+
+        /* split */
+        .split {
+            flex: 1;
+            display: flex;
+            overflow: hidden
+        }
+
+        .left {
+            flex: 1;
+            overflow-y: auto;
+            padding: 18px 20px
+        }
+
+        .right {
+            width: 42%;
+            min-width: 360px;
+            background: var(--surface);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden
+        }
+
+        .right-head {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12.5px;
+            font-weight: 500
+        }
+
+        #response-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            color: #a5b4fc;
+            background: var(--code);
+            line-height: 1.6
+        }
+
+        /* card */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 14px;
+            overflow: hidden
+        }
+
+        .card-head {
+            padding: 10px 14px;
+            background: var(--surface2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+            user-select: none
+        }
+
+        .card-head:hover {
+            background: #272b3f
+        }
+
+        .card-body {
+            padding: 14px;
+            display: none
+        }
+
+        .card-body.open {
+            display: block
+        }
+
+        .chevron {
+            margin-left: auto;
+            transition: transform .2s;
+            font-size: 11px;
+            color: var(--muted)
+        }
+
+        .card-head.open .chevron {
+            transform: rotate(180deg)
+        }
+
+        /* method badge */
+        .mb {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace
+        }
+
+        .get {
+            background: rgba(16, 185, 129, .15);
+            color: #34d399
+        }
+
+        .post {
+            background: rgba(99, 102, 241, .15);
+            color: #818cf8
+        }
+
+        .put {
+            background: rgba(245, 158, 11, .15);
+            color: #fbbf24
+        }
+
+        .del {
+            background: rgba(239, 68, 68, .15);
+            color: #f87171
+        }
+
+        /* status */
+        .sbadge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 9px;
+            border-radius: 100px
+        }
+
+        .s2 {
+            background: rgba(16, 185, 129, .15);
+            color: var(--success)
+        }
+
+        .s4 {
+            background: rgba(239, 68, 68, .15);
+            color: var(--danger)
+        }
+
+        .s5 {
+            background: rgba(239, 68, 68, .15);
+            color: var(--danger)
+        }
+
+        .sp {
+            background: rgba(100, 116, 139, .15);
+            color: var(--muted)
+        }
+
+        /* form */
+        label {
+            display: block;
+            font-size: 11.5px;
+            color: var(--muted);
+            margin-bottom: 4px;
+            font-weight: 500
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 7px 11px;
+            background: var(--code);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            outline: none;
+            transition: border-color .15s;
+            resize: vertical
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            border-color: var(--accent)
+        }
+
+        textarea {
+            min-height: 90px
+        }
+
+        .fr {
+            margin-bottom: 10px
+        }
+
+        .row {
+            display: flex;
+            gap: 10px
+        }
+
+        .row>.fr {
+            flex: 1
+        }
+
+        /* buttons */
+        .btn {
+            padding: 7px 16px;
+            border: none;
+            border-radius: 7px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px
+        }
+
+        .btn-p {
+            background: var(--accent);
+            color: #fff
+        }
+
+        .btn-p:hover {
+            background: var(--ah)
+        }
+
+        .btn-sm {
+            padding: 5px 12px;
+            font-size: 12px
+        }
+
+        /* state bar */
+        #state-bar {
+            background: var(--surface2);
+            border-bottom: 1px solid var(--border);
+            padding: 8px 14px;
+            font-size: 11.5px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center
+        }
+
+        .state-chip {
+            background: rgba(16, 185, 129, .15);
+            color: var(--ah);
+            padding: 2px 10px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer
+        }
+
+        /* flow */
+        .flow-step {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 12px
+        }
+
+        .flow-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            background: var(--accent);
+            border-radius: 50%;
+            font-size: 11px;
+            font-weight: 700;
+            color: #fff;
+            margin-right: 8px;
+            flex-shrink: 0
+        }
+
+        .flow-title {
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 10px
+        }
+
+        .step-result {
+            font-size: 11.5px;
+            color: var(--success);
+            margin-top: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(16, 185, 129, .08);
+            padding: 5px 9px;
+            border-radius: 5px;
+            display: none
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav id="sidebar">
+        <div class="logo">📰 Post API Tester</div>
+        <div class="nav-group">Full Flow</div>
+        <div class="nav-item active" data-t="flow" onclick="switchTab(this,'flow')"><span>🚀</span> Guided Flow</div>
+        <div class="nav-group">Individual</div>
+        <div class="nav-item" data-t="cats" onclick="switchTab(this,'cats')"><span>📁</span> Categories</div>
+        <div class="nav-item" data-t="tags" onclick="switchTab(this,'tags')"><span>🏷</span> Tags</div>
+        <div class="nav-item" data-t="posts" onclick="switchTab(this,'posts')"><span>📝</span> Posts</div>
+    </nav>
+
+    <div id="main">
+        <div class="topbar">
+            <span style="font-size:17px">🔬</span>
+            <h1 id="top-title">Guided Flow</h1>
+            <input type="text" id="token" placeholder="Bearer Token..." style="width: 200px; margin-left: 20px;">
+            <span class="env">localhost · /api/admin/posts</span>
+        </div>
+
+        <div id="state-bar" style="display:none"></div>
+
+        <div class="split">
+            <div class="left" id="left"></div>
+            <div class="right">
+                <div class="right-head">
+                    <span>Response</span>
+                    <span id="sbadge" class="sbadge sp">—</span>
+                </div>
+                <div id="response-body">// Kết quả sẽ hiển thị ở đây...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const B = '/api/admin/posts';
+
+        // State
+        const S = { catIds: [], tagIds: [], postId: null };
+
+        function saveCat(id, name) { if (!S.catIds.find(c => c.id === id)) S.catIds.push({ id, name }); renderStateBar(); }
+        function saveTag(id, name) { if (!S.tagIds.find(t => t.id === id)) S.tagIds.push({ id, name }); renderStateBar(); }
+        function savePost(id) { S.postId = id; renderStateBar(); }
+
+        function renderStateBar() {
+            const bar = document.getElementById('state-bar');
+            const chips = [];
+            S.catIds.forEach(c => chips.push(`cat:${c.name}=#${c.id}`));
+            S.tagIds.forEach(t => chips.push(`tag:${t.name}=#${t.id}`));
+            if (S.postId) chips.push(`post=#${S.postId}`);
+
+            if (chips.length === 0) { bar.style.display = 'none'; return; }
+            bar.style.display = 'flex';
+            bar.innerHTML = `<span style="color:var(--muted);font-size:11px;margin-right:8px">Đã tạo:</span>`
+                + chips.map(c => `<span class="state-chip" onclick="copyId(this)">${c}</span>`).join('');
+        }
+
+        function copyId(el) {
+            const m = el.textContent.match(/#([a-f0-9-]+)$/);
+            if (m) { navigator.clipboard.writeText(m[1]); el.style.background = 'rgba(16,185,129,.3)'; setTimeout(() => el.style.background = '', 1000); }
+        }
+
+        async function api(method, url, body = null) {
+            setStatus('sp', '...');
+            document.getElementById('response-body').textContent = '⏳ Đang gọi...';
+            const headers = {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            };
+            const token = document.getElementById('token').value.trim();
+            if (token) headers['Authorization'] = token.startsWith('Bearer ') ? token : 'Bearer ' + token;
+
+            const opts = { method, headers };
+            if (body) opts.body = JSON.stringify(body);
+
+            try {
+                const r = await fetch(url, opts);
+                const txt = await r.text();
+                let parsed; try { parsed = JSON.parse(txt); } catch { parsed = txt; }
+                const code = r.status;
+                const cls = code >= 500 ? 's5' : code >= 400 ? 's4' : 's2';
+                setStatus(cls, code + ' ' + r.statusText);
+                document.getElementById('response-body').textContent = JSON.stringify(parsed, null, 2);
+                return { ok: code >= 200 && code < 300, data: parsed };
+            } catch (e) {
+                setStatus('s5', 'Network Error');
+                document.getElementById('response-body').textContent = '❌ ' + e.message;
+                return { ok: false, data: null };
+            }
+        }
+
+        function setStatus(cls, txt) { const el = document.getElementById('sbadge'); el.className = 'sbadge ' + cls; el.textContent = txt; }
+        function v(id) { return document.getElementById(id)?.value?.trim() || ''; }
+        function j(id) {
+            const x = v(id); if (!x) return null;
+            try { return JSON.parse(x); } catch { alert('JSON lỗi ở field: ' + id); return null; }
+        }
+        function toggle(el) { el.classList.toggle('open'); el.nextElementSibling.classList.toggle('open'); }
+
+        function switchTab(el, t) {
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
+            const titles = { flow: 'Guided Flow', cats: 'Categories', tags: 'Tags', posts: 'Posts' };
+            document.getElementById('top-title').textContent = titles[t];
+
+            const left = document.getElementById('left');
+            if (t === 'flow') renderFlow();
+            else if (t === 'cats') renderCats();
+            else if (t === 'tags') renderTags();
+            else if (t === 'posts') renderPosts();
+        }
+
+        function card(method, title, body) {
+            const cls = method.toLowerCase();
+            return `<div class="card"><div class="card-head" onclick="toggle(this)"><span class="mb ${cls}">${method}</span>${title}<span class="chevron">▼</span></div><div class="card-body">${body}</div></div>`;
+        }
+
+        function renderFlow() {
+            document.getElementById('left').innerHTML = `
+                <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Thứ tự: Tạo Category → Tạo Tag → Tạo Post.</div>
+                
+                <div class="flow-step" id="fs1">
+                    <div class="flow-title"><span class="flow-num">1</span> Tạo Post Category</div>
+                    <div class="fr"><label>translations (vi/en)</label>
+                        <textarea id="f-cat-tr">{"vi":{"name":"Tin Tức","slug":"tin-tuc","description":"Tin tức hàng ngày"},"en":{"name":"News","slug":"news","description":"Daily news"}}</textarea>
+                    </div>
+                    <button class="btn btn-p btn-sm" onclick="flowCreateCat()">▶ Tạo Category</button>
+                    <div class="step-result" id="fr1"></div>
+                </div>
+
+                <div class="flow-step" id="fs2">
+                    <div class="flow-title"><span class="flow-num">2</span> Tạo Post Tag</div>
+                    <div class="fr"><label>translations (vi/en)</label>
+                        <textarea id="f-tag-tr">{"vi":{"name":"Khuyến mãi","slug":"khuyen-mai"},"en":{"name":"Promotion","slug":"promotion"}}</textarea>
+                    </div>
+                    <button class="btn btn-p btn-sm" onclick="flowCreateTag()">▶ Tạo Tag</button>
+                    <div class="step-result" id="fr2"></div>
+                </div>
+
+                <div class="flow-step" id="fs3">
+                    <div class="flow-title"><span class="flow-num">3</span> Tạo Post</div>
+                    <div class="row">
+                        <div class="fr"><label>category_id</label><input id="f-post-cat" placeholder="UUID từ bước 1"></div>
+                        <div class="fr"><label>tag_id</label><input id="f-post-tag" placeholder="UUID từ bước 2"></div>
+                    </div>
+                    <div class="fr"><label>translations (vi/en)</label>
+                        <textarea id="f-post-tr" style="min-height:150px">{
+  "vi": {
+    "name": "Chào mừng đến với Blog",
+    "slug": "chao-mung",
+    "short_description": "Đây là bài viết đầu tiên.",
+    "content": "<h1>Nội dung bài viết</h1><p>Chào mừng bạn đã đến!</p>"
+  },
+  "en": {
+    "name": "Welcome to Blog",
+    "slug": "welcome",
+    "short_description": "This is the first post.",
+    "content": "<h1>Post Content</h1><p>Welcome to our blog!</p>"
+  }
+}</textarea>
+                    </div>
+                    <button class="btn btn-p btn-sm" onclick="flowCreatePost()">▶ Tạo Post</button>
+                    <div class="step-result" id="fr3"></div>
+                </div>
+            `;
+        }
+
+        async function flowCreateCat() {
+            const body = { translations: j('f-cat-tr'), status: true };
+            const r = await api('POST', B + '/categories', body);
+            if (r.ok) {
+                const id = r.data.data.id;
+                saveCat(id, 'New Cat');
+                document.getElementById('f-post-cat').value = id;
+                document.getElementById('fr1').style.display = 'block';
+                document.getElementById('fr1').textContent = '✅ Đã tạo Category ID: ' + id;
+            }
+        }
+
+        async function flowCreateTag() {
+            const body = { translations: j('f-tag-tr'), status: true };
+            const r = await api('POST', B + '/tags', body);
+            if (r.ok) {
+                const id = r.data.data.id;
+                saveTag(id, 'New Tag');
+                document.getElementById('f-post-tag').value = id;
+                document.getElementById('fr2').style.display = 'block';
+                document.getElementById('fr2').textContent = '✅ Đã tạo Tag ID: ' + id;
+            }
+        }
+
+        async function flowCreatePost() {
+            const tr = j('f-post-tr');
+            const body = {
+                translations: tr,
+                status: true,
+                categories: [v('f-post-cat')],
+                tags: [v('f-post-tag')]
+            };
+            const r = await api('POST', B, body);
+            if (r.ok) {
+                const id = r.data.data.id;
+                savePost(id);
+                document.getElementById('fr3').style.display = 'block';
+                document.getElementById('fr3').textContent = '✅ Đã tạo Post ID: ' + id;
+            }
+        }
+
+        function renderCats() {
+            document.getElementById('left').innerHTML = `
+                ${card('GET', 'Lấy danh sách Categories', `
+                    <button class="btn btn-p btn-sm" onclick="api('GET', B + '/categories')">Execute</button>
+                `)}
+                ${card('POST', 'Tạo Category mới', `
+                    <div class="fr"><label>Payload (JSON)</label>
+                        <textarea id="c-post">{"status":true, "translations": {"vi":{"name":"Danh mục 1","slug":"danh-muc-1"}}}</textarea>
+                    </div>
+                    <button class="btn btn-p btn-sm" onclick="api('POST', B + '/categories', j('c-post'))">Execute</button>
+                `)}
+            `;
+        }
+
+        function renderTags() {
+            document.getElementById('left').innerHTML = `
+                ${card('GET', 'Lấy danh sách Tags', `
+                    <button class="btn btn-p btn-sm" onclick="api('GET', B + '/tags')">Execute</button>
+                `)}
+                ${card('POST', 'Tạo Tag mới', `
+                    <div class="fr"><label>Payload (JSON)</label>
+                        <textarea id="t-post">{"status":true, "translations": {"vi":{"name":"Tag 1","slug":"tag-1"}}}</textarea>
+                    </div>
+                    <button class="btn btn-p btn-sm" onclick="api('POST', B + '/tags', j('t-post'))">Execute</button>
+                `)}
+            `;
+        }
+
+        function renderPosts() {
+            document.getElementById('left').innerHTML = `
+                ${card('GET', 'Lấy danh sách Posts', `
+                    <button class="btn btn-p btn-sm" onclick="api('GET', B)">Execute</button>
+                `)}
+                ${card('POST', 'Tạo Post mới', `
+                    <div class="fr"><label>Payload (JSON)</label>
+                        <textarea id="p-post" style="min-height:200px">{
+  "status": true,
+  "categories": [],
+  "tags": [],
+  "translations": {
+    "vi": {
+      "name": "Bài viết test",
+      "slug": "bai-viet-test",
+      "content": "Nội dung"
+    }
+  }
+}</textarea>
+                    </div>
+                    <button class="btn btn-p btn-sm" onclick="api('POST', B, j('p-post'))">Execute</button>
+                `)}
+            `;
+        }
+
+        renderFlow();
+    </script>
+</body>
+
+</html>

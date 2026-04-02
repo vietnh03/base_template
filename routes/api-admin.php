@@ -11,6 +11,9 @@ use App\AppMain\Application\Admin\Catalog\Controllers\AttributeFamilyController;
 use App\AppMain\Application\Admin\Sales\Controllers\OrderController;
 use App\AppMain\Application\Admin\Sales\Controllers\InvoiceController;
 use App\AppMain\Application\Admin\Sales\Controllers\OrderTransactionController;
+use App\AppMain\Application\Admin\Post\Controllers\PostController;
+use App\AppMain\Application\Admin\Post\Controllers\PostCategoryController;
+use App\AppMain\Application\Admin\Post\Controllers\PostTagController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -134,5 +137,34 @@ Route::middleware('auth:admin')->group(function () {
             Route::put('/{id}', [CmsSectionController::class, 'update']);
         });
     });
+
+    // Post Management
+
 });
 
+Route::prefix('posts')->group(function () {
+    // Post Category Management
+    Route::prefix('categories')->group(function () {
+        Route::get('/', [PostCategoryController::class, 'index']);
+        Route::post('/', [PostCategoryController::class, 'store']);
+        Route::get('/{id}', [PostCategoryController::class, 'show']);
+        Route::put('/{id}', [PostCategoryController::class, 'update']);
+        Route::delete('/{id}', [PostCategoryController::class, 'destroy']);
+    });
+
+    // Post Tag Management
+    Route::prefix('tags')->group(function () {
+        Route::get('/', [PostTagController::class, 'index']);
+        Route::post('/', [PostTagController::class, 'store']);
+        Route::get('/{id}', [PostTagController::class, 'show']);
+        Route::put('/{id}', [PostTagController::class, 'update']);
+        Route::delete('/{id}', [PostTagController::class, 'destroy']);
+    });
+
+    // Post Management
+    Route::get('/', [PostController::class, 'index']);
+    Route::post('/', [PostController::class, 'store']);
+    Route::get('/{id}', [PostController::class, 'show']);
+    Route::put('/{id}', [PostController::class, 'update']);
+    Route::delete('/{id}', [PostController::class, 'destroy']);
+});

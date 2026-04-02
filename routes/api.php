@@ -38,6 +38,13 @@ Route::prefix('cms')->group(function () {
     Route::get('/pages/{slug}', [\App\AppMain\Application\Api\Cms\Controllers\CmsController::class, 'getPageData']); // GET /api/cms/pages/{slug}
 });
 
+// Post Routes (Public - serves frontend post data)
+Route::prefix('posts')->group(function () {
+    Route::get('/', [\App\AppMain\Application\Api\Post\Controllers\PostController::class, 'index']);      // GET /api/posts
+    Route::get('/categories', [\App\AppMain\Application\Api\Post\Controllers\PostController::class, 'categories']); // GET /api/posts/categories
+    Route::get('/{id}', [\App\AppMain\Application\Api\Post\Controllers\PostController::class, 'show']); // GET /api/posts/{id}
+});
+
 // Protected Routes (Require Passport authentication)
 Route::middleware('auth:api')->group(function () {
     // Auth Routes (Authenticated)

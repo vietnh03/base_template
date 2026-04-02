@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post API Tester – Public</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --border: #334155;
+            --accent: #38bdf8;
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+            --code: #020617;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            gap: 30px;
+        }
+
+        .left {
+            flex: 1;
+        }
+
+        .right {
+            flex: 1;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .right-header {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+        }
+
+        #response {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: #7dd3fc;
+            background: var(--code);
+            white-space: pre-wrap;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: var(--accent);
+        }
+
+        .endpoint {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .endpoint:hover {
+            border-color: var(--accent);
+        }
+
+        .method {
+            font-family: 'JetBrains Mono';
+            font-weight: 700;
+            color: #10b981;
+            margin-right: 10px;
+        }
+
+        .path {
+            font-family: 'JetBrains Mono';
+            font-size: 14px;
+        }
+
+        .desc {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="left">
+            <h1>📰 Public Post API</h1>
+
+            <div class="endpoint" onclick="call('/api/posts')">
+                <span class="method">GET</span>
+                <span class="path">/api/posts</span>
+                <div class="desc">Lấy danh sách bài viết công khai</div>
+            </div>
+
+            <div class="endpoint" onclick="call('/api/posts/categories')">
+                <span class="method">GET</span>
+                <span class="path">/api/posts/categories</span>
+                <div class="desc">Lấy danh sách danh mục bài viết</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method">GET</span>
+                <span class="path">/api/posts/{id}</span>
+                <input type="text" id="post-id" placeholder="ID bài viết..."
+                    style="margin-top:10px; width:100%; padding:8px; background:var(--code); border:1px solid var(--border); color:white; border-radius:4px;">
+                <button onclick="call('/api/posts/' + document.getElementById('post-id').value)"
+                    style="margin-top:10px; width:100%; padding:8px; background:var(--accent); border:none; color:black; font-weight:700; border-radius:4px; cursor:pointer;">Lấy
+                    chi tiết bài viết</button>
+            </div>
+        </div>
+
+        <div class="right">
+            <div class="right-header">JSON Response</div>
+            <div id="response">// Kết quả sẽ hiển thị ở đây...</div>
+        </div>
+    </div>
+
+    <script>
+        async function call(url) {
+            const resEl = document.getElementById('response');
+            resEl.textContent = '⏳ Loading...';
+            try {
+                const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                const data = await r.json();
+                resEl.textContent = JSON.stringify(data, null, 2);
+            } catch (e) {
+                resEl.textContent = '❌ Error: ' + e.message;
+            }
+        }
+    </script>
+</body>
+
+</html>
