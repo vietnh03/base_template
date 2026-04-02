@@ -1,6 +1,7 @@
 <?php
 
 use App\AppMain\Application\Admin\Auth\Controllers\AuthController;
+use App\AppMain\Application\Admin\Cms\Controllers\CmsSectionController;
 use App\AppMain\Application\Admin\User\Controllers\UserController;
 use App\AppMain\Application\Admin\Catalog\Controllers\TagController;
 use App\AppMain\Application\Admin\Catalog\Controllers\CategoryController;
@@ -130,7 +131,7 @@ Route::middleware('auth:admin')->group(function () {
     // CMS Management
     Route::prefix('cms')->group(function () {
         Route::prefix('sections')->group(function () {
-            Route::put('/{id}', [\App\AppMain\Application\Admin\Cms\Controllers\CmsSectionController::class, 'update']);
+            Route::put('/{id}', [CmsSectionController::class, 'update']);
         });
     });
 });

@@ -1,6 +1,7 @@
 <?php
 
 use App\AppMain\Application\User\Auth\Controllers\AuthController;
+use App\AppMain\Application\User\Checkout\Controllers\CartController;
 use App\AppMain\Application\User\Customer\Controllers\CustomerController;
 use Illuminate\Support\Facades\Route;
 
@@ -58,10 +59,10 @@ Route::middleware('auth:api')->group(function () {
 
     // Cart and Checkout endpoints
     Route::prefix('cart')->group(function () {
-        Route::get('/', [\App\AppMain\Application\User\Checkout\Controllers\CartController::class, 'get']);
-        Route::post('/add', [\App\AppMain\Application\User\Checkout\Controllers\CartController::class, 'add']);
-        Route::put('/update/{itemId}', [\App\AppMain\Application\User\Checkout\Controllers\CartController::class, 'update']);
-        Route::delete('/remove/{itemId}', [\App\AppMain\Application\User\Checkout\Controllers\CartController::class, 'remove']);
-        Route::post('/checkout', [\App\AppMain\Application\User\Checkout\Controllers\CartController::class, 'checkout']);
+        Route::get('/', [CartController::class, 'get']);
+        Route::post('/add', [CartController::class, 'add']);
+        Route::put('/update/{itemId}', [CartController::class, 'update']);
+        Route::delete('/remove/{itemId}', [CartController::class, 'remove']);
+        Route::post('/checkout', [CartController::class, 'checkout']);
     });
 });
