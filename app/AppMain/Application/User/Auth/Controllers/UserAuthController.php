@@ -25,7 +25,8 @@ class UserAuthController extends Controller
                 $request->name,
                 $request->email,
                 $request->password,
-                $request->ip()
+                $request->ip(),
+                $request->phone
             );
 
             return UserAuthResponse::fromArray($result);

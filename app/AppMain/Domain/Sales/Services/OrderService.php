@@ -9,6 +9,7 @@ use App\AppMain\Domain\Catalog\Repositories\ProductRepository;
 use App\Models\Cart;
 use App\Models\Order;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class OrderService
 {
@@ -104,6 +105,7 @@ class OrderService
                 $inventory->save();
 
                 $orderItemsData[] = [
+                    'id' => (string) Str::uuid(),
                     'sku' => $cartItem->sku,
                     'name' => $cartItem->name,
                     'coupon_code' => $cartItem->coupon_code,
@@ -137,7 +139,8 @@ class OrderService
             $addressesData = [];
             foreach ($cart->addresses as $address) {
                 $addressData = $address->toArray();
-                unset($addressData['id'], $addressData['created_at'], $addressData['updated_at']);
+                $addressData['id'] = (string) Str::uuid();
+                unset($addressData['created_at'], $addressData['updated_at']);
                 $addressData['address_type'] = str_replace('cart_', 'order_', $addressData['address_type']);
                 $addressData['cart_id'] = null;
                 $addressData['order_id'] = $order->id;
@@ -206,6 +209,7 @@ class OrderService
                 $totalWeight += ($weight * $qty);
 
                 $itemsData[] = [
+                    'id' => (string) Str::uuid(),
                     'product_id' => $product->id,
                     'sku' => $product->sku,
                     'name' => $name,
@@ -265,6 +269,7 @@ class OrderService
             $addressesData = [];
             $shippingAddress = $data['shipping_address'];
             $shippingAddress['address_type'] = 'order_shipping';
+            $shippingAddress['id'] = (string) Str::uuid();
             $shippingAddress['order_id'] = $order->id;
             $shippingAddress['created_at'] = $now;
             $shippingAddress['updated_at'] = $now;
@@ -272,6 +277,7 @@ class OrderService
 
             $billingAddress = $data['billing_address'];
             $billingAddress['address_type'] = 'order_billing';
+            $billingAddress['id'] = (string) Str::uuid();
             $billingAddress['order_id'] = $order->id;
             $billingAddress['created_at'] = $now;
             $billingAddress['updated_at'] = $now;

@@ -13,7 +13,7 @@ class UserRequest extends BaseFormRequest
 
     public function rules(): array
     {
-        $id = $this->route('user');
+        $id = $this->route('id');
         return [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $id,

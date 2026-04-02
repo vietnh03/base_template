@@ -51,7 +51,7 @@ class UserAuthService
         $this->userAuthRepository->revokeAllTokens($user);
     }
 
-    public function register(string $name, string $email, string $password, string $ip): array
+    public function register(string $name, string $email, string $password, string $ip, string $phone): array
     {
         // Check if email already exists
         if ($this->userAuthRepository->findByEmail($email)) {
@@ -63,6 +63,7 @@ class UserAuthService
             'name' => $name,
             'email' => $email,
             'password' => Hash::make($password),
+            'phone' => $phone,
             'status' => 1,
             'email_verified_at' => null,
         ]);

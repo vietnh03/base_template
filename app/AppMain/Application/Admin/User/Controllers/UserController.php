@@ -62,7 +62,7 @@ class UserController extends Controller
         return $this->baseActionTransaction(function () use ($request, $id) {
             $this->userService->findUser($id); // Ensure exists
             $this->userService->updateUser($id, UserDTO::fromRequest($request));
-            return null;
+            return true;
         }, 'User updated successfully');
     }
 
@@ -74,7 +74,7 @@ class UserController extends Controller
         return $this->baseActionTransaction(function () use ($id) {
             $this->userService->findUser($id); // Ensure exists
             $this->userService->deleteUser($id);
-            return null;
+            return true;
         }, 'User deleted successfully');
     }
 }
