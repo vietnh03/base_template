@@ -5,10 +5,18 @@ namespace App\AppMain\Domain\Catalog\Repositories;
 use App\AppMain\Core\BaseRepository;
 use App\AppMain\Domain\Catalog\Services\CategoryUrlKeyService;
 use App\Models\Category;
+use App\AppMain\Core\Helpers\FileUploadService;
 use Illuminate\Support\Facades\DB;
 
 class CategoryRepository extends BaseRepository
 {
+    protected FileUploadService $fileUploadService;
+
+    public function __construct(Category $model, FileUploadService $fileUploadService)
+    {
+        $this->model = $model;
+        $this->fileUploadService = $fileUploadService;
+    }
     public function getModel()
     {
         return Category::class;
@@ -105,16 +113,16 @@ class CategoryRepository extends BaseRepository
     {
         if (isset($data['logo']) && $data['logo'] instanceof \Illuminate\Http\UploadedFile) {
             if ($category && $category->logo_path) {
-                \Illuminate\Support\Facades\Storage::delete($category->logo_path);
+                $this->fileUploadService->delete($category->logo_path);
             }
-            $data['logo_path'] = $data['logo']->store('categories/logo', config('filesystems.default'));
+            $data['logo_path'] = $this->fileUploadService->upload($data['logo'], 'categories/logo');
         }
 
         if (isset($data['banner']) && $data['banner'] instanceof \Illuminate\Http\UploadedFile) {
             if ($category && $category->banner_path) {
-                \Illuminate\Support\Facades\Storage::delete($category->banner_path);
+                $this->fileUploadService->delete($category->banner_path);
             }
-            $data['banner_path'] = $data['banner']->store('categories/banner', config('filesystems.default'));
+            $data['banner_path'] = $this->fileUploadService->upload($data['banner'], 'categories/banner');
         }
 
         unset($data['logo'], $data['banner']);

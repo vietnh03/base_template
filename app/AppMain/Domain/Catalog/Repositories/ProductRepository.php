@@ -5,12 +5,20 @@ namespace App\AppMain\Domain\Catalog\Repositories;
 use App\AppMain\Core\BaseRepository;
 use App\Models\Product;
 use App\Models\ProductFlat;
+use App\AppMain\Core\Helpers\FileUploadService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class ProductRepository extends BaseRepository
 {
     protected array $defaultRelations = Product::RELATION_KEYS;
+    protected FileUploadService $fileUploadService;
+
+    public function __construct(Product $model, FileUploadService $fileUploadService)
+    {
+        $this->model = $model;
+        $this->fileUploadService = $fileUploadService;
+    }
 
     public function getModel()
     {
@@ -438,7 +446,7 @@ class ProductRepository extends BaseRepository
         foreach ($images as $imageData) {
             if (isset($imageData['file']) && $imageData['file'] instanceof \Illuminate\Http\UploadedFile) {
                 // Upload new image
-                $path = $imageData['file']->store('products/' . $product->id, config('filesystems.default'));
+                $path = $this->fileUploadService->upload($imageData['file'], 'products/' . $product->id);
                 $imageData['path'] = $path;
                 unset($imageData['file']);
             }
@@ -454,7 +462,7 @@ class ProductRepository extends BaseRepository
             ->get();
 
         foreach ($imagesToDelete as $image) {
-            \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->delete($image->path);
+            $this->fileUploadService->delete($image->path);
         }
 
         $relations['images'] = $processedImages;

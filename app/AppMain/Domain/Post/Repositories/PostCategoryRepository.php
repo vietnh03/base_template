@@ -6,10 +6,17 @@ use App\AppMain\Core\BaseRepository;
 use App\AppMain\Domain\Post\Services\PostSlugService;
 use App\Models\PostCategory;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use App\AppMain\Core\Helpers\FileUploadService;
 
 class PostCategoryRepository extends BaseRepository
 {
+    protected FileUploadService $fileUploadService;
+
+    public function __construct(PostCategory $model, FileUploadService $fileUploadService)
+    {
+        $this->model = $model;
+        $this->fileUploadService = $fileUploadService;
+    }
     public function getModel()
     {
         return PostCategory::class;
@@ -92,9 +99,9 @@ class PostCategoryRepository extends BaseRepository
     {
         if (isset($data['image']) && $data['image'] instanceof \Illuminate\Http\UploadedFile) {
             if ($category && $category->image_path) {
-                Storage::delete($category->image_path);
+                $this->fileUploadService->delete($category->image_path);
             }
-            $data['image_path'] = $data['image']->store('posts/categories', config('filesystems.default'));
+            $data['image_path'] = $this->fileUploadService->upload($data['image'], 'posts/categories');
         }
 
         unset($data['image']);
