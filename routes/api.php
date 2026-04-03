@@ -45,6 +45,12 @@ Route::prefix('posts')->group(function () {
     Route::get('/{id}', [\App\AppMain\Application\Api\Post\Controllers\PostController::class, 'show']); // GET /api/posts/{id}
 });
 
+// Product Routes (Public - serves frontend product data)
+Route::prefix('products')->group(function () {
+    Route::get('/', [\App\AppMain\Application\Api\Product\Controllers\ProductController::class, 'index']);      // GET /api/products
+    Route::get('/{urlKey}', [\App\AppMain\Application\Api\Product\Controllers\ProductController::class, 'show']); // GET /api/products/{urlKey}
+});
+
 // Protected Routes (Require Passport authentication - now uses users table)
 Route::middleware('auth:api')->group(function () {
     // Auth Routes (Authenticated)

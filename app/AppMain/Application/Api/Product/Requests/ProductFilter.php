@@ -1,6 +1,6 @@
 <?php
 
-namespace App\AppMain\Application\Web\Product\Requests;
+namespace App\AppMain\Application\Api\Product\Requests;
 
 use App\AppMain\Core\BaseFilterDTO;
 
