@@ -24,9 +24,9 @@ class AdminAuthResponse
         $dto->id = $admin->id;
         $dto->name = $admin->name;
         $dto->email = $admin->email;
-        $dto->role = $admin->role;
+        $dto->role = $admin->getRoleNames()->first();
         $dto->status = $admin->status;
-        $dto->permissions = $admin->permissions;
+        $dto->permissions = $admin->getAllPermissions()->pluck('name');
         $dto->lastLoginAt = $admin->last_login_at;
 
         // Add token if provided (for login response)

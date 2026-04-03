@@ -8,10 +8,18 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class Admin extends Authenticatable
 {
-    use HasFactory, Notifiable, HasUuids, SoftDeletes, HasApiTokens;
+    use HasFactory, Notifiable, HasUuids, SoftDeletes, HasApiTokens, HasRoles;
+
+    /**
+     * The guard name for Spatie Permission
+     *
+     * @var string
+     */
+    protected $guard_name = 'admin';
 
     /**
      * The attributes that are mass assignable.
@@ -22,9 +30,7 @@ class Admin extends Authenticatable
         'name',
         'email',
         'password',
-        'role',
         'status',
-        'permissions',
         'last_login_at',
         'last_login_ip',
     ];
@@ -49,7 +55,6 @@ class Admin extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'permissions' => 'array',
             'last_login_at' => 'datetime',
         ];
     }
@@ -59,7 +64,7 @@ class Admin extends Authenticatable
      */
     public function isSuperAdmin(): bool
     {
-        return $this->role === 'super_admin';
+        return $this->hasRole('super_admin');
     }
 
     /**
