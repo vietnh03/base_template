@@ -1,6 +1,6 @@
 <?php
 
-namespace App\AppMain\Application\Api\Product\Responses;
+namespace App\AppMain\Application\Api\Catalog\Product\Responses;
 
 use App\AppMain\Core\BaseResponseDTO;
 

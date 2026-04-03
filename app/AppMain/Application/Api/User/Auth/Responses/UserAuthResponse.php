@@ -1,6 +1,6 @@
 <?php
 
-namespace App\AppMain\Application\User\Auth\Responses;
+namespace App\AppMain\Application\Api\User\Auth\Responses;
 
 use App\AppMain\Core\BaseResponseDTO;
 

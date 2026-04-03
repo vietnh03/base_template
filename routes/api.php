@@ -1,8 +1,8 @@
 <?php
 
-use App\AppMain\Application\User\Auth\Controllers\UserAuthController;
+use App\AppMain\Application\Api\User\Auth\Controllers\UserAuthController;
 use App\AppMain\Application\Admin\User\Controllers\UserController;
-use App\AppMain\Application\User\Checkout\Controllers\CartController;
+use App\AppMain\Application\Api\Sales\Checkout\Controllers\CartController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -47,8 +47,8 @@ Route::prefix('posts')->group(function () {
 
 // Product Routes (Public - serves frontend product data)
 Route::prefix('products')->group(function () {
-    Route::get('/', [\App\AppMain\Application\Api\Product\Controllers\ProductController::class, 'index']);      // GET /api/products
-    Route::get('/{urlKey}', [\App\AppMain\Application\Api\Product\Controllers\ProductController::class, 'show']); // GET /api/products/{urlKey}
+    Route::get('/', [\App\AppMain\Application\Api\Catalog\Product\Controllers\ProductController::class, 'index']);      // GET /api/products
+    Route::get('/{urlKey}', [\App\AppMain\Application\Api\Catalog\Product\Controllers\ProductController::class, 'show']); // GET /api/products/{urlKey}
 });
 
 // Protected Routes (Require Passport authentication - now uses users table)

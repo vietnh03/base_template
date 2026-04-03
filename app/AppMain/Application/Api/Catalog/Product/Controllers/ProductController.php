@@ -1,11 +1,11 @@
 <?php
 
-namespace App\AppMain\Application\Api\Product\Controllers;
+namespace App\AppMain\Application\Api\Catalog\Product\Controllers;
 
 use App\AppMain\Core\Controller;
 use App\AppMain\Domain\Catalog\Services\ProductService;
-use App\AppMain\Application\Api\Product\Requests\ProductFilter;
-use App\AppMain\Application\Api\Product\Responses\ProductResponse;
+use App\AppMain\Application\Api\Catalog\Product\Requests\ProductFilter;
+use App\AppMain\Application\Api\Catalog\Product\Responses\ProductResponse;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller

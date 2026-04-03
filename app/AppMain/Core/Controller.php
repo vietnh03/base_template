@@ -2,7 +2,6 @@
 
 namespace App\AppMain\Core;
 
-use App\AppMain\Config\AppConst;
 use Closure;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;

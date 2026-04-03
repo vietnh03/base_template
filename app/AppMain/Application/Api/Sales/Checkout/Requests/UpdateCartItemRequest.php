@@ -1,6 +1,6 @@
 <?php
 
-namespace App\AppMain\Application\User\Checkout\Requests;
+namespace App\AppMain\Application\Api\Sales\Checkout\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 

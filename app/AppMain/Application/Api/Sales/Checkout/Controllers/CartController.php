@@ -1,9 +1,10 @@
 <?php
 
-namespace App\AppMain\Application\User\Checkout\Controllers;
+namespace App\AppMain\Application\Api\Sales\Checkout\Controllers;
 
-use App\AppMain\Application\User\Checkout\Requests\AddCartItemRequest;
-use App\AppMain\Application\User\Checkout\Requests\UpdateCartItemRequest;
+use App\AppMain\Application\Api\Sales\Checkout\Requests\AddCartItemRequest;
+use App\AppMain\Application\Api\Sales\Checkout\Requests\UpdateCartItemRequest;
+use App\AppMain\Application\Api\Sales\Checkout\Responses\CartResponse;
 use App\AppMain\Domain\Checkout\Services\CartService;
 use App\AppMain\Domain\Checkout\Services\CheckoutService;
 use App\AppMain\Core\Controller;
@@ -30,7 +31,7 @@ class CartController extends Controller
                 throw new \Exception('Cart is empty', 404);
             }
 
-            return $cart->load('items');
+            return CartResponse::single($cart->load('items'));
         }, 'Cart retrieved successfully');
     }
 

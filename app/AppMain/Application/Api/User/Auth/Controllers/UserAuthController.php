@@ -1,10 +1,10 @@
 <?php
 
-namespace App\AppMain\Application\User\Auth\Controllers;
+namespace App\AppMain\Application\Api\User\Auth\Controllers;
 
-use App\AppMain\Application\User\Auth\Requests\UserRegisterRequest;
-use App\AppMain\Application\User\Auth\Requests\LoginRequest;
-use App\AppMain\Application\User\Auth\Responses\UserAuthResponse;
+use App\AppMain\Application\Api\User\Auth\Requests\UserRegisterRequest;
+use App\AppMain\Application\Api\User\Auth\Requests\LoginRequest;
+use App\AppMain\Application\Api\User\Auth\Responses\UserAuthResponse;
 use App\AppMain\Domain\Auth\Services\UserAuthService;
 use App\AppMain\Core\Controller;
 use Illuminate\Http\Request;
