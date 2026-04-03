@@ -72,10 +72,11 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens; // ← Import Sanctum trait
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class Admin extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasUuid, SoftDeletes; // ← Add HasApiTokens
+    use HasApiTokens, HasFactory, Notifiable, HasUuids, SoftDeletes; // ← Add HasApiTokens
 
     protected $fillable = [
         'name', 'email', 'password', 'role', 'status',

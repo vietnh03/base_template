@@ -7,7 +7,7 @@ This project uses **Domain-Driven Design (DDD)** architecture combined with **Se
 ```
 app/AppMain/
 ├── Core/                   # Base classes and shared utilities
-│   ├── Traits/            # Reusable traits (HasUuid, etc.)
+│   ├── Traits/            # Reusable traits
 │   ├── Helpers/           # Helper functions & Services
 │   │   └── FileUploadService.php
 │   ├── common.php         # Shared helper functions
@@ -337,32 +337,20 @@ class UserAuthRepository extends BaseRepository
 
 ---
 
-### 1.8 HasUuid Trait
-
-**File:** `app/AppMain/Core/Traits/HasUuid.php`
-
-**Description:** Trait to use UUID instead of auto-incrementing integer for primary key.
-
-**Methods:**
-
-- **`bootHasUuid()`** - Automatically generates UUID when creating new model
-- **`getIncrementing()`** - Returns false
-- **`getKeyType()`** - Returns 'string'
-
 **Usage Example:**
 
 ```php
-use App\AppMain\Core\Traits\HasUuid;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasUuid, HasApiTokens;
+    use HasFactory, Notifiable, HasUuids, HasApiTokens;
 }
 ```
 
 ---
 
-### 1.9 Helper Functions
+### 1.8 Helper Functions
 
 #### Response Helpers (`app/AppMain/Core/Helpers/response.php`)
 
@@ -730,12 +718,12 @@ app/AppMain/
 // app/Models/Customer.php
 namespace App\Models;
 
-use App\AppMain\Core\Traits\HasUuid;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
 class Customer extends Model
 {
-    use HasUuid;
+    use HasUuids;
 
     protected $fillable = [
         'name',

@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\AppMain\Core\Traits\HasUuid;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -11,7 +11,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class Admin extends Authenticatable
 {
-    use HasFactory, Notifiable, HasUuid, SoftDeletes, HasApiTokens;
+    use HasFactory, Notifiable, HasUuids, SoftDeletes, HasApiTokens;
 
     /**
      * The attributes that are mass assignable.

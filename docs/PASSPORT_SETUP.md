@@ -125,10 +125,11 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Passport\HasApiTokens; // ← Import Passport trait (NOT Sanctum!)
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasUuid; // ← Add HasApiTokens
+    use HasApiTokens, HasFactory, Notifiable, HasUuids; // ← Add HasApiTokens
 
     protected $fillable = [
         'name', 'email', 'password', 'role', 'status'
