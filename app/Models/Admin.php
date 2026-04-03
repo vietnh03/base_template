@@ -60,14 +60,6 @@ class Admin extends Authenticatable
     }
 
     /**
-     * Check if admin is super admin
-     */
-    public function isSuperAdmin(): bool
-    {
-        return $this->hasRole('super_admin');
-    }
-
-    /**
      * Check if admin is active
      */
     public function isActive(): bool

@@ -12,7 +12,7 @@ class AdminSeeder extends Seeder
     public function run(): void
     {
         // Create role if not exists
-        $role = Role::firstOrCreate(['name' => 'super_admin', 'guard_name' => 'admin']);
+        $role = Role::firstOrCreate(['name' => 'Super Admin', 'guard_name' => 'admin']);
 
         $admin = Admin::create([
             'name' => 'Super Admin',

@@ -49,7 +49,7 @@ Route::middleware('auth:admin')->group(function () {
     });
 
     // User Management (for Platform Admins)
-    Route::prefix('users')->group(function () {
+    Route::middleware('auth:admin')->prefix('users')->group(function () {
         Route::get('/', [UserController::class, 'index']);          // GET /api/admin/users
         Route::post('/', [UserController::class, 'store']);         // POST /api/admin/users
         Route::get('/{id}', [UserController::class, 'show']);       // GET /api/admin/users/{id}
