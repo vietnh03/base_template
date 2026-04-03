@@ -31,6 +31,8 @@ Route::get('/health', function () {
 Route::prefix('auth')->group(function () {
     Route::post('/register', [UserAuthController::class, 'register']);
     Route::post('/login', [UserAuthController::class, 'login']);
+    Route::post('/forgot-password', [UserAuthController::class, 'forgotPassword']);
+    Route::post('/reset-password', [UserAuthController::class, 'resetPassword']);
 });
 
 // CMS Routes (Public - serves frontend page data)

@@ -37,6 +37,8 @@ use Illuminate\Support\Facades\Route;
 // Auth Routes (Public - No authentication required)
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);        // POST /api/admin/auth/login
+    Route::post('/forgot-password', [AuthController::class, 'forgotPassword']); // POST /api/admin/auth/forgot-password
+    Route::post('/reset-password', [AuthController::class, 'resetPassword']);   // POST /api/admin/auth/reset-password
 });
 
 // Protected Routes (Require Sanctum authentication)

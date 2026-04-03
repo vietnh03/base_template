@@ -4,6 +4,8 @@ namespace App\AppMain\Application\Admin\Auth\Controllers;
 
 use App\AppMain\Core\Controller;
 use App\AppMain\Application\Admin\Auth\Requests\LoginRequest;
+use App\AppMain\Application\Admin\Auth\Requests\ForgotPasswordRequest;
+use App\AppMain\Application\Admin\Auth\Requests\ResetPasswordRequest;
 use App\AppMain\Application\Admin\Auth\Responses\AdminAuthResponse;
 use App\AppMain\Domain\Auth\Services\AdminAuthService;
 use Illuminate\Http\Request;
@@ -33,6 +35,30 @@ class AuthController extends Controller
             // Return response with admin info and token
             return AdminAuthResponse::fromLoginResult($result['admin'], $result['token']);
         }, 'Login successful', 'Login failed');
+    }
+
+    /**
+     * Send password reset link
+     */
+    public function forgotPassword(ForgotPasswordRequest $request)
+    {
+        return $this->baseAction(function () use ($request) {
+            return $this->adminAuthService->sendResetLink($request->email);
+        });
+    }
+
+    /**
+     * Reset password
+     */
+    public function resetPassword(ResetPasswordRequest $request)
+    {
+        return $this->baseAction(function () use ($request) {
+            return $this->adminAuthService->resetPassword(
+                $request->email,
+                $request->token,
+                $request->password
+            );
+        });
     }
 
     /**

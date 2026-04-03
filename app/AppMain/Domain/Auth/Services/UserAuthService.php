@@ -4,6 +4,8 @@ namespace App\AppMain\Domain\Auth\Services;
 
 use App\AppMain\Domain\Auth\Repositories\UserAuthRepository;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 
 class UserAuthService
 {
@@ -81,5 +83,46 @@ class UserAuthService
             'token_type' => 'Bearer',
             'expires_at' => $tokenResult->token->expires_at,
         ];
+    }
+
+    /**
+     * Send password reset link to user
+     */
+    public function sendResetLink(string $email): string
+    {
+        $status = Password::broker('users')->sendResetLink(['email' => $email]);
+
+        if ($status !== Password::RESET_LINK_SENT) {
+            throw new \Exception(__($status));
+        }
+
+        return __($status);
+    }
+
+    /**
+     * Reset user password
+     */
+    public function resetPassword(string $email, string $token, string $password): string
+    {
+        $status = Password::broker('users')->reset(
+            [
+                'email' => $email,
+                'password' => $password,
+                'password_confirmation' => $password,
+                'token' => $token,
+            ],
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password),
+                    'remember_token' => Str::random(60),
+                ])->save();
+            }
+        );
+
+        if ($status !== Password::PASSWORD_RESET) {
+            throw new \Exception(__($status));
+        }
+
+        return __($status);
     }
 }

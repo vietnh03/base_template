@@ -4,6 +4,8 @@ namespace App\AppMain\Application\Api\User\Auth\Controllers;
 
 use App\AppMain\Application\Api\User\Auth\Requests\UserRegisterRequest;
 use App\AppMain\Application\Api\User\Auth\Requests\LoginRequest;
+use App\AppMain\Application\Api\User\Auth\Requests\ForgotPasswordRequest;
+use App\AppMain\Application\Api\User\Auth\Requests\ResetPasswordRequest;
 use App\AppMain\Application\Api\User\Auth\Responses\UserAuthResponse;
 use App\AppMain\Domain\Auth\Services\UserAuthService;
 use App\AppMain\Core\Controller;
@@ -44,6 +46,30 @@ class UserAuthController extends Controller
 
             return UserAuthResponse::fromArray($result);
         }, 'Login successful');
+    }
+
+    /**
+     * Send password reset link
+     */
+    public function forgotPassword(ForgotPasswordRequest $request)
+    {
+        return $this->baseAction(function () use ($request) {
+            return $this->userAuthService->sendResetLink($request->email);
+        });
+    }
+
+    /**
+     * Reset password
+     */
+    public function resetPassword(ResetPasswordRequest $request)
+    {
+        return $this->baseAction(function () use ($request) {
+            return $this->userAuthService->resetPassword(
+                $request->email,
+                $request->token,
+                $request->password
+            );
+        });
     }
 
     public function me(Request $request)
